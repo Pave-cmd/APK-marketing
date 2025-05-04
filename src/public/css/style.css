@@ -1,0 +1,316 @@
+/* Hlavní CSS styly pro APK Marketing */
+
+:root {
+  --primary-color: #007bff;
+  --secondary-color: #6c757d;
+  --success-color: #28a745;
+  --info-color: #17a2b8;
+  --warning-color: #ffc107;
+  --danger-color: #dc3545;
+  --light-color: #f8f9fa;
+  --dark-color: #343a40;
+}
+
+/* Základní styly */
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f8f9fa;
+  color: #333;
+}
+
+/* Globální styly */
+a {
+  text-decoration: none;
+}
+
+/* Navigační lišta */
+.navbar-brand {
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+/* Hero sekce */
+.hero {
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Tlačítka */
+.btn-primary {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+.btn-primary:hover {
+  background-color: #0069d9;
+  border-color: #0062cc;
+}
+
+.btn-outline-primary {
+  color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+.btn-outline-primary:hover {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+  color: white;
+}
+
+/* Karty */
+.card {
+  border: none;
+  border-radius: 0.5rem;
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+  margin-bottom: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+}
+
+.card-header {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  padding: 1rem 1.25rem;
+}
+
+.card-header h5 {
+  margin-bottom: 0;
+  font-weight: 600;
+}
+
+/* Cenové plány */
+.pricing .card-header {
+  border-radius: 10px 10px 0 0;
+}
+
+.price {
+  margin: 10px 0;
+}
+
+/* Testimoniály */
+.testimonials .card {
+  border-radius: 10px;
+}
+
+.avatar img {
+  border: 3px solid var(--light-color);
+}
+
+/* Feature ikony */
+.feature-icon {
+  width: 70px;
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  border-radius: 50%;
+}
+
+/* Formuláře */
+.form-control:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+/* Footer */
+.footer a {
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.footer a:hover {
+  opacity: 0.8;
+}
+
+.social-icons a {
+  font-size: 1.25rem;
+  margin-right: 15px;
+}
+
+/* Animace */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.5s ease forwards;
+}
+
+/* Responzivní úpravy */
+@media (max-width: 768px) {
+  .hero h1 {
+    font-size: 2.5rem;
+  }
+  
+  .pricing .card {
+    margin-bottom: 20px;
+  }
+}
+
+/* Přihlašovací/registrační stránka */
+.auth-container {
+  max-width: 500px;
+  margin: 50px auto;
+}
+
+.auth-container .card {
+  border: none;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+.auth-container .card-header {
+  background-color: white;
+  border-bottom: none;
+  text-align: center;
+  padding-top: 40px;
+}
+
+.auth-container .card-body {
+  padding: 40px;
+}
+
+/* Dashboard styly */
+.dashboard-container {
+  padding: 20px;
+}
+
+.dashboard-card {
+  border-left: 4px solid var(--primary-color);
+  border-radius: 5px;
+}
+
+.dashboard-card.success {
+  border-left-color: var(--success-color);
+}
+
+.dashboard-card.warning {
+  border-left-color: var(--warning-color);
+}
+
+.dashboard-card.danger {
+  border-left-color: var(--danger-color);
+}
+
+.dashboard-card.info {
+  border-left-color: var(--info-color);
+}
+
+.dashboard-card .icon {
+  font-size: 2rem;
+  color: #dddfeb;
+}
+
+/* Dashboard sidebar */
+.sidebar {
+  min-height: 100vh;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 16.666667%; /* col-md-3 šířka */
+  z-index: 1000;
+  background: linear-gradient(180deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+}
+
+@media (min-width: 992px) {
+  .sidebar {
+    width: 16.666667%; /* col-lg-2 šířka */
+  }
+}
+
+.sidebar-link {
+  display: block;
+  padding: 0.5rem 1rem;
+  color: rgba(255, 255, 255, 0.8);
+  border-radius: 0.25rem;
+  margin-bottom: 0.25rem;
+  transition: all 0.2s;
+}
+
+.sidebar-link:hover {
+  color: #fff;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-link.active {
+  color: #fff;
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.sidebar-link i {
+  width: 20px;
+  text-align: center;
+}
+
+@media (max-width: 767.98px) {
+  .sidebar {
+    position: static;
+    min-height: auto;
+    width: 100%;
+  }
+  
+  main {
+    margin-left: 0 !important;
+  }
+}
+
+.sidebar-brand {
+  padding: 1.5rem;
+  color: white;
+  font-weight: 700;
+  font-size: 1.2rem;
+}
+
+/* Dashboard karty */
+.card {
+  border: none;
+  border-radius: 0.5rem;
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+  margin-bottom: 1.5rem;
+}
+
+.card-header {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  padding: 1rem 1.25rem;
+}
+
+.card-header h5 {
+  margin-bottom: 0;
+  font-weight: 600;
+}
+
+/* Progress bar pro analýzu */
+.progress-sm {
+  height: 8px;
+}
+
+/* Chart kontejner */
+.chart-container {
+  position: relative;
+  height: 300px;
+}
+
+/* Alerty */
+.alert {
+  border: none;
+  border-radius: 0.5rem;
+}
+
+/* Responzivní přizpůsobení */
+@media (max-width: 576px) {
+  .dashboard-content {
+    padding: 1rem 0;
+  }
+}

@@ -1,0 +1,222 @@
+<!-- Nadpis stránky -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 mb-0">Dashboard</h1>
+    <button class="btn btn-primary">
+        <i class="fas fa-plus me-2"></i> Přidat web
+    </button>
+</div>
+
+<!-- Oznámení -->
+<div class="alert alert-info" role="alert">
+    <div class="d-flex">
+        <div class="me-3">
+            <i class="fas fa-info-circle fa-2x"></i>
+        </div>
+        <div>
+            <h4 class="alert-heading">Vítejte ve vašem AI marketingovém dashboardu!</h4>
+            <p>Začněte přidáním vašeho webu a propojením sociálních sítí pro automatizovaný marketing pomocí umělé inteligence.</p>
+        </div>
+    </div>
+</div>
+
+<!-- Přehledové karty -->
+<div class="row g-4 mb-4">
+    <div class="col-md-6 col-lg-3">
+        <div class="card dashboard-card h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted">Aktivní weby</h6>
+                        <h3 class="mb-0">0</h3>
+                    </div>
+                    <div class="icon">
+                        <i class="fas fa-globe"></i>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <a href="/dashboard/weby" class="btn btn-sm btn-outline-primary">Přidat web</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-lg-3">
+        <div class="card dashboard-card success h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted">Propojené sítě</h6>
+                        <h3 class="mb-0">0</h3>
+                    </div>
+                    <div class="icon">
+                        <i class="fas fa-share-alt"></i>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <a href="/dashboard/socialni-site" class="btn btn-sm btn-outline-success">Propojit sítě</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-lg-3">
+        <div class="card dashboard-card warning h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted">Příspěvky tento měsíc</h6>
+                        <h3 class="mb-0">0</h3>
+                    </div>
+                    <div class="icon">
+                        <i class="fas fa-pen-fancy"></i>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <a href="/dashboard/prispevky" class="btn btn-sm btn-outline-warning">Zobrazit příspěvky</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-lg-3">
+        <div class="card dashboard-card info h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted">Celkový dosah</h6>
+                        <h3 class="mb-0">0</h3>
+                    </div>
+                    <div class="icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <a href="/dashboard/analyza" class="btn btn-sm btn-outline-info">Detailní analýza</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Začínáme kroky -->
+<div class="card mb-4">
+    <div class="card-header bg-white">
+        <h5 class="mb-0">Začínáme</h5>
+    </div>
+    <div class="card-body">
+        <div class="steps">
+            <div class="step">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                    <h5>Přidejte váš web</h5>
+                    <p>Zadejte URL webu, který chcete propagovat pomocí AI marketingu.</p>
+                    <a href="/dashboard/weby/pridat" class="btn btn-sm btn-primary">Přidat web</a>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                    <h5>Propojte sociální sítě</h5>
+                    <p>Připojte své účty na sociálních sítích, kde chcete publikovat příspěvky.</p>
+                    <a href="/dashboard/socialni-site" class="btn btn-sm btn-primary">Propojit sítě</a>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                    <h5>Nastavte preference</h5>
+                    <p>Upravte nastavení pro tón komunikace, plánování a další parametry.</p>
+                    <a href="/dashboard/nastaveni" class="btn btn-sm btn-primary">Nastavit preference</a>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-number">4</div>
+                <div class="step-content">
+                    <h5>Sledujte výsledky</h5>
+                    <p>AI začne generovat a publikovat obsah. Sledujte výsledky v analýze.</p>
+                    <a href="/dashboard/analyza" class="btn btn-sm btn-primary">Přejít na analýzu</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Plán předplatného -->
+<div class="card mb-4">
+    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Vaše předplatné</h5>
+        <a href="/dashboard/predplatne" class="btn btn-sm btn-outline-primary">Spravovat předplatné</a>
+    </div>
+    <div class="card-body">
+        <div class="d-flex align-items-center">
+            <div class="badge bg-primary p-2 me-3">BASIC</div>
+            <div>
+                <p class="mb-0">1 web, 1 sociální síť, 3 příspěvky týdně</p>
+                <small class="text-muted">Následující platba: 4. června 2025</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Poslední aktivita -->
+<div class="card">
+    <div class="card-header bg-white">
+        <h5 class="mb-0">Poslední aktivita</h5>
+    </div>
+    <div class="card-body">
+        <div class="text-center py-5">
+            <i class="fas fa-stream fa-3x text-muted mb-3"></i>
+            <p class="lead">Zatím žádná aktivita</p>
+            <p class="text-muted">Vaše poslední aktivity se zobrazí zde po nastavení webu a propojení sociálních sítí.</p>
+        </div>
+    </div>
+</div>
+
+<!-- Styly pro kroky -->
+<style>
+.steps {
+    position: relative;
+    padding-left: 45px;
+}
+.steps:before {
+    content: '';
+    position: absolute;
+    left: 15px;
+    top: 0;
+    height: 100%;
+    width: 2px;
+    background: #e9ecef;
+}
+.step {
+    position: relative;
+    padding-bottom: 1.5rem;
+}
+.step:last-child {
+    padding-bottom: 0;
+}
+.step-number {
+    position: absolute;
+    left: -45px;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: var(--primary-color);
+    color: white;
+    text-align: center;
+    line-height: 30px;
+    font-weight: bold;
+}
+.dashboard-card {
+    border-left: 4px solid var(--primary-color);
+}
+.dashboard-card.success {
+    border-left-color: var(--success-color);
+}
+.dashboard-card.warning {
+    border-left-color: var(--warning-color);
+}
+.dashboard-card.info {
+    border-left-color: var(--info-color);
+}
+.dashboard-card .icon {
+    font-size: 2rem;
+    color: #e9ecef;
+}
+</style>

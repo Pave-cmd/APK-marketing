@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <meta name="description" content="<%= description %>">
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Boční navigace -->
+            <div class="col-md-3 col-lg-2 sidebar bg-primary text-white d-md-block">
+                <div class="sidebar-brand py-4 px-3">
+                    <i class="fas fa-robot me-2"></i>
+                    <span class="fw-bold">APK Marketing</span>
+                </div>
+                <hr class="bg-white">
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a href="/dashboard" class="sidebar-link active">
+                            <i class="fas fa-tachometer-alt me-2"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/dashboard/weby" class="sidebar-link">
+                            <i class="fas fa-globe me-2"></i> Moje weby
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/dashboard/socialni-site" class="sidebar-link">
+                            <i class="fas fa-share-alt me-2"></i> Sociální sítě
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/dashboard/prispevky" class="sidebar-link">
+                            <i class="fas fa-pen-fancy me-2"></i> Příspěvky
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/dashboard/analyza" class="sidebar-link">
+                            <i class="fas fa-chart-line me-2"></i> Analýza
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/dashboard/nastaveni" class="sidebar-link">
+                            <i class="fas fa-cog me-2"></i> Nastavení
+                        </a>
+                    </li>
+                    <li class="nav-item mt-3">
+                        <a href="/dashboard/podpora" class="sidebar-link">
+                            <i class="fas fa-question-circle me-2"></i> Podpora
+                        </a>
+                    </li>
+                </ul>
+                <hr class="bg-white">
+                <div class="sidebar-bottom mt-auto mb-4 px-3">
+                    <a href="/api/auth/logout" class="btn btn-outline-light btn-sm w-100">
+                        <i class="fas fa-sign-out-alt me-2"></i> Odhlásit se
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Hlavní obsah -->
+            <main class="col-md-9 col-lg-10 ms-auto px-4 py-4">
+                <!-- Horní navigace -->
+                <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom mb-4">
+                    <button class="navbar-toggler d-md-none" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="d-flex ms-auto">
+                        <div class="dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-user-circle me-1"></i>
+                                <span class="d-none d-sm-inline">Můj účet</span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                                <li><a class="dropdown-item" href="/dashboard/profil">Profil</a></li>
+                                <li><a class="dropdown-item" href="/dashboard/nastaveni">Nastavení</a></li>
+                                <li><a class="dropdown-item" href="/dashboard/predplatne">Předplatné</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="/api/auth/logout">Odhlásit se</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </nav>
+                
+                <!-- Obsah stránky -->
+                <div class="dashboard-content">
+                    <%- body %>
+                </div>
+            </main>
+        </div>
+    </div>
+    
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JavaScript -->
+    <script src="/js/main.js"></script>
+    <!-- Dashboard JavaScript -->
+    <script src="/js/dashboard.js"></script>
+</body>
+</html>

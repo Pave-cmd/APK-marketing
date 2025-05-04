@@ -1,0 +1,249 @@
+<div class="card shadow-sm">
+    <div class="card-header">
+        <h3 class="text-center mb-0">Registrace</h3>
+    </div>
+    <div class="card-body">
+        <div id="alertContainer"></div>
+
+        <form id="registerForm" class="needs-validation" novalidate>
+            <div class="row mb-3">
+                <div class="col-md-6 mb-3 mb-md-0">
+                    <label for="firstName" class="form-label">Jméno</label>
+                    <input type="text" class="form-control" id="firstName" name="firstName" required placeholder="Jan" autocomplete="given-name">
+                    <div class="invalid-feedback">
+                        Zadejte jméno.
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <label for="lastName" class="form-label">Příjmení</label>
+                    <input type="text" class="form-control" id="lastName" name="lastName" required placeholder="Novák" autocomplete="family-name">
+                    <div class="invalid-feedback">
+                        Zadejte příjmení.
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mb-3">
+                <label for="email" class="form-label">Email</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                    <input type="email" class="form-control" id="email" name="email" required placeholder="vas@email.cz" autocomplete="email">
+                    <div class="invalid-feedback">
+                        Zadejte platnou emailovou adresu.
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mb-3">
+                <label for="company" class="form-label">Společnost (volitelné)</label>
+                <input type="text" class="form-control" id="company" name="company" placeholder="Vaše společnost s.r.o." autocomplete="organization">
+            </div>
+            
+            <div class="mb-3">
+                <label for="password" class="form-label">Heslo</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                    <input type="password" class="form-control" id="password" name="password" required placeholder="••••••••" minlength="8" autocomplete="new-password">
+                    <div class="invalid-feedback">
+                        Heslo musí mít alespoň 8 znaků.
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mb-4">
+                <label for="confirmPassword" class="form-label">Potvrzení hesla</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                    <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required placeholder="••••••••" autocomplete="new-password">
+                    <div class="invalid-feedback">
+                        Hesla se neshodují.
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mb-4">
+                <label class="form-label">Vyberte cenový plán</label>
+                <div class="row g-2">
+                    <div class="col-md-3">
+                        <div class="form-check card p-3 <%= selectedPlan === 'basic' ? 'border-primary' : '' %>">
+                            <input class="form-check-input" type="radio" name="plan" id="planBasic" value="basic" <%= selectedPlan === 'basic' ? 'checked' : '' %> required>
+                            <label class="form-check-label w-100" for="planBasic">
+                                <strong>Basic</strong><br>
+                                <small class="text-muted">499 Kč/měsíc</small>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-check card p-3 <%= selectedPlan === 'standard' ? 'border-primary' : '' %>">
+                            <input class="form-check-input" type="radio" name="plan" id="planStandard" value="standard" <%= selectedPlan === 'standard' ? 'checked' : '' %> required>
+                            <label class="form-check-label w-100" for="planStandard">
+                                <strong>Standard</strong><br>
+                                <small class="text-muted">999 Kč/měsíc</small>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-check card p-3 <%= selectedPlan === 'premium' ? 'border-primary' : '' %>">
+                            <input class="form-check-input" type="radio" name="plan" id="planPremium" value="premium" <%= selectedPlan === 'premium' ? 'checked' : '' %> required>
+                            <label class="form-check-label w-100" for="planPremium">
+                                <strong>Premium</strong><br>
+                                <small class="text-muted">1 999 Kč/měsíc</small>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-check card p-3 <%= selectedPlan === 'enterprise' ? 'border-primary' : '' %>">
+                            <input class="form-check-input" type="radio" name="plan" id="planEnterprise" value="enterprise" <%= selectedPlan === 'enterprise' ? 'checked' : '' %> required>
+                            <label class="form-check-label w-100" for="planEnterprise">
+                                <strong>Enterprise</strong><br>
+                                <small class="text-muted">Kontaktujte nás</small>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mb-4">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="terms" name="terms" required>
+                    <label class="form-check-label" for="terms">
+                        Souhlasím s <a href="/obchodni-podminky" class="text-decoration-none">obchodními podmínkami</a> a <a href="/ochrana-soukromi" class="text-decoration-none">podmínkami ochrany soukromí</a>.
+                    </label>
+                    <div class="invalid-feedback">
+                        Musíte souhlasit s podmínkami.
+                    </div>
+                </div>
+            </div>
+            
+            <div class="d-grid">
+                <button type="submit" class="btn btn-primary" id="registerButton">
+                    <span class="spinner-border spinner-border-sm d-none" id="registerSpinner" role="status" aria-hidden="true"></span>
+                    Vytvořit účet
+                </button>
+            </div>
+        </form>
+        
+        <hr class="my-4">
+        
+        <div class="d-grid gap-2">
+            <a href="/api/auth/google" class="btn btn-outline-dark">
+                <i class="fab fa-google me-2"></i> Registrovat se pomocí Google
+            </a>
+            <a href="/api/auth/facebook" class="btn btn-outline-primary">
+                <i class="fab fa-facebook-f me-2"></i> Registrovat se pomocí Facebook
+            </a>
+        </div>
+    </div>
+    <div class="card-footer text-center py-3">
+        <p class="mb-0">Již máte účet? <a href="/prihlaseni" class="text-decoration-none">Přihlaste se</a></p>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('registerForm');
+    const button = document.getElementById('registerButton');
+    const spinner = document.getElementById('registerSpinner');
+    const alertContainer = document.getElementById('alertContainer');
+    const password = document.getElementById('password');
+    const confirmPassword = document.getElementById('confirmPassword');
+    
+    // Funkce pro validaci shodnosti hesel
+    function validatePassword() {
+        if (password.value !== confirmPassword.value) {
+            confirmPassword.setCustomValidity('Hesla se neshodují.');
+        } else {
+            confirmPassword.setCustomValidity('');
+        }
+    }
+    
+    // Posluchači událostí pro validaci hesel
+    password.addEventListener('change', validatePassword);
+    confirmPassword.addEventListener('keyup', validatePassword);
+    
+    // Zpracování odeslání formuláře
+    form.addEventListener('submit', async function(event) {
+        event.preventDefault();
+        
+        // Kontrola, zda je formulář validní podle HTML5 validace
+        if (!form.checkValidity()) {
+            event.stopPropagation();
+            form.classList.add('was-validated');
+            return;
+        }
+        
+        // Zobrazení loaderu
+        button.disabled = true;
+        spinner.classList.remove('d-none');
+        
+        // Vytvoření objektu s daty formuláře
+        const formData = new FormData(form);
+        const formDataObj = {};
+        formData.forEach((value, key) => {
+            if (key !== 'confirmPassword' && key !== 'terms') { // Nepotřebujeme odesílat confirmPassword nebo terms
+                formDataObj[key] = value;
+            }
+        });
+
+        try {
+            // Odeslání dat pomocí Fetch API
+            const response = await fetch('/api/auth/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formDataObj)
+            });
+            
+            // Získání dat z odpovědi
+            const data = await response.json();
+            
+            if (response.ok) {
+                // Úspěšná registrace
+                alertContainer.innerHTML = `
+                    <div class="alert alert-success" role="alert">
+                        <h4 class="alert-heading">Registrace úspěšná!</h4>
+                        <p>${data.message}</p>
+                        <hr>
+                        <p class="mb-0">Přesměrování na dashboard...</p>
+                    </div>
+                `;
+                
+                // Uložení tokenu do lokálního úložiště
+                localStorage.setItem('authToken', data.token);
+                
+                // Okamžité přesměrování na dashboard
+                window.location.href = '/dashboard';
+            } else {
+                // Chyba při registraci
+                alertContainer.innerHTML = `
+                    <div class="alert alert-danger" role="alert">
+                        <h4 class="alert-heading">Chyba při registraci</h4>
+                        <p>${data.message || 'Nastala neočekávaná chyba. Zkuste to prosím znovu.'}</p>
+                    </div>
+                `;
+                
+                // Resetování tlačítka
+                button.disabled = false;
+                spinner.classList.add('d-none');
+            }
+        } catch (error) {
+            // Chyba při komunikaci se serverem
+            console.error('Chyba při registraci:', error);
+            alertContainer.innerHTML = `
+                <div class="alert alert-danger" role="alert">
+                    <h4 class="alert-heading">Chyba připojení</h4>
+                    <p>Při komunikaci se serverem došlo k chybě. Zkontrolujte své připojení a zkuste to znovu.</p>
+                </div>
+            `;
+            
+            // Resetování tlačítka
+            button.disabled = false;
+            spinner.classList.add('d-none');
+        }
+        
+        // Označení formuláře jako validovaný
+        form.classList.add('was-validated');
+    });
+});
+</script>

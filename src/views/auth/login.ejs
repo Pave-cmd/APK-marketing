@@ -1,0 +1,146 @@
+<div class="card shadow-sm">
+    <div class="card-header">
+        <h3 class="text-center mb-0">Přihlášení</h3>
+    </div>
+    <div class="card-body">
+        <div id="alertContainer"></div>
+
+        <form id="loginForm" class="needs-validation" novalidate>
+            <div class="mb-3">
+                <label for="email" class="form-label">Email</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                    <input type="email" class="form-control" id="email" name="email" required placeholder="vas@email.cz" autocomplete="email">
+                    <div class="invalid-feedback">
+                        Zadejte platnou emailovou adresu.
+                    </div>
+                </div>
+            </div>
+            <div class="mb-4">
+                <label for="password" class="form-label">Heslo</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                    <input type="password" class="form-control" id="password" name="password" required placeholder="••••••••" autocomplete="current-password">
+                    <div class="invalid-feedback">
+                        Zadejte heslo.
+                    </div>
+                </div>
+                <div class="form-text text-end">
+                    <a href="/zapomenute-heslo" class="text-decoration-none">Zapomenuté heslo?</a>
+                </div>
+            </div>
+            <div class="d-grid">
+                <button type="submit" class="btn btn-primary" id="loginButton">
+                    <span class="spinner-border spinner-border-sm d-none" id="loginSpinner" role="status" aria-hidden="true"></span>
+                    Přihlásit se
+                </button>
+            </div>
+        </form>
+        
+        <hr class="my-4">
+        
+        <div class="d-grid gap-2">
+            <a href="/api/auth/google" class="btn btn-outline-dark">
+                <i class="fab fa-google me-2"></i> Přihlásit se pomocí Google
+            </a>
+            <a href="/api/auth/facebook" class="btn btn-outline-primary">
+                <i class="fab fa-facebook-f me-2"></i> Přihlásit se pomocí Facebook
+            </a>
+        </div>
+    </div>
+    <div class="card-footer text-center py-3">
+        <p class="mb-0">Nemáte účet? <a href="/registrace" class="text-decoration-none">Registrujte se</a></p>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('loginForm');
+    const button = document.getElementById('loginButton');
+    const spinner = document.getElementById('loginSpinner');
+    const alertContainer = document.getElementById('alertContainer');
+    
+    // Zpracování odeslání formuláře
+    form.addEventListener('submit', async function(event) {
+        event.preventDefault();
+        
+        // Kontrola, zda je formulář validní podle HTML5 validace
+        if (!form.checkValidity()) {
+            event.stopPropagation();
+            form.classList.add('was-validated');
+            return;
+        }
+        
+        // Zobrazení loaderu
+        button.disabled = true;
+        spinner.classList.remove('d-none');
+        
+        // Vytvoření objektu s daty formuláře
+        const formData = new FormData(form);
+        const formDataObj = {};
+        formData.forEach((value, key) => {
+            formDataObj[key] = value;
+        });
+
+        try {
+            // Odeslání dat pomocí Fetch API
+            const response = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formDataObj)
+            });
+            
+            // Získání dat z odpovědi
+            const data = await response.json();
+            
+            if (response.ok) {
+                // Úspěšné přihlášení
+                alertContainer.innerHTML = `
+                    <div class="alert alert-success" role="alert">
+                        <h4 class="alert-heading">Přihlášení úspěšné!</h4>
+                        <p>${data.message}</p>
+                        <hr>
+                        <p class="mb-0">Přesměrování na dashboard...</p>
+                    </div>
+                `;
+                
+                // Uložení tokenu do lokálního úložiště
+                localStorage.setItem('authToken', data.token);
+                
+                // Okamžité přesměrování na dashboard
+                window.location.href = '/dashboard';
+            } else {
+                // Chyba při přihlášení
+                alertContainer.innerHTML = `
+                    <div class="alert alert-danger" role="alert">
+                        <h4 class="alert-heading">Přihlášení se nezdařilo</h4>
+                        <p>${data.message || 'Neplatné přihlašovací údaje. Zkontrolujte svůj email a heslo.'}</p>
+                    </div>
+                `;
+                
+                // Resetování tlačítka
+                button.disabled = false;
+                spinner.classList.add('d-none');
+            }
+        } catch (error) {
+            // Chyba při komunikaci se serverem
+            console.error('Chyba při přihlášení:', error);
+            alertContainer.innerHTML = `
+                <div class="alert alert-danger" role="alert">
+                    <h4 class="alert-heading">Chyba připojení</h4>
+                    <p>Při komunikaci se serverem došlo k chybě. Zkontrolujte své připojení a zkuste to znovu.</p>
+                </div>
+            `;
+            
+            // Resetování tlačítka
+            button.disabled = false;
+            spinner.classList.add('d-none');
+        }
+        
+        // Označení formuláře jako validovaný
+        form.classList.add('was-validated');
+    });
+});
+</script>
