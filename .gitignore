@@ -1,0 +1,51 @@
+# Node.js a npm
+node_modules/
+npm-debug.log
+yarn-error.log
+yarn-debug.log
+.npm/
+
+# Kompilované soubory
+/dist/
+/build/
+*.tsbuildinfo
+
+# Proměnné prostředí
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# Logy
+logs/
+*.log
+
+# Dočasné soubory
+.tmp/
+temp/
+
+# Editoři a IDE
+.idea/
+.vscode/
+*.sublime-workspace
+*.sublime-project
+.DS_Store
+*.swp
+*.swo
+
+# OS specifické soubory
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+.DS_Store
+
+# Soubory pro testování a pokrytí kódu
+/coverage/
+.nyc_output/
+
+# Další
+.cache/
+.yarn/
+.pnp.*
