@@ -53,23 +53,35 @@
     </div>
 </div>
 
+<%- contentFor('script') %>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('[FRONTEND] Přihlašovací formulář - načten');
+    
     const form = document.getElementById('loginForm');
     const button = document.getElementById('loginButton');
     const spinner = document.getElementById('loginSpinner');
     const alertContainer = document.getElementById('alertContainer');
     
+    if (!form || !button || !spinner || !alertContainer) {
+        console.error('[FRONTEND] Některé potřebné elementy nebyly nalezeny v DOM');
+        return;
+    }
+    
     // Zpracování odeslání formuláře
     form.addEventListener('submit', async function(event) {
+        console.log('[FRONTEND] Submit přihlašovacího formuláře');
         event.preventDefault();
         
         // Kontrola, zda je formulář validní podle HTML5 validace
         if (!form.checkValidity()) {
+            console.log('[FRONTEND] Formulář neprošel HTML5 validací');
             event.stopPropagation();
             form.classList.add('was-validated');
             return;
         }
+        
+        console.log('[FRONTEND] Formulář validní, začíná odeslání');
         
         // Zobrazení loaderu
         button.disabled = true;
@@ -81,8 +93,23 @@ document.addEventListener('DOMContentLoaded', function() {
         formData.forEach((value, key) => {
             formDataObj[key] = value;
         });
+        
+        console.log('[FRONTEND] Data k odeslání:', {
+            email: formDataObj.email,
+            passwordLength: formDataObj.password ? formDataObj.password.length : 0
+        });
+
+        // Přidání debugovací zprávy přímo do UI
+        alertContainer.innerHTML = `
+            <div class="alert alert-info" role="alert">
+                <h4 class="alert-heading">Odesílání požadavku...</h4>
+                <p>Odesílám přihlašovací data na server...</p>
+            </div>
+        `;
 
         try {
+            console.log('[FRONTEND] Začínám odesílat přihlašovací data na server');
+            
             // Odeslání dat pomocí Fetch API
             const response = await fetch('/api/auth/login', {
                 method: 'POST',
@@ -90,66 +117,74 @@ document.addEventListener('DOMContentLoaded', function() {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify(formDataObj),
-                // Přidáno nastavení credentials pro správné ukládání cookies
                 credentials: 'same-origin'
             });
             
-            // Získání dat z odpovědi
-            const data = await response.json();
+            console.log('[FRONTEND] Odpověď od serveru:', response.status, response.statusText);
             
-            if (response.ok) {
-                // Úspěšné přihlášení
-                alertContainer.innerHTML = `
-                    <div class="alert alert-success" role="alert">
-                        <h4 class="alert-heading">Přihlášení úspěšné!</h4>
-                        <p>${data.message}</p>
-                        <hr>
-                        <p class="mb-0">Přesměrování na dashboard...</p>
-                    </div>
-                `;
+            try {
+                // Získání dat z odpovědi
+                const data = await response.json();
+                console.log('[FRONTEND] Data z odpovědi:', data);
                 
-                // Uložení tokenu do localStorage
-                localStorage.setItem('authToken', data.token);
-                
-                // Přidán nový kód pro přesměrování pomocí FORM přímo na server
-                const redirectForm = document.createElement('form');
-                redirectForm.method = 'GET';
-                redirectForm.action = '/dashboard';
-                
-                // Přidání tokenu jako skryté pole
-                const tokenInput = document.createElement('input');
-                tokenInput.type = 'hidden';
-                tokenInput.name = 'token';
-                tokenInput.value = data.token;
-                redirectForm.appendChild(tokenInput);
-                
-                // Přidání formuláře do dokumentu a odeslání
-                document.body.appendChild(redirectForm);
-                
-                // Krátká prodleva pro zobrazení zprávy o úspěšném přihlášení
-                setTimeout(() => {
-                    redirectForm.submit();
-                }, 1000);
-            } else {
-                // Chyba při přihlášení
+                if (response.ok) {
+                    // Úspěšné přihlášení
+                    console.log('[FRONTEND] Přihlášení úspěšné, token:', data.token ? 'Přijat' : 'Chybí!');
+                    alertContainer.innerHTML = `
+                        <div class="alert alert-success" role="alert">
+                            <h4 class="alert-heading">Přihlášení úspěšné!</h4>
+                            <p>${data.message}</p>
+                            <hr>
+                            <p class="mb-0">Přesměrování na dashboard...</p>
+                        </div>
+                    `;
+                    
+                    // Uložení tokenu do localStorage
+                    localStorage.setItem('authToken', data.token);
+                    console.log('[FRONTEND] Token uložen do localStorage');
+                    
+                    // Přesměrování na dashboard po krátké prodlevě
+                    console.log('[FRONTEND] Přesměrování na dashboard za 2 sekundy...');
+                    setTimeout(() => {
+                        console.log('[FRONTEND] Přesměrování nyní...');
+                        window.location.href = '/dashboard';
+                    }, 2000);
+                } else {
+                    // Chyba při přihlášení
+                    console.log('[FRONTEND] Chyba při přihlášení:', data.message);
+                    alertContainer.innerHTML = `
+                        <div class="alert alert-danger" role="alert">
+                            <h4 class="alert-heading">Přihlášení se nezdařilo</h4>
+                            <p>${data.message || 'Neplatné přihlašovací údaje. Zkontrolujte svůj email a heslo.'}</p>
+                        </div>
+                    `;
+                    
+                    // Resetování tlačítka
+                    button.disabled = false;
+                    spinner.classList.add('d-none');
+                }
+            } catch (parseError) {
+                console.error('[FRONTEND] Chyba při parsování JSON odpovědi:', parseError);
                 alertContainer.innerHTML = `
                     <div class="alert alert-danger" role="alert">
-                        <h4 class="alert-heading">Přihlášení se nezdařilo</h4>
-                        <p>${data.message || 'Neplatné přihlašovací údaje. Zkontrolujte svůj email a heslo.'}</p>
+                        <h4 class="alert-heading">Neplatná odpověď od serveru</h4>
+                        <p>Server vrátil neplatnou odpověď. Zkuste to prosím znovu později.</p>
+                        <hr>
+                        <p class="mb-0">Status: ${response.status}, Technická chyba: ${parseError.message}</p>
                     </div>
                 `;
-                
-                // Resetování tlačítka
                 button.disabled = false;
                 spinner.classList.add('d-none');
             }
         } catch (error) {
             // Chyba při komunikaci se serverem
-            console.error('Chyba při přihlášení:', error);
+            console.error('[FRONTEND] Chyba při komunikaci se serverem:', error);
             alertContainer.innerHTML = `
                 <div class="alert alert-danger" role="alert">
                     <h4 class="alert-heading">Chyba připojení</h4>
                     <p>Při komunikaci se serverem došlo k chybě. Zkontrolujte své připojení a zkuste to znovu.</p>
+                    <hr>
+                    <p class="mb-0">Technická chyba: ${error.message}</p>
                 </div>
             `;
             
@@ -162,4 +197,7 @@ document.addEventListener('DOMContentLoaded', function() {
         form.classList.add('was-validated');
     });
 });
+
+// Přímý debugovací výpis
+console.log('[LOGIN] Skript přihlašovacího formuláře byl načten');
 </script>
