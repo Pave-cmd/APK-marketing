@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="800px" height="600px" viewBox="0 0 800 600" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>AI Marketing Hero</title>
+    <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <rect fill="#F5F7FA" x="0" y="0" width="800" height="600"></rect>
+        <circle fill="#5A67D8" cx="400" cy="300" r="150"></circle>
+        <path d="M500,250 L550,200 L600,250 L550,300 Z" fill="#4C51BF"></path>
+        <path d="M250,350 L200,400 L250,450 L300,400 Z" fill="#4C51BF"></path>
+        <text font-family="Arial" font-size="48" font-weight="bold" fill="#FFFFFF" x="310" y="315">
+            AI Marketing
+        </text>
+    </g>
+</svg>

@@ -89,7 +89,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(formDataObj)
+                body: JSON.stringify(formDataObj),
+                // Přidáno nastavení credentials pro správné ukládání cookies
+                credentials: 'same-origin'
             });
             
             // Získání dat z odpovědi
@@ -106,11 +108,28 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>
                 `;
                 
-                // Uložení tokenu do lokálního úložiště
+                // Uložení tokenu do localStorage
                 localStorage.setItem('authToken', data.token);
                 
-                // Okamžité přesměrování na dashboard
-                window.location.href = '/dashboard';
+                // Přidán nový kód pro přesměrování pomocí FORM přímo na server
+                const redirectForm = document.createElement('form');
+                redirectForm.method = 'GET';
+                redirectForm.action = '/dashboard';
+                
+                // Přidání tokenu jako skryté pole
+                const tokenInput = document.createElement('input');
+                tokenInput.type = 'hidden';
+                tokenInput.name = 'token';
+                tokenInput.value = data.token;
+                redirectForm.appendChild(tokenInput);
+                
+                // Přidání formuláře do dokumentu a odeslání
+                document.body.appendChild(redirectForm);
+                
+                // Krátká prodleva pro zobrazení zprávy o úspěšném přihlášení
+                setTimeout(() => {
+                    redirectForm.submit();
+                }, 1000);
             } else {
                 // Chyba při přihlášení
                 alertContainer.innerHTML = `
