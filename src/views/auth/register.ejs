@@ -139,8 +139,10 @@
     </div>
 </div>
 
-<%- contentFor('script') %>
 <script>
+// Jednoduchý debugovací alert pro potvrzení, že skript funguje
+alert('Registrační stránka načtena!');
+
 document.addEventListener('DOMContentLoaded', function() {
     console.log('[FRONTEND] Registrační formulář - načten');
     
@@ -153,6 +155,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     if (!form || !button || !spinner || !alertContainer || !password || !confirmPassword) {
         console.error('[FRONTEND] Některé potřebné elementy nebyly nalezeny v DOM');
+        alert('Chyba: některé elementy nebyly nalezeny!');
         return;
     }
     
@@ -174,6 +177,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Zpracování odeslání formuláře
     form.addEventListener('submit', async function(event) {
         console.log('[FRONTEND] Submit registračního formuláře');
+        alert('Formulář odeslán!');
         event.preventDefault();
         
         // Kontrola, zda je formulář validní podle HTML5 validace
@@ -199,15 +203,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
         
-        console.log('[FRONTEND] Data k odeslání:', {
-            email: formDataObj.email,
-            firstName: formDataObj.firstName,
-            lastName: formDataObj.lastName,
-            company: formDataObj.company,
-            plan: formDataObj.plan,
-            passwordLength: formDataObj.password ? formDataObj.password.length : 0
-        });
-
         // Přidání debugovací zprávy přímo do UI
         alertContainer.innerHTML = `
             <div class="alert alert-info" role="alert">
@@ -292,7 +287,4 @@ document.addEventListener('DOMContentLoaded', function() {
         form.classList.add('was-validated');
     });
 });
-
-// Přímý debugovací výpis
-console.log('[REGISTER] Skript registračního formuláře byl načten');
 </script>
