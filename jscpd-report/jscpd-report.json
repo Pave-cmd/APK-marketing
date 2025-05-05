@@ -1,6 +1,6 @@
 {
   "statistics": {
-    "detectionDate": "2025-05-05T12:57:10.483Z",
+    "detectionDate": "2025-05-05T13:13:58.544Z",
     "formats": {
       "typescript": {
         "sources": {
@@ -125,14 +125,14 @@
             "newClones": 0
           },
           "src/controllers/websiteController.ts": {
-            "lines": 246,
-            "tokens": 1780,
+            "lines": 263,
+            "tokens": 1960,
             "sources": 1,
             "clones": 4,
-            "duplicatedLines": 60,
-            "duplicatedTokens": 412,
-            "percentage": 24.39,
-            "percentageTokens": 23.15,
+            "duplicatedLines": 62,
+            "duplicatedTokens": 448,
+            "percentage": 23.57,
+            "percentageTokens": 22.86,
             "newDuplicatedLines": 0,
             "newClones": 0
           },
@@ -198,14 +198,14 @@
           }
         },
         "total": {
-          "lines": 2457,
-          "tokens": 18722,
+          "lines": 2474,
+          "tokens": 18902,
           "sources": 16,
           "clones": 3,
-          "duplicatedLines": 35,
-          "duplicatedTokens": 349,
-          "percentage": 1.42,
-          "percentageTokens": 1.86,
+          "duplicatedLines": 36,
+          "duplicatedTokens": 367,
+          "percentage": 1.46,
+          "percentageTokens": 1.94,
           "newDuplicatedLines": 0,
           "newClones": 0
         }
@@ -304,14 +304,14 @@
       }
     },
     "total": {
-      "lines": 3083,
-      "tokens": 22283,
+      "lines": 3100,
+      "tokens": 22463,
       "sources": 21,
       "clones": 3,
-      "duplicatedLines": 35,
-      "duplicatedTokens": 349,
-      "percentage": 1.14,
-      "percentageTokens": 1.57,
+      "duplicatedLines": 36,
+      "duplicatedTokens": 367,
+      "percentage": 1.16,
+      "percentageTokens": 1.63,
       "newDuplicatedLines": 0,
       "newClones": 0
     }
@@ -355,37 +355,37 @@
     },
     {
       "format": "typescript",
-      "lines": 16,
-      "fragment": "});\n    }\n    \n    // Vyhledání uživatele podle ID\n    console.log('[WEBSITE] Vyhledávání uživatele s ID:', userId);\n    const user = await User.findById(userId);\n    \n    if (!user) {\n      console.error('[WEBSITE] Uživatel nebyl nalezen:', userId);\n      return res.status(404).json({\n        success: false,\n        message: 'Uživatel nebyl nalezen'\n      });\n    }\n    \n    // Nastavení maximálního počtu webů podle plánu",
+      "lines": 17,
+      "fragment": "});\n    }\n    \n    // Vyhledání uživatele podle ID\n    console.log('[WEBSITE] Vyhledávání uživatele s ID:', userId);\n    const user = await User.findById(userId);\n    \n    if (!user) {\n      console.error('[WEBSITE] Uživatel nebyl nalezen:', userId);\n      return res.status(404).json({\n        success: false,\n        message: 'Uživatel nebyl nalezen'\n      });\n    }\n    \n    console.log('[WEBSITE] Uživatel nalezen:', user.email);\n    console.log('[WEBSITE] Aktuální seznam webů uživatele v getWebsites:'",
       "tokens": 0,
       "firstFile": {
         "name": "src/controllers/websiteController.ts",
-        "start": 129,
-        "end": 144,
+        "start": 143,
+        "end": 159,
         "startLoc": {
-          "line": 129,
+          "line": 143,
           "column": 7,
-          "position": 922
+          "position": 1072
         },
         "endLoc": {
-          "line": 144,
-          "column": 48,
-          "position": 1025
+          "line": 159,
+          "column": 58,
+          "position": 1193
         }
       },
       "secondFile": {
         "name": "src/controllers/websiteController.ts",
-        "start": 44,
-        "end": 59,
+        "start": 48,
+        "end": 64,
         "startLoc": {
-          "line": 44,
+          "line": 48,
           "column": 7,
-          "position": 313
+          "position": 353
         },
         "endLoc": {
-          "line": 59,
-          "column": 53,
-          "position": 416
+          "line": 64,
+          "column": 44,
+          "position": 474
         }
       }
     },
@@ -396,32 +396,32 @@
       "tokens": 0,
       "firstFile": {
         "name": "src/controllers/websiteController.ts",
-        "start": 202,
-        "end": 217,
+        "start": 219,
+        "end": 234,
         "startLoc": {
-          "line": 202,
+          "line": 219,
           "column": 7,
-          "position": 1435
+          "position": 1615
         },
         "endLoc": {
-          "line": 217,
+          "line": 234,
           "column": 48,
-          "position": 1538
+          "position": 1718
         }
       },
       "secondFile": {
         "name": "src/controllers/websiteController.ts",
-        "start": 44,
-        "end": 59,
+        "start": 48,
+        "end": 63,
         "startLoc": {
-          "line": 44,
+          "line": 48,
           "column": 7,
-          "position": 313
+          "position": 353
         },
         "endLoc": {
-          "line": 59,
-          "column": 53,
-          "position": 416
+          "line": 63,
+          "column": 8,
+          "position": 456
         }
       }
     }
