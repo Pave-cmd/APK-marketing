@@ -1,0 +1,512 @@
+<!-- Nadpis stránky -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 mb-0">Správa webových stránek</h1>
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addWebsiteModal">
+        <i class="fas fa-plus me-2"></i> Přidat web
+    </button>
+</div>
+
+<!-- Informační box -->
+<div class="alert alert-info mb-4" role="alert">
+    <div class="d-flex">
+        <div class="me-3">
+            <i class="fas fa-info-circle fa-2x"></i>
+        </div>
+        <div>
+            <h4 class="alert-heading">Správa webových stránek pro AI marketing</h4>
+            <p>Zde můžete přidat URL webů, které chcete propagovat. Systém bude pravidelně analyzovat obsah vašich webů a automaticky generovat příspěvky na propojené sociální sítě.</p>
+            <hr>
+            <p class="mb-0">V rámci vašeho plánu můžete přidat až <strong id="websiteLimit">1</strong> webovou stránku.</p>
+        </div>
+    </div>
+</div>
+
+<!-- Seznam webových stránek -->
+<div class="card mb-4">
+    <div class="card-header bg-white">
+        <h5 class="mb-0">Vaše webové stránky</h5>
+    </div>
+    <div class="card-body p-0">
+        <div id="websitesList" class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>URL webu</th>
+                        <th>Datum přidání</th>
+                        <th>Stav</th>
+                        <th>Akce</th>
+                    </tr>
+                </thead>
+                <tbody id="websitesTableBody">
+                    <!-- Sem se dynamicky vloží webové stránky pomocí JS -->
+                </tbody>
+            </table>
+        </div>
+        <div id="emptyWebsitesMessage" class="text-center py-5" style="display: none;">
+            <i class="fas fa-globe fa-3x text-muted mb-3"></i>
+            <p class="lead">Zatím nemáte přidané žádné webové stránky</p>
+            <p class="text-muted">Přidejte svůj první web kliknutím na tlačítko "Přidat web".</p>
+            <button class="btn btn-primary mt-2" data-bs-toggle="modal" data-bs-target="#addWebsiteModal">
+                <i class="fas fa-plus me-2"></i> Přidat web
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Informace o analýze webu -->
+<div class="card">
+    <div class="card-header bg-white">
+        <h5 class="mb-0">Jak probíhá analýza vašeho webu</h5>
+    </div>
+    <div class="card-body">
+        <div class="row g-4">
+            <div class="col-md-3">
+                <div class="text-center mb-3">
+                    <div class="rounded-circle bg-light d-inline-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+                        <i class="fas fa-spider fa-2x text-primary"></i>
+                    </div>
+                </div>
+                <h5 class="text-center">1. Skenování webu</h5>
+                <p class="text-muted text-center">Náš systém pravidelně prochází váš web a hledá nový obsah, produkty a stránky.</p>
+            </div>
+            <div class="col-md-3">
+                <div class="text-center mb-3">
+                    <div class="rounded-circle bg-light d-inline-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+                        <i class="fas fa-file-alt fa-2x text-primary"></i>
+                    </div>
+                </div>
+                <h5 class="text-center">2. Extrakce obsahu</h5>
+                <p class="text-muted text-center">Získáváme texty, obrázky a další důležité informace z vašeho webu.</p>
+            </div>
+            <div class="col-md-3">
+                <div class="text-center mb-3">
+                    <div class="rounded-circle bg-light d-inline-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+                        <i class="fas fa-robot fa-2x text-primary"></i>
+                    </div>
+                </div>
+                <h5 class="text-center">3. AI generování</h5>
+                <p class="text-muted text-center">Umělá inteligence vytvoří optimalizované příspěvky pro různé sociální sítě.</p>
+            </div>
+            <div class="col-md-3">
+                <div class="text-center mb-3">
+                    <div class="rounded-circle bg-light d-inline-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+                        <i class="fas fa-share-alt fa-2x text-primary"></i>
+                    </div>
+                </div>
+                <h5 class="text-center">4. Publikace</h5>
+                <p class="text-muted text-center">Automaticky publikujeme vytvořený obsah na vaše propojené sociální sítě.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal pro přidání webu -->
+<div class="modal fade" id="addWebsiteModal" tabindex="-1" aria-labelledby="addWebsiteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addWebsiteModalLabel">Přidat webovou stránku</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Zavřít"></button>
+            </div>
+            <div class="modal-body">
+                <div id="modalAlertContainer"></div>
+                <form id="addWebsiteForm">
+                    <div class="mb-3">
+                        <label for="websiteUrl" class="form-label">URL webové stránky</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-globe"></i></span>
+                            <input type="url" class="form-control" id="websiteUrl" name="url" required placeholder="https://www.vasedomena.cz">
+                            <div class="invalid-feedback">
+                                Zadejte platnou URL webové stránky.
+                            </div>
+                        </div>
+                        <div class="form-text">
+                            Zadejte úplnou URL včetně protokolu (https://).
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Zrušit</button>
+                <button type="button" class="btn btn-primary" id="saveWebsiteBtn">
+                    <span class="spinner-border spinner-border-sm d-none" id="saveWebsiteSpinner" role="status" aria-hidden="true"></span>
+                    Přidat web
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal pro odstranění webu -->
+<div class="modal fade" id="removeWebsiteModal" tabindex="-1" aria-labelledby="removeWebsiteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="removeWebsiteModalLabel">Odstranit webovou stránku</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Zavřít"></button>
+            </div>
+            <div class="modal-body">
+                <p>Opravdu chcete odstranit tuto webovou stránku?</p>
+                <p><strong id="websiteToRemove">https://www.example.com</strong></p>
+                <p class="text-danger">Upozornění: Tato akce zastaví všechny automatické marketingové aktivity pro tento web.</p>
+                <input type="hidden" id="websiteToRemoveUrl" value="">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Zrušit</button>
+                <button type="button" class="btn btn-danger" id="confirmRemoveWebsiteBtn">
+                    <span class="spinner-border spinner-border-sm d-none" id="removeWebsiteSpinner" role="status" aria-hidden="true"></span>
+                    Odstranit
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Odstranění pomocných debug alertů z login.ejs
+    // alert('Stránka správy webů načtena!');
+    
+    console.log('[WEBSITES] Načítám stránku správy webových stránek');
+    
+    // DOM elementy
+    const websitesTableBody = document.getElementById('websitesTableBody');
+    const emptyWebsitesMessage = document.getElementById('emptyWebsitesMessage');
+    const websitesList = document.getElementById('websitesList');
+    const addWebsiteForm = document.getElementById('addWebsiteForm');
+    const saveWebsiteBtn = document.getElementById('saveWebsiteBtn');
+    const saveWebsiteSpinner = document.getElementById('saveWebsiteSpinner');
+    const modalAlertContainer = document.getElementById('modalAlertContainer');
+    const websiteLimit = document.getElementById('websiteLimit');
+    const confirmRemoveWebsiteBtn = document.getElementById('confirmRemoveWebsiteBtn');
+    const removeWebsiteSpinner = document.getElementById('removeWebsiteSpinner');
+    
+    // Načíst seznam webových stránek
+    loadWebsites();
+    
+    // Nastavit událost pro uložení nového webu
+    saveWebsiteBtn.addEventListener('click', addWebsite);
+    
+    // Nastavit událost pro odstranění webu
+    confirmRemoveWebsiteBtn.addEventListener('click', removeWebsite);
+    
+    // Funkce pro načtení webových stránek
+    async function loadWebsites() {
+        console.log('[WEBSITES] Načítám seznam webových stránek');
+        
+        try {
+            // Načtení dat ze serveru s použitím cookies
+            const response = await fetch('/api/websites/list', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'include' // Důležité: zajistí odeslání cookies s požadavkem
+            });
+            
+            const data = await response.json();
+            console.log('[WEBSITES] Odpověď serveru:', data);
+            
+            if (response.ok) {
+                // Zobrazení seznamu webů
+                renderWebsites(data.websites);
+                
+                // Zobrazení limitu webů podle plánu
+                if (data.maxWebsites) {
+                    websiteLimit.textContent = data.maxWebsites;
+                }
+            } else {
+                console.error('[WEBSITES] Chyba při načítání webů:', data.message);
+                displayError(data.message || 'Nepodařilo se načíst seznam webů');
+            }
+        } catch (error) {
+            console.error('[WEBSITES] Chyba při komunikaci se serverem:', error);
+            displayError('Chyba při komunikaci se serverem');
+        }
+    }
+    
+    // Funkce pro vykreslení seznamu webových stránek
+    function renderWebsites(websites) {
+        console.log('[WEBSITES] Vykresluji seznam webů:', websites);
+        
+        // Kontrola, zda máme nějaké weby
+        if (!websites || websites.length === 0) {
+            // Žádné weby - zobrazíme prázdnou zprávu
+            websitesList.style.display = 'none';
+            emptyWebsitesMessage.style.display = 'block';
+            return;
+        }
+        
+        // Máme weby - zobrazíme tabulku
+        websitesList.style.display = 'block';
+        emptyWebsitesMessage.style.display = 'none';
+        
+        // Vyprázdnění tabulky
+        websitesTableBody.innerHTML = '';
+        
+        // Vykreslení webů do tabulky
+        websites.forEach(url => {
+            const row = document.createElement('tr');
+            
+            // Předpokládáme, že máme pouze URL, ostatní data jsou výplňová
+            // V reálné aplikaci byste měli ukládat více informací o každém webu
+            row.innerHTML = `
+                <td>
+                    <a href="${url}" target="_blank" class="text-decoration-none">
+                        ${url}
+                        <i class="fas fa-external-link-alt ms-2 small"></i>
+                    </a>
+                </td>
+                <td>Dnes</td>
+                <td><span class="badge bg-success">Aktivní</span></td>
+                <td>
+                    <button class="btn btn-sm btn-outline-danger remove-website-btn" data-url="${url}">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </td>
+            `;
+            
+            websitesTableBody.appendChild(row);
+        });
+        
+        // Přidání událostí pro tlačítka odstranění
+        document.querySelectorAll('.remove-website-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const url = this.getAttribute('data-url');
+                openRemoveModal(url);
+            });
+        });
+    }
+    
+    // Funkce pro přidání nové webové stránky
+    async function addWebsite() {
+        console.log('[WEBSITES] Přidávám novou webovou stránku');
+        
+        // Získání dat z formuláře
+        const url = document.getElementById('websiteUrl').value.trim();
+        
+        // Validace URL
+        if (!url) {
+            showModalAlert('Zadejte URL webové stránky', 'danger');
+            return;
+        }
+        
+        try {
+            new URL(url);
+        } catch (e) {
+            showModalAlert('Zadejte platnou URL webové stránky včetně https://', 'danger');
+            return;
+        }
+        
+        // Zobrazení loaderu
+        saveWebsiteBtn.disabled = true;
+        saveWebsiteSpinner.classList.remove('d-none');
+        
+        try {
+            // Získání tokenu z localStorage nebo cookies (není potřeba, protože token je v cookies)
+            // V tomto případě můžeme posílat požadavek bez explicitního tokenu v hlavičce
+            // a spoléháme se na to, že token v cookies bude automaticky odeslán s požadavkem
+            
+            console.log('[WEBSITES] Odesílám požadavek na server bez explicitního tokenu');
+            
+            // Odeslání dat na server
+            const response = await fetch('/api/websites/add', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ url }),
+                credentials: 'include' // Důležité: zajistí odeslání cookies s požadavkem
+            });
+            
+            const data = await response.json();
+            console.log('[WEBSITES] Odpověď serveru:', data);
+            
+            if (response.ok) {
+                // Úspěšné přidání webu
+                showModalAlert(data.message || 'Webová stránka byla úspěšně přidána', 'success');
+                
+                // Resetování formuláře
+                addWebsiteForm.reset();
+                
+                // Znovunačtení seznamu webů po krátké prodlevě
+                setTimeout(() => {
+                    // Zavřeme modální okno
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('addWebsiteModal'));
+                    if (modal) {
+                        modal.hide();
+                    }
+                    
+                    // Načteme seznam webů
+                    loadWebsites();
+                    
+                    // Resetování formuláře
+                    modalAlertContainer.innerHTML = '';
+                }, 1500);
+            } else {
+                // Chyba při přidání webu
+                console.error('[WEBSITES] Chyba při přidání webu:', data.message);
+                showModalAlert(data.message || 'Nepodařilo se přidat webovou stránku', 'danger');
+            }
+        } catch (error) {
+            console.error('[WEBSITES] Chyba při komunikaci se serverem:', error);
+            showModalAlert('Chyba při komunikaci se serverem', 'danger');
+        } finally {
+            // Resetování tlačítka
+            saveWebsiteBtn.disabled = false;
+            saveWebsiteSpinner.classList.add('d-none');
+        }
+    }
+    
+    // Funkce pro otevření modálního okna pro odstranění webu
+    function openRemoveModal(url) {
+        console.log('[WEBSITES] Otevírám modální okno pro odstranění webu:', url);
+        
+        // Nastavení URL do modálního okna
+        document.getElementById('websiteToRemove').textContent = url;
+        document.getElementById('websiteToRemoveUrl').value = url;
+        
+        // Otevření modálního okna
+        const modal = new bootstrap.Modal(document.getElementById('removeWebsiteModal'));
+        modal.show();
+    }
+    
+    // Funkce pro odstranění webové stránky
+    async function removeWebsite() {
+        console.log('[WEBSITES] Odstraňuji webovou stránku');
+        
+        // Získání URL k odstranění
+        const url = document.getElementById('websiteToRemoveUrl').value;
+        
+        if (!url) {
+            console.error('[WEBSITES] Chybí URL k odstranění');
+            return;
+        }
+        
+        // Zobrazení loaderu
+        confirmRemoveWebsiteBtn.disabled = true;
+        removeWebsiteSpinner.classList.remove('d-none');
+        
+        try {
+            // Odeslání požadavku na server s použitím cookies
+            const response = await fetch('/api/websites/remove', {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ url }),
+                credentials: 'include' // Důležité: zajistí odeslání cookies s požadavkem
+            });
+            
+            const data = await response.json();
+            console.log('[WEBSITES] Odpověď serveru:', data);
+            
+            if (response.ok) {
+                // Úspěšné odstranění webu
+                console.log('[WEBSITES] Web byl úspěšně odstraněn');
+                
+                // Zavřeme modální okno
+                const modal = bootstrap.Modal.getInstance(document.getElementById('removeWebsiteModal'));
+                if (modal) {
+                    modal.hide();
+                }
+                
+                // Zobrazíme zprávu o úspěchu
+                displaySuccess(data.message || 'Webová stránka byla úspěšně odstraněna');
+                
+                // Znovunačtení seznamu webů po krátké prodlevě
+                setTimeout(() => {
+                    loadWebsites();
+                }, 1000);
+            } else {
+                // Chyba při odstranění webu
+                console.error('[WEBSITES] Chyba při odstranění webu:', data.message);
+                displayError(data.message || 'Nepodařilo se odstranit webovou stránku');
+                
+                // Zavřeme modální okno
+                const modal = bootstrap.Modal.getInstance(document.getElementById('removeWebsiteModal'));
+                if (modal) {
+                    modal.hide();
+                }
+            }
+        } catch (error) {
+            console.error('[WEBSITES] Chyba při komunikaci se serverem:', error);
+            displayError('Chyba při komunikaci se serverem');
+            
+            // Zavřeme modální okno
+            const modal = bootstrap.Modal.getInstance(document.getElementById('removeWebsiteModal'));
+            if (modal) {
+                modal.hide();
+            }
+        } finally {
+            // Resetování tlačítka
+            confirmRemoveWebsiteBtn.disabled = false;
+            removeWebsiteSpinner.classList.add('d-none');
+        }
+    }
+    
+    // Pomocná funkce pro zobrazení chybové zprávy v modálním okně
+    function showModalAlert(message, type = 'info') {
+        console.log(`[WEBSITES] Zobrazuji modální ${type} zprávu:`, message);
+        
+        modalAlertContainer.innerHTML = `
+            <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Zavřít"></button>
+            </div>
+        `;
+    }
+    
+    // Pomocná funkce pro zobrazení chybové zprávy na stránce
+    function displayError(message) {
+        console.log('[WEBSITES] Zobrazuji chybovou zprávu:', message);
+        
+        // Vytvoření a zobrazení chybové zprávy nad seznamem webů
+        const alertElement = document.createElement('div');
+        alertElement.className = 'alert alert-danger alert-dismissible fade show mb-4';
+        alertElement.role = 'alert';
+        alertElement.innerHTML = `
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Zavřít"></button>
+        `;
+        
+        // Vložení do stránky před seznam webů
+        const pageTitle = document.querySelector('.d-flex.justify-content-between');
+        pageTitle.parentNode.insertBefore(alertElement, pageTitle.nextSibling);
+        
+        // Automatické skrytí po 5 sekundách
+        setTimeout(() => {
+            alertElement.classList.remove('show');
+            setTimeout(() => {
+                alertElement.remove();
+            }, 150);
+        }, 5000);
+    }
+    
+    // Pomocná funkce pro zobrazení zprávy o úspěchu na stránce
+    function displaySuccess(message) {
+        console.log('[WEBSITES] Zobrazuji zprávu o úspěchu:', message);
+        
+        // Vytvoření a zobrazení zprávy o úspěchu nad seznamem webů
+        const alertElement = document.createElement('div');
+        alertElement.className = 'alert alert-success alert-dismissible fade show mb-4';
+        alertElement.role = 'alert';
+        alertElement.innerHTML = `
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Zavřít"></button>
+        `;
+        
+        // Vložení do stránky před seznam webů
+        const pageTitle = document.querySelector('.d-flex.justify-content-between');
+        pageTitle.parentNode.insertBefore(alertElement, pageTitle.nextSibling);
+        
+        // Automatické skrytí po 5 sekundách
+        setTimeout(() => {
+            alertElement.classList.remove('show');
+            setTimeout(() => {
+                alertElement.remove();
+            }, 150);
+        }, 5000);
+    }
+});
+</script>
