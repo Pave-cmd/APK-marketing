@@ -1,6 +1,6 @@
 {
   "statistics": {
-    "detectionDate": "2025-05-05T10:28:13.997Z",
+    "detectionDate": "2025-05-05T11:01:28.170Z",
     "formats": {
       "typescript": {
         "sources": {
@@ -200,6 +200,18 @@
             "newDuplicatedLines": 0,
             "newClones": 0
           },
+          "src/public/js/dashboard.js": {
+            "lines": 106,
+            "tokens": 638,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
           "src/public/js/content.js": {
             "lines": 32,
             "tokens": 188,
@@ -226,9 +238,9 @@
           }
         },
         "total": {
-          "lines": 205,
-          "tokens": 1288,
-          "sources": 3,
+          "lines": 311,
+          "tokens": 1926,
+          "sources": 4,
           "clones": 0,
           "duplicatedLines": 0,
           "duplicatedTokens": 0,
@@ -268,14 +280,14 @@
       }
     },
     "total": {
-      "lines": 2705,
-      "tokens": 19615,
-      "sources": 18,
+      "lines": 2811,
+      "tokens": 20253,
+      "sources": 19,
       "clones": 1,
       "duplicatedLines": 5,
       "duplicatedTokens": 143,
       "percentage": 0.18,
-      "percentageTokens": 0.73,
+      "percentageTokens": 0.71,
       "newDuplicatedLines": 0,
       "newClones": 0
     }
