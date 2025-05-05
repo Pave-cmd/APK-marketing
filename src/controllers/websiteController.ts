@@ -9,10 +9,14 @@ import User, { IUser } from '../models/User';
 export const addWebsite = async (req: Request, res: Response) => {
   console.log('[WEBSITE] Začátek přidání nové webové stránky');
   console.log('[WEBSITE] Příchozí data:', req.body);
+  console.log('[WEBSITE] User objekt:', req.user);
   
   try {
     // Získáme ID uživatele z authentication middlewaru
-    const userId = req.user?.id;
+    // Podpora pro různé formáty ID v objektu user
+    const userId = req.user?.id || req.user?._id;
+    
+    console.log('[WEBSITE] Nalezené ID uživatele:', userId);
     
     if (!userId) {
       console.error('[WEBSITE] Chybějící ID uživatele pro přidání webové stránky');
@@ -56,6 +60,9 @@ export const addWebsite = async (req: Request, res: Response) => {
       });
     }
     
+    console.log('[WEBSITE] Uživatel nalezen:', user.email);
+    console.log('[WEBSITE] Aktuální seznam webů uživatele:', user.websites);
+    
     // Kontrola, zda uživatel již nemá tuto URL přidanou
     if (user.websites.includes(url)) {
       console.log('[WEBSITE] Webová stránka již existuje v seznamu uživatele:', url);
@@ -88,10 +95,13 @@ export const addWebsite = async (req: Request, res: Response) => {
     
     // Přidání nové URL do pole websites
     user.websites.push(url);
+    console.log('[WEBSITE] Přidávám URL do seznamu webů uživatele:', url);
+    console.log('[WEBSITE] Nový seznam webů uživatele před uložením:', user.websites);
     
     // Uložení změn
     await user.save();
-    console.log('[WEBSITE] Webová stránka úspěšně přidána:', url);
+    console.log('[WEBSITE] Webová stránka úspěšně přidána a uložena do DB:', url);
+    console.log('[WEBSITE] Aktualizovaný seznam webů po uložení:', user.websites);
     
     return res.status(201).json({
       success: true,
@@ -116,10 +126,14 @@ export const addWebsite = async (req: Request, res: Response) => {
  */
 export const getWebsites = async (req: Request, res: Response) => {
   console.log('[WEBSITE] Začátek získávání seznamu webových stránek uživatele');
+  console.log('[WEBSITE] User objekt v getWebsites:', req.user);
   
   try {
     // Získáme ID uživatele z authentication middlewaru
-    const userId = req.user?.id;
+    // Podpora pro různé formáty ID v objektu user
+    const userId = req.user?.id || req.user?._id;
+    
+    console.log('[WEBSITE] Nalezené ID uživatele v getWebsites:', userId);
     
     if (!userId) {
       console.error('[WEBSITE] Chybějící ID uživatele pro získání webových stránek');
@@ -140,6 +154,9 @@ export const getWebsites = async (req: Request, res: Response) => {
         message: 'Uživatel nebyl nalezen'
       });
     }
+    
+    console.log('[WEBSITE] Uživatel nalezen:', user.email);
+    console.log('[WEBSITE] Aktuální seznam webů uživatele v getWebsites:', user.websites);
     
     // Nastavení maximálního počtu webů podle plánu
     const maxWebsites = {

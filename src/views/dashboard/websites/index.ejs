@@ -197,18 +197,25 @@ document.addEventListener('DOMContentLoaded', function() {
     addWebsiteForm.addEventListener('submit', function(e) {
         e.preventDefault();
         
+        // Přidáno logování události submit
+        console.log('[WEBSITES] Formulář byl odeslán');
+        
         // Získání URL z formuláře
         const url = document.getElementById('websiteUrl').value.trim();
+        console.log('[WEBSITES] Zadaná URL:', url);
         
         // Základní validace
         if (!url) {
+            console.log('[WEBSITES] Chybí URL');
             showModalAlert('Zadejte URL webové stránky', 'danger');
             return;
         }
         
         try {
             new URL(url);
+            console.log('[WEBSITES] URL je platná');
         } catch (e) {
+            console.log('[WEBSITES] Neplatná URL:', e);
             showModalAlert('Zadejte platnou URL webové stránky včetně https://', 'danger');
             return;
         }
@@ -219,8 +226,11 @@ document.addEventListener('DOMContentLoaded', function() {
         
         saveWebsiteBtn.disabled = true;
         saveWebsiteSpinner.classList.remove('d-none');
+        console.log('[WEBSITES] Loader zobrazen, tlačítko deaktivováno');
         
         // Odeslání dat formou AJAX
+        console.log('[WEBSITES] Odesílám požadavek na /api/websites/add s daty:', { url });
+        
         fetch('/api/websites/add', {
             method: 'POST',
             headers: {
@@ -229,12 +239,17 @@ document.addEventListener('DOMContentLoaded', function() {
             body: JSON.stringify({ url }),
             credentials: 'include'
         })
-        .then(response => response.json())
+        .then(response => {
+            console.log('[WEBSITES] Server odpověděl se statusem:', response.status);
+            console.log('[WEBSITES] Response headers:', Object.fromEntries(response.headers.entries()));
+            return response.json();
+        })
         .then(data => {
-            console.log('[WEBSITES] Odpověď serveru:', data);
+            console.log('[WEBSITES] Data z odpovědi serveru:', data);
             
             if (data.success) {
                 // Úspěšné přidání
+                console.log('[WEBSITES] Úspěšné přidání webu, websites:', data.websites);
                 showModalAlert('Webová stránka byla úspěšně přidána', 'success');
                 
                 // Resetování formuláře
@@ -244,16 +259,19 @@ document.addEventListener('DOMContentLoaded', function() {
                 setTimeout(() => {
                     try {
                         // Pokus o ruční zavření modálu
+                        console.log('[WEBSITES] Zavírám modální okno');
                         document.querySelector('#addWebsiteModal .btn-close').click();
                     } catch (e) {
                         console.error('[WEBSITES] Chyba při zavírání modálu:', e);
                     }
                     
                     // Obnovení seznamu webů
+                    console.log('[WEBSITES] Znovu načítám seznam webů');
                     loadWebsites();
                 }, 1500);
             } else {
                 // Chyba
+                console.error('[WEBSITES] Chyba při přidání webu:', data.message);
                 showModalAlert(data.message || 'Nepodařilo se přidat webovou stránku', 'danger');
             }
         })
@@ -265,6 +283,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // Obnovení tlačítka
             saveWebsiteBtn.disabled = false;
             saveWebsiteSpinner.classList.add('d-none');
+            console.log('[WEBSITES] Loader skryt, tlačítko znovu aktivováno');
         });
     });
     
@@ -370,19 +389,29 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Funkce pro načtení webových stránek pomocí AJAX
     function loadWebsites() {
-        console.log('[WEBSITES] Načítám seznam webových stránek');
+        console.log('[WEBSITES] Začátek načítání seznamu webových stránek');
         
         fetch('/api/websites/list', {
             method: 'GET',
             credentials: 'include'
         })
-        .then(response => response.json())
+        .then(response => {
+            console.log('[WEBSITES] Odpověď seznamu webů - status:', response.status);
+            console.log('[WEBSITES] Odpověď seznamu webů - headers:', Object.fromEntries(response.headers.entries()));
+            return response.json();
+        })
         .then(data => {
-            console.log('[WEBSITES] Odpověď serveru:', data);
+            console.log('[WEBSITES] Data ze seznamu webů:', data);
             
             if (data.success !== false) {
                 // Zobrazení seznamu webů
-                renderWebsites(data.websites);
+                if (Array.isArray(data.websites)) {
+                    console.log('[WEBSITES] Počet načtených webů:', data.websites.length);
+                    renderWebsites(data.websites);
+                } else {
+                    console.error('[WEBSITES] Neplatná data webů, není pole:', data.websites);
+                    displayAlert('Nepodařilo se načíst seznam webů - neplatná data', 'danger');
+                }
                 
                 // Zobrazení limitu webů podle plánu
                 if (data.maxWebsites) {
@@ -394,7 +423,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         })
         .catch(error => {
-            console.error('[WEBSITES] Chyba při komunikaci se serverem:', error);
+            console.error('[WEBSITES] Chyba při načítání webů:', error);
             displayAlert('Chyba při komunikaci se serverem', 'danger');
         });
     }
