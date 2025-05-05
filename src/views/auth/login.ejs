@@ -53,8 +53,10 @@
     </div>
 </div>
 
-<%- contentFor('script') %>
 <script>
+// Jednoduchý debugovací alert pro potvrzení, že skript funguje
+alert('Přihlašovací stránka načtena!');
+
 document.addEventListener('DOMContentLoaded', function() {
     console.log('[FRONTEND] Přihlašovací formulář - načten');
     
@@ -65,12 +67,14 @@ document.addEventListener('DOMContentLoaded', function() {
     
     if (!form || !button || !spinner || !alertContainer) {
         console.error('[FRONTEND] Některé potřebné elementy nebyly nalezeny v DOM');
+        alert('Chyba: některé elementy nebyly nalezeny!');
         return;
     }
     
     // Zpracování odeslání formuláře
     form.addEventListener('submit', async function(event) {
         console.log('[FRONTEND] Submit přihlašovacího formuláře');
+        alert('Formulář odeslán!');
         event.preventDefault();
         
         // Kontrola, zda je formulář validní podle HTML5 validace
