@@ -6,6 +6,7 @@ import cookieParser from 'cookie-parser';  // přidáno pro správu cookies
 import { connectDB } from './config/db';
 import { SERVER_CONFIG } from './config/config';
 import authRoutes from './routes/authRoutes';
+import websiteRoutes from './routes/websiteRoutes'; // import rout pro webové stránky
 import { auth } from './middleware/authMiddleware';  // import autentizačního middleware
 import { runDuplicityCheck, formatDuplicityResults } from './utils/duplicateDetection';  // import kontroly duplicit
 
@@ -28,6 +29,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // API Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/websites', websiteRoutes); // přidání rout pro webové stránky
 
 // Endpoint pro kontrolu duplicit - pouze pro adminy nebo vývojáře
 app.get('/api/check-duplicates', auth, async (req: Request, res: Response) => {
@@ -74,6 +76,16 @@ app.get('/dashboard', auth, (req: Request, res: Response) => {
   res.render('dashboard/index', { 
     title: 'Dashboard | APK-marketing',
     description: 'Správa vaší AI marketingové kampaně',
+    layout: 'layouts/dashboard',
+    user: req.user  // předání informací o uživateli do šablony
+  });
+});
+
+// Stránka správy webových stránek
+app.get('/dashboard/weby', auth, (req: Request, res: Response) => {
+  res.render('dashboard/websites/index', { 
+    title: 'Správa webových stránek | APK-marketing',
+    description: 'Přidejte a spravujte webové stránky pro AI marketing',
     layout: 'layouts/dashboard',
     user: req.user  // předání informací o uživateli do šablony
   });

@@ -1,6 +1,6 @@
 {
   "statistics": {
-    "detectionDate": "2025-05-05T11:01:28.170Z",
+    "detectionDate": "2025-05-05T11:36:55.539Z",
     "formats": {
       "typescript": {
         "sources": {
@@ -64,6 +64,18 @@
             "newDuplicatedLines": 0,
             "newClones": 0
           },
+          "src/routes/websiteRoutes.ts": {
+            "lines": 14,
+            "tokens": 145,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
           "src/routes/authRoutes.ts": {
             "lines": 11,
             "tokens": 101,
@@ -112,6 +124,18 @@
             "newDuplicatedLines": 0,
             "newClones": 0
           },
+          "src/controllers/websiteController.ts": {
+            "lines": 246,
+            "tokens": 1780,
+            "sources": 1,
+            "clones": 4,
+            "duplicatedLines": 60,
+            "duplicatedTokens": 412,
+            "percentage": 24.39,
+            "percentageTokens": 23.15,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
           "src/controllers/authController.ts": {
             "lines": 236,
             "tokens": 1781,
@@ -149,8 +173,8 @@
             "newClones": 0
           },
           "src/server.ts": {
-            "lines": 182,
-            "tokens": 1444,
+            "lines": 194,
+            "tokens": 1549,
             "sources": 1,
             "clones": 0,
             "duplicatedLines": 0,
@@ -174,14 +198,14 @@
           }
         },
         "total": {
-          "lines": 2185,
-          "tokens": 16692,
-          "sources": 14,
-          "clones": 1,
-          "duplicatedLines": 5,
-          "duplicatedTokens": 143,
-          "percentage": 0.23,
-          "percentageTokens": 0.86,
+          "lines": 2457,
+          "tokens": 18722,
+          "sources": 16,
+          "clones": 3,
+          "duplicatedLines": 35,
+          "duplicatedTokens": 349,
+          "percentage": 1.42,
+          "percentageTokens": 1.86,
           "newDuplicatedLines": 0,
           "newClones": 0
         }
@@ -280,14 +304,14 @@
       }
     },
     "total": {
-      "lines": 2811,
-      "tokens": 20253,
-      "sources": 19,
-      "clones": 1,
-      "duplicatedLines": 5,
-      "duplicatedTokens": 143,
-      "percentage": 0.18,
-      "percentageTokens": 0.71,
+      "lines": 3083,
+      "tokens": 22283,
+      "sources": 21,
+      "clones": 3,
+      "duplicatedLines": 35,
+      "duplicatedTokens": 349,
+      "percentage": 1.14,
+      "percentageTokens": 1.57,
       "newDuplicatedLines": 0,
       "newClones": 0
     }
@@ -326,6 +350,78 @@
           "line": 637,
           "column": 2,
           "position": 4818
+        }
+      }
+    },
+    {
+      "format": "typescript",
+      "lines": 16,
+      "fragment": "});\n    }\n    \n    // Vyhledání uživatele podle ID\n    console.log('[WEBSITE] Vyhledávání uživatele s ID:', userId);\n    const user = await User.findById(userId);\n    \n    if (!user) {\n      console.error('[WEBSITE] Uživatel nebyl nalezen:', userId);\n      return res.status(404).json({\n        success: false,\n        message: 'Uživatel nebyl nalezen'\n      });\n    }\n    \n    // Nastavení maximálního počtu webů podle plánu",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src/controllers/websiteController.ts",
+        "start": 129,
+        "end": 144,
+        "startLoc": {
+          "line": 129,
+          "column": 7,
+          "position": 922
+        },
+        "endLoc": {
+          "line": 144,
+          "column": 48,
+          "position": 1025
+        }
+      },
+      "secondFile": {
+        "name": "src/controllers/websiteController.ts",
+        "start": 44,
+        "end": 59,
+        "startLoc": {
+          "line": 44,
+          "column": 7,
+          "position": 313
+        },
+        "endLoc": {
+          "line": 59,
+          "column": 53,
+          "position": 416
+        }
+      }
+    },
+    {
+      "format": "typescript",
+      "lines": 16,
+      "fragment": "});\n    }\n    \n    // Vyhledání uživatele podle ID\n    console.log('[WEBSITE] Vyhledávání uživatele s ID:', userId);\n    const user = await User.findById(userId);\n    \n    if (!user) {\n      console.error('[WEBSITE] Uživatel nebyl nalezen:', userId);\n      return res.status(404).json({\n        success: false,\n        message: 'Uživatel nebyl nalezen'\n      });\n    }\n    \n    // Kontrola, zda uživatel má tuto URL v seznamu",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src/controllers/websiteController.ts",
+        "start": 202,
+        "end": 217,
+        "startLoc": {
+          "line": 202,
+          "column": 7,
+          "position": 1435
+        },
+        "endLoc": {
+          "line": 217,
+          "column": 48,
+          "position": 1538
+        }
+      },
+      "secondFile": {
+        "name": "src/controllers/websiteController.ts",
+        "start": 44,
+        "end": 59,
+        "startLoc": {
+          "line": 44,
+          "column": 7,
+          "position": 313
+        },
+        "endLoc": {
+          "line": 59,
+          "column": 53,
+          "position": 416
         }
       }
     }
