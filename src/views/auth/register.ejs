@@ -139,8 +139,11 @@
     </div>
 </div>
 
+<%- contentFor('script') %>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('[FRONTEND] Registrační formulář - načten');
+    
     const form = document.getElementById('registerForm');
     const button = document.getElementById('registerButton');
     const spinner = document.getElementById('registerSpinner');
@@ -148,11 +151,18 @@ document.addEventListener('DOMContentLoaded', function() {
     const password = document.getElementById('password');
     const confirmPassword = document.getElementById('confirmPassword');
     
+    if (!form || !button || !spinner || !alertContainer || !password || !confirmPassword) {
+        console.error('[FRONTEND] Některé potřebné elementy nebyly nalezeny v DOM');
+        return;
+    }
+    
     // Funkce pro validaci shodnosti hesel
     function validatePassword() {
         if (password.value !== confirmPassword.value) {
+            console.log('[FRONTEND] Hesla se neshodují');
             confirmPassword.setCustomValidity('Hesla se neshodují.');
         } else {
+            console.log('[FRONTEND] Hesla jsou shodná');
             confirmPassword.setCustomValidity('');
         }
     }
@@ -163,14 +173,18 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Zpracování odeslání formuláře
     form.addEventListener('submit', async function(event) {
+        console.log('[FRONTEND] Submit registračního formuláře');
         event.preventDefault();
         
         // Kontrola, zda je formulář validní podle HTML5 validace
         if (!form.checkValidity()) {
+            console.log('[FRONTEND] Formulář neprošel HTML5 validací');
             event.stopPropagation();
             form.classList.add('was-validated');
             return;
         }
+        
+        console.log('[FRONTEND] Formulář validní, začíná odeslání');
         
         // Zobrazení loaderu
         button.disabled = true;
@@ -184,22 +198,46 @@ document.addEventListener('DOMContentLoaded', function() {
                 formDataObj[key] = value;
             }
         });
+        
+        console.log('[FRONTEND] Data k odeslání:', {
+            email: formDataObj.email,
+            firstName: formDataObj.firstName,
+            lastName: formDataObj.lastName,
+            company: formDataObj.company,
+            plan: formDataObj.plan,
+            passwordLength: formDataObj.password ? formDataObj.password.length : 0
+        });
+
+        // Přidání debugovací zprávy přímo do UI
+        alertContainer.innerHTML = `
+            <div class="alert alert-info" role="alert">
+                <h4 class="alert-heading">Odesílání požadavku...</h4>
+                <p>Odesílám registrační data na server...</p>
+            </div>
+        `;
 
         try {
+            console.log('[FRONTEND] Začínám odesílat registrační data na server');
+            
             // Odeslání dat pomocí Fetch API
             const response = await fetch('/api/auth/register', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(formDataObj)
+                body: JSON.stringify(formDataObj),
+                credentials: 'same-origin'
             });
+            
+            console.log('[FRONTEND] Odpověď od serveru:', response.status, response.statusText);
             
             // Získání dat z odpovědi
             const data = await response.json();
+            console.log('[FRONTEND] Data z odpovědi:', data);
             
             if (response.ok) {
                 // Úspěšná registrace
+                console.log('[FRONTEND] Registrace úspěšná, token:', data.token ? 'Přijat' : 'Chybí!');
                 alertContainer.innerHTML = `
                     <div class="alert alert-success" role="alert">
                         <h4 class="alert-heading">Registrace úspěšná!</h4>
@@ -211,11 +249,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 // Uložení tokenu do lokálního úložiště
                 localStorage.setItem('authToken', data.token);
+                console.log('[FRONTEND] Token uložen do localStorage');
                 
-                // Okamžité přesměrování na dashboard
-                window.location.href = '/dashboard';
+                // Přesměrování na dashboard po krátké prodlevě
+                console.log('[FRONTEND] Přesměrování na dashboard za 2 sekundy...');
+                setTimeout(() => {
+                    console.log('[FRONTEND] Přesměrování nyní...');
+                    window.location.href = '/dashboard';
+                }, 2000);
             } else {
                 // Chyba při registraci
+                console.log('[FRONTEND] Chyba při registraci:', data.message);
                 alertContainer.innerHTML = `
                     <div class="alert alert-danger" role="alert">
                         <h4 class="alert-heading">Chyba při registraci</h4>
@@ -229,11 +273,13 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         } catch (error) {
             // Chyba při komunikaci se serverem
-            console.error('Chyba při registraci:', error);
+            console.error('[FRONTEND] Chyba při komunikaci se serverem:', error);
             alertContainer.innerHTML = `
                 <div class="alert alert-danger" role="alert">
                     <h4 class="alert-heading">Chyba připojení</h4>
                     <p>Při komunikaci se serverem došlo k chybě. Zkontrolujte své připojení a zkuste to znovu.</p>
+                    <hr>
+                    <p class="mb-0">Technická chyba: ${error.message}</p>
                 </div>
             `;
             
@@ -246,4 +292,7 @@ document.addEventListener('DOMContentLoaded', function() {
         form.classList.add('was-validated');
     });
 });
+
+// Přímý debugovací výpis
+console.log('[REGISTER] Skript registračního formuláře byl načten');
 </script>

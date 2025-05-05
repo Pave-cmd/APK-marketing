@@ -1,6 +1,6 @@
 {
   "statistics": {
-    "detectionDate": "2025-05-05T09:02:20.186Z",
+    "detectionDate": "2025-05-05T10:28:13.997Z",
     "formats": {
       "typescript": {
         "sources": {
@@ -113,8 +113,8 @@
             "newClones": 0
           },
           "src/controllers/authController.ts": {
-            "lines": 177,
-            "tokens": 1210,
+            "lines": 236,
+            "tokens": 1781,
             "sources": 1,
             "clones": 0,
             "duplicatedLines": 0,
@@ -174,14 +174,14 @@
           }
         },
         "total": {
-          "lines": 2126,
-          "tokens": 16121,
+          "lines": 2185,
+          "tokens": 16692,
           "sources": 14,
           "clones": 1,
           "duplicatedLines": 5,
           "duplicatedTokens": 143,
-          "percentage": 0.24,
-          "percentageTokens": 0.89,
+          "percentage": 0.23,
+          "percentageTokens": 0.86,
           "newDuplicatedLines": 0,
           "newClones": 0
         }
@@ -268,14 +268,14 @@
       }
     },
     "total": {
-      "lines": 2646,
-      "tokens": 19044,
+      "lines": 2705,
+      "tokens": 19615,
       "sources": 18,
       "clones": 1,
       "duplicatedLines": 5,
       "duplicatedTokens": 143,
-      "percentage": 0.19,
-      "percentageTokens": 0.75,
+      "percentage": 0.18,
+      "percentageTokens": 0.73,
       "newDuplicatedLines": 0,
       "newClones": 0
     }
