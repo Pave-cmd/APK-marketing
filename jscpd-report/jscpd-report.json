@@ -1,0 +1,321 @@
+{
+  "statistics": {
+    "detectionDate": "2025-05-05T09:02:20.186Z",
+    "formats": {
+      "typescript": {
+        "sources": {
+          "src/utils/duplicateDetection/unusedCodeDetector.ts": {
+            "lines": 636,
+            "tokens": 4818,
+            "sources": 1,
+            "clones": 1,
+            "duplicatedLines": 5,
+            "duplicatedTokens": 143,
+            "percentage": 0.79,
+            "percentageTokens": 2.97,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/utils/duplicateDetection/index.ts": {
+            "lines": 94,
+            "tokens": 714,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/utils/duplicateDetection/fileSizeChecker.ts": {
+            "lines": 241,
+            "tokens": 1883,
+            "sources": 1,
+            "clones": 1,
+            "duplicatedLines": 5,
+            "duplicatedTokens": 143,
+            "percentage": 2.07,
+            "percentageTokens": 7.59,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/utils/duplicateDetection/fileDetector.ts": {
+            "lines": 161,
+            "tokens": 1268,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/utils/duplicateDetection/codeDetector.ts": {
+            "lines": 134,
+            "tokens": 982,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/routes/authRoutes.ts": {
+            "lines": 11,
+            "tokens": 101,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/models/User.ts": {
+            "lines": 116,
+            "tokens": 853,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/models/Content.ts": {
+            "lines": 126,
+            "tokens": 874,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/middleware/authMiddleware.ts": {
+            "lines": 107,
+            "tokens": 899,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/controllers/authController.ts": {
+            "lines": 177,
+            "tokens": 1210,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/config/db.ts": {
+            "lines": 22,
+            "tokens": 190,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/config/config.ts": {
+            "lines": 60,
+            "tokens": 412,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/server.ts": {
+            "lines": 182,
+            "tokens": 1444,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "scripts/check-duplicates.ts": {
+            "lines": 59,
+            "tokens": 473,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          }
+        },
+        "total": {
+          "lines": 2126,
+          "tokens": 16121,
+          "sources": 14,
+          "clones": 1,
+          "duplicatedLines": 5,
+          "duplicatedTokens": 143,
+          "percentage": 0.24,
+          "percentageTokens": 0.89,
+          "newDuplicatedLines": 0,
+          "newClones": 0
+        }
+      },
+      "javascript": {
+        "sources": {
+          "src/public/js/main.js": {
+            "lines": 128,
+            "tokens": 805,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/public/js/content.js": {
+            "lines": 32,
+            "tokens": 188,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "eslint.config.js": {
+            "lines": 45,
+            "tokens": 295,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          }
+        },
+        "total": {
+          "lines": 205,
+          "tokens": 1288,
+          "sources": 3,
+          "clones": 0,
+          "duplicatedLines": 0,
+          "duplicatedTokens": 0,
+          "percentage": 0,
+          "percentageTokens": 0,
+          "newDuplicatedLines": 0,
+          "newClones": 0
+        }
+      },
+      "css": {
+        "sources": {
+          "src/public/css/style.css": {
+            "lines": 315,
+            "tokens": 1635,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          }
+        },
+        "total": {
+          "lines": 315,
+          "tokens": 1635,
+          "sources": 1,
+          "clones": 0,
+          "duplicatedLines": 0,
+          "duplicatedTokens": 0,
+          "percentage": 0,
+          "percentageTokens": 0,
+          "newDuplicatedLines": 0,
+          "newClones": 0
+        }
+      }
+    },
+    "total": {
+      "lines": 2646,
+      "tokens": 19044,
+      "sources": 18,
+      "clones": 1,
+      "duplicatedLines": 5,
+      "duplicatedTokens": 143,
+      "percentage": 0.19,
+      "percentageTokens": 0.75,
+      "newDuplicatedLines": 0,
+      "newClones": 0
+    }
+  },
+  "duplicates": [
+    {
+      "format": "typescript",
+      "lines": 6,
+      "fragment": "function formatFileSize(bytes: number): string {\n  if (bytes < 1024) return `${bytes} B`;\n  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(2)} KB`;\n  if (bytes < 1024 * 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;\n  return `${(bytes / (1024 * 1024 * 1024)).toFixed(2)} GB`;\n}",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src/utils/duplicateDetection/fileSizeChecker.ts",
+        "start": 237,
+        "end": 242,
+        "startLoc": {
+          "line": 237,
+          "column": 2,
+          "position": 1740
+        },
+        "endLoc": {
+          "line": 242,
+          "column": 2,
+          "position": 1883
+        }
+      },
+      "secondFile": {
+        "name": "src/utils/duplicateDetection/unusedCodeDetector.ts",
+        "start": 632,
+        "end": 637,
+        "startLoc": {
+          "line": 632,
+          "column": 1,
+          "position": 4675
+        },
+        "endLoc": {
+          "line": 637,
+          "column": 2,
+          "position": 4818
+        }
+      }
+    }
+  ]
+}

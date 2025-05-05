@@ -2,9 +2,12 @@ import express, { Express, Request, Response } from 'express';
 import cors from 'cors';
 import path from 'path';
 import expressLayouts from 'express-ejs-layouts';
+import cookieParser from 'cookie-parser';  // přidáno pro správu cookies
 import { connectDB } from './config/db';
 import { SERVER_CONFIG } from './config/config';
 import authRoutes from './routes/authRoutes';
+import { auth } from './middleware/authMiddleware';  // import autentizačního middleware
+import { runDuplicityCheck, formatDuplicityResults } from './utils/duplicateDetection';  // import kontroly duplicit
 
 // Inicializace Express aplikace
 const app: Express = express();
@@ -18,12 +21,45 @@ console.log('Připojování k MongoDB Atlas...');
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(cookieParser());  // přidání cookie parseru
 
 // Statické soubory
 app.use(express.static(path.join(__dirname, 'public')));
 
 // API Routes
 app.use('/api/auth', authRoutes);
+
+// Endpoint pro kontrolu duplicit - pouze pro adminy nebo vývojáře
+app.get('/api/check-duplicates', auth, async (req: Request, res: Response) => {
+  // Kontrola, zda má uživatel oprávnění (pouze admin)
+  if (req.user && req.user.role === 'admin') {
+    try {
+      // Spuštění kontroly duplicit
+      const results = await runDuplicityCheck();
+      const formattedResults = formatDuplicityResults(results);
+      
+      res.status(200).json({
+        success: true,
+        message: 'Kontrola duplicit dokončena',
+        results: {
+          formattedResults,
+          rawResults: results
+        }
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: 'Při kontrole duplicit došlo k chybě',
+        error: (error as Error).message
+      });
+    }
+  } else {
+    res.status(403).json({
+      success: false,
+      message: 'Nemáte oprávnění pro tuto akci'
+    });
+  }
+});
 
 // EJS šablony a layout
 app.use(expressLayouts);
@@ -33,12 +69,13 @@ app.set('layout', 'layouts/main');
 app.set('layout extractScripts', true);
 app.set('layout extractStyles', true);
 
-// Dashboard stránka po přihlášení
-app.get('/dashboard', (req: Request, res: Response) => {
+// Dashboard stránka po přihlášení - použití auth middleware
+app.get('/dashboard', auth, (req: Request, res: Response) => {
   res.render('dashboard/index', { 
     title: 'Dashboard | APK-marketing',
     description: 'Správa vaší AI marketingové kampaně',
-    layout: 'layouts/dashboard'
+    layout: 'layouts/dashboard',
+    user: req.user  // předání informací o uživateli do šablony
   });
 });
 
@@ -110,7 +147,37 @@ app.use((req: Request, res: Response) => {
   });
 });
 
-// Spuštění serveru
+// Automatická kontrola duplicit při spuštění serveru
+async function runInitialDuplicityCheck() {
+  try {
+    console.log('Spouštím kontrolu duplicit...');
+    const results = await runDuplicityCheck();
+    console.log(formatDuplicityResults(results));
+    
+    // Upozornění, pokud je procento duplicit příliš vysoké
+    if (results.codeDuplicates.percentOfDuplication > 10) {
+      console.warn('VAROVÁNÍ: Procento duplicitního kódu je vyšší než 10%!');
+    }
+    
+    // Upozornění, pokud existují duplicitní soubory
+    if (results.fileDuplicates.length > 0) {
+      console.warn('VAROVÁNÍ: Byly nalezeny duplicitní soubory v projektu!');
+    }
+  } catch (error) {
+    console.error('Chyba při počáteční kontrole duplicit:', error);
+  }
+}
+
+// Spuštění serveru a inicializace kontroly duplicit
 app.listen(port, () => {
   console.log(`Server běží na portu ${port} v režimu ${SERVER_CONFIG.environment}`);
+  
+  // Spuštění kontroly duplicit pouze v development režimu
+  if (SERVER_CONFIG.environment === 'development') {
+    runInitialDuplicityCheck();
+    
+    // Nastavení pravidelné kontroly duplicit každých 24 hodin
+    const oneDayInMs = 24 * 60 * 60 * 1000;
+    setInterval(runInitialDuplicityCheck, oneDayInMs);
+  }
 });

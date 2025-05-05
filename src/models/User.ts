@@ -99,8 +99,9 @@ UserSchema.pre<IUser>('save', async function(next) {
     const salt = await bcrypt.genSalt(10);
     this.password = await bcrypt.hash(this.password, salt);
     return next();
-  } catch (error: any) {
-    return next(error);
+  } catch (e) {
+    // Přidáno typování: zpracování chyby jako mongoose CallbackError
+    return next(e as mongoose.CallbackError);
   }
 });
 

@@ -1,13 +1,87 @@
 import { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
-import mongoose from 'mongoose';
 import User, { IUser } from '../models/User';
 import { SECURITY_CONFIG } from '../config/config';
 
-// Typ pro JWT payload
-interface JwtPayload {
+// Typ pro odpověď uživatele
+interface UserResponse {
   id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  company?: string;
+  plan: string;
 }
+
+/**
+ * Vytvoření JWT tokenu pro uživatele
+ * @param userId ID uživatele
+ * @returns JWT token nebo null v případě chyby
+ */
+const createToken = (userId: string): string | null => {
+  try {
+    const secretKey = Buffer.from(SECURITY_CONFIG.jwtSecret || 'default-secret-key', 'utf8');
+    return jwt.sign({ id: userId } as object, secretKey);
+  } catch (error) {
+    console.error('JWT signing error:', error);
+    return null;
+  }
+};
+
+/**
+ * Formátování uživatelské odpovědi bez citlivých dat
+ * @param user Uživatelský objekt
+ * @returns Formátovaná odpověď
+ */
+const formatUserResponse = (user: IUser): UserResponse => {
+  return {
+    id: String(user._id),
+    email: user.email,
+    firstName: user.firstName,
+    lastName: user.lastName,
+    company: user.company,
+    plan: user.plan
+  };
+};
+
+/**
+ * Zpracování autentizace a vytvoření odpovědi
+ * @param user Uživatelský objekt
+ * @param res Response objekt
+ * @param statusCode HTTP status kód
+ * @param message Zpráva pro uživatele
+ * @returns HTTP odpověď
+ */
+const createAuthResponse = (
+  user: IUser,
+  res: Response,
+  statusCode: number,
+  message: string
+) => {
+  // Získání ID jako string
+  const userId = String(user._id);
+  
+  // Vytvoření JWT tokenu
+  const token = createToken(userId);
+  
+  if (!token) {
+    return res.status(500).json({
+      success: false,
+      message: 'Chyba při vytváření autentizačního tokenu'
+    });
+  }
+  
+  // Formátování odpovědi
+  const userResponse = formatUserResponse(user);
+  
+  // Odeslání odpovědi
+  return res.status(statusCode).json({
+    success: true,
+    message,
+    token,
+    user: userResponse
+  });
+};
 
 // Registrace nového uživatele
 export const register = async (req: Request, res: Response) => {
@@ -38,43 +112,14 @@ export const register = async (req: Request, res: Response) => {
     // Uložení uživatele do databáze
     await user.save();
 
-    // Získání ID jako string a typování uživatele
+    // Typování uživatele a vytvoření odpovědi
     const typedUser = user as unknown as IUser;
-    const userId = String(typedUser._id);
-
-    // Vytvoření JWT tokenu - použití Buffer místo přímého string
-    const secretKey = Buffer.from(SECURITY_CONFIG.jwtSecret || 'default-secret-key', 'utf8');
-    
-    // Vytvořit token s explicitním typováním
-    let token = '';
-    try {
-      // Použití konkrétního přetížení jwt.sign s explicitním typováním
-      token = jwt.sign({ id: userId } as object, secretKey);
-    } catch (jwtError) {
-      console.error('JWT signing error:', jwtError);
-      return res.status(500).json({
-        success: false,
-        message: 'Chyba při vytváření autentizačního tokenu'
-      });
-    }
-
-    // Odebrání hesla z odpovědi
-    const userResponse = {
-      id: userId,
-      email: typedUser.email,
-      firstName: typedUser.firstName,
-      lastName: typedUser.lastName,
-      company: typedUser.company,
-      plan: typedUser.plan
-    };
-
-    // Odeslání odpovědi
-    return res.status(201).json({
-      success: true,
-      message: 'Uživatel byl úspěšně zaregistrován',
-      token,
-      user: userResponse
-    });
+    return createAuthResponse(
+      typedUser,
+      res,
+      201,
+      'Uživatel byl úspěšně zaregistrován'
+    );
   } catch (error) {
     console.error('Chyba při registraci:', error);
     return res.status(500).json({ 
@@ -115,42 +160,13 @@ export const login = async (req: Request, res: Response) => {
     typedUser.lastLogin = new Date();
     await typedUser.save();
 
-    // Získání ID jako string
-    const userId = String(typedUser._id);
-
-    // Vytvoření JWT tokenu - použití Buffer místo přímého string
-    const secretKey = Buffer.from(SECURITY_CONFIG.jwtSecret || 'default-secret-key', 'utf8');
-    
-    // Vytvořit token s explicitním typováním
-    let token = '';
-    try {
-      // Použití konkrétního přetížení jwt.sign s explicitním typováním
-      token = jwt.sign({ id: userId } as object, secretKey);
-    } catch (jwtError) {
-      console.error('JWT signing error:', jwtError);
-      return res.status(500).json({
-        success: false,
-        message: 'Chyba při vytváření autentizačního tokenu'
-      });
-    }
-
-    // Odebrání hesla z odpovědi
-    const userResponse = {
-      id: userId,
-      email: typedUser.email,
-      firstName: typedUser.firstName,
-      lastName: typedUser.lastName,
-      company: typedUser.company,
-      plan: typedUser.plan
-    };
-
-    // Odeslání odpovědi
-    return res.status(200).json({
-      success: true,
-      message: 'Přihlášení proběhlo úspěšně',
-      token,
-      user: userResponse
-    });
+    // Vytvoření odpovědi
+    return createAuthResponse(
+      typedUser,
+      res,
+      200,
+      'Přihlášení proběhlo úspěšně'
+    );
   } catch (error) {
     console.error('Chyba při přihlášení:', error);
     return res.status(500).json({ 

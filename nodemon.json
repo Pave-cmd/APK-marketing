@@ -1,0 +1,6 @@
+{
+  "watch": ["src"],
+  "ext": "ts,json",
+  "ignore": ["node_modules/*", "dist/*", "**/*.test.ts", "jscpd-report/*", "jscpd-config.json"],
+  "exec": "ts-node src/server.ts"
+}
