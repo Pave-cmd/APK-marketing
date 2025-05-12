@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import util from 'util';
+import { formatFileSize } from '../formatters';
 
 const stat = util.promisify(fs.stat);
 const readdir = util.promisify(fs.readdir);
@@ -229,14 +230,3 @@ export function formatFileSizeReport(report: FileSizeReport): string {
   return output;
 }
 
-/**
- * Pomocná funkce pro formátování velikosti souborů
- * @param bytes Velikost v bajtech
- * @returns Formátovaná velikost s jednotkou
- */
-export function formatFileSize(bytes: number): string {
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(2)} KB`;
-  if (bytes < 1024 * 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
-  return `${(bytes / (1024 * 1024 * 1024)).toFixed(2)} GB`;
-}

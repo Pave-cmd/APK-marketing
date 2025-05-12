@@ -49,3 +49,4 @@ $RECYCLE.BIN/
 .cache/
 .yarn/
 .pnp.*
+**/.claude/settings.local.json

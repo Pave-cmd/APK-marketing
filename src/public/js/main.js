@@ -3,14 +3,94 @@
  */
 
 document.addEventListener('DOMContentLoaded', function() {
+    // Přidání auth tokenu do každého fetch požadavku
+    setupAuthInterceptor();
+
     // Inicializace nástrojů
     initializeAnimations();
     initializeTooltips();
     initializeScrollSpy();
-    
+
     // Naslouchání událostem
     setupEventListeners();
 });
+
+/**
+ * Nastavení interceptoru pro přidání auth tokenu a základní zpracování chyb
+ */
+function setupAuthInterceptor() {
+    // Ukládáme původní funkci fetch
+    const originalFetch = window.fetch;
+
+    // Přepisujeme globální fetch funkci pro přidání auth tokenu
+    window.fetch = async function(input, init) {
+        try {
+            // Použijeme původní inicializační objekt nebo vytvoříme nový
+            init = init || {};
+            init.headers = init.headers || {};
+
+            // Přidáme credentials: 'include' pro zajištění, že cookies budou odeslány
+            init.credentials = 'include';
+
+            // Přidáme auth token z localStorage, pokud je dostupný
+            const token = localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
+            if (token) {
+                // Přidáme token do hlavičky
+                init.headers = {
+                    ...init.headers,
+                    'Authorization': `Bearer ${token}`
+                };
+            }
+
+            // Zavoláme původní fetch s modifikovanými parametry
+            const response = await originalFetch.call(this, input, init);
+
+            // Základní zpracování běžných chybových stavů
+            if (response.status === 401) {
+                // Neautorizovaný přístup - pravděpodobně vypršel token
+                handleUnauthorized();
+            } else if (response.status === 403) {
+                // Nedostatečná práva
+                console.error('[AUTH] Nedostatečná oprávnění pro přístup k prostředku:', input);
+            } else if (response.status >= 500) {
+                // Serverová chyba
+                console.error('[FETCH] Serverová chyba:', response.status, input);
+            }
+
+            return response;
+        } catch (error) {
+            // Zachycení síťových chyb
+            console.error('[FETCH] Síťová chyba při volání API:', error.message);
+            // Případ, kdy síť selže úplně - vytvoříme "mock" response pro konzistentní API
+            return new Response(JSON.stringify({
+                success: false,
+                message: 'Síťová chyba při připojení k serveru. Zkontrolujte připojení k internetu.',
+                networkError: true
+            }), {
+                status: 0,
+                statusText: 'Network Error',
+                headers: new Headers({'Content-Type': 'application/json'})
+            });
+        }
+    };
+
+    // Funkce pro zpracování neautorizovaného přístupu
+    function handleUnauthorized() {
+        const currentPath = window.location.pathname;
+        // Přesměrování na přihlašovací stránku pouze pokud nejsme již tam
+        if (currentPath !== '/prihlaseni') {
+            console.warn('[AUTH] Neautorizovaný přístup, přesměrování na přihlášení');
+            // Odstranění neplatného tokenu
+            localStorage.removeItem('authToken');
+            sessionStorage.removeItem('authToken');
+
+            // Přesměrování s informací o původní stránce
+            window.location.href = `/prihlaseni?from=${encodeURIComponent(currentPath)}`;
+        }
+    }
+
+    console.log('[AUTH] Interceptor pro autentizaci byl nastaven');
+}
 
 /**
  * Inicializace animací na stránce
@@ -34,22 +114,57 @@ function initializeAnimations() {
 }
 
 /**
- * Inicializace tooltipů z Bootstrap
+ * Inicializace tooltipů z Bootstrap s ošetřením chyb
  */
 function initializeTooltips() {
-    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-    tooltipTriggerList.map(function (tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl);
-    });
+    try {
+        // Kontrola, zda je Bootstrap dostupný
+        if (typeof bootstrap === 'undefined' || !bootstrap.Tooltip) {
+            console.warn('[UI] Bootstrap není dostupný, přeskakuji inicializaci tooltipů');
+            return;
+        }
+
+        const tooltipTriggerList = Array.from(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        if (tooltipTriggerList.length === 0) {
+            return; // Žádné tooltip elementy, není potřeba inicializovat
+        }
+
+        tooltipTriggerList.forEach(function (tooltipTriggerEl) {
+            try {
+                new bootstrap.Tooltip(tooltipTriggerEl);
+            } catch (err) {
+                console.error('[UI] Chyba při inicializaci tooltip prvku:', err);
+            }
+        });
+    } catch (error) {
+        console.error('[UI] Chyba při inicializaci tooltipů:', error);
+    }
 }
 
 /**
- * Inicializace ScrollSpy pro navigaci
+ * Inicializace ScrollSpy pro navigaci s ošetřením chyb
  */
 function initializeScrollSpy() {
-    const scrollSpy = new bootstrap.ScrollSpy(document.body, {
-        target: '#navbarMain'
-    });
+    try {
+        // Kontrola, zda je Bootstrap dostupný
+        if (typeof bootstrap === 'undefined' || !bootstrap.ScrollSpy) {
+            console.warn('[UI] Bootstrap není dostupný, přeskakuji inicializaci ScrollSpy');
+            return;
+        }
+
+        // Kontrola, zda cílový navigační element existuje
+        const navbarMain = document.querySelector('#navbarMain');
+        if (!navbarMain) {
+            console.warn('[UI] Navigační lišta #navbarMain nenalezena, přeskakuji inicializaci ScrollSpy');
+            return;
+        }
+
+        const scrollSpy = new bootstrap.ScrollSpy(document.body, {
+            target: '#navbarMain'
+        });
+    } catch (error) {
+        console.error('[UI] Chyba při inicializaci ScrollSpy:', error);
+    }
 }
 
 /**

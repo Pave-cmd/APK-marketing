@@ -1,4 +1,5 @@
 import mongoose, { Document, Schema } from 'mongoose';
+import { normalizeUrl } from '../utils/urlUtils';
 
 // Rozhraní pro obsahový příspěvek
 export interface IContent extends Document {
@@ -44,9 +45,13 @@ const ContentSchema: Schema = new Schema({
   websiteUrl: {
     type: String,
     required: true,
+    set: (url: string) => normalizeUrl(url, { keepTrailingSlash: false }),
+    get: (url: string) => url
   },
   sourceUrl: {
     type: String,
+    set: (url: string) => url ? normalizeUrl(url, { keepTrailingSlash: false }) : url,
+    get: (url: string) => url
   },
   title: {
     type: String,

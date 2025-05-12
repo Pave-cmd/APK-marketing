@@ -54,8 +54,8 @@
 </div>
 
 <script>
-// Jednoduchý debugovací alert pro potvrzení, že skript funguje
-alert('Přihlašovací stránka načtena!');
+// Zakomentováno - žádné alerty
+// alert('Přihlašovací stránka načtena!');
 
 document.addEventListener('DOMContentLoaded', function() {
     console.log('[FRONTEND] Přihlašovací formulář - načten');
@@ -74,7 +74,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Zpracování odeslání formuláře
     form.addEventListener('submit', async function(event) {
         console.log('[FRONTEND] Submit přihlašovacího formuláře');
-        alert('Formulář odeslán!');
+        // alert('Formulář odeslán!');
         event.preventDefault();
         
         // Kontrola, zda je formulář validní podle HTML5 validace
@@ -143,15 +143,51 @@ document.addEventListener('DOMContentLoaded', function() {
                         </div>
                     `;
                     
-                    // Uložení tokenu do localStorage
+                    // Uložení tokenu do localStorage a sessionStorage pro zálohu
+                    // (primárně by měl být použit token z cookies)
                     localStorage.setItem('authToken', data.token);
-                    console.log('[FRONTEND] Token uložen do localStorage');
+                    sessionStorage.setItem('authToken', data.token);
+                    console.log('[FRONTEND] Token uložen do localStorage a sessionStorage');
                     
                     // Přesměrování na dashboard po krátké prodlevě
                     console.log('[FRONTEND] Přesměrování na dashboard za 2 sekundy...');
+                    // Výpis cookies pro debugging
+                    console.log('[FRONTEND] Cookies před přesměrováním:', document.cookie);
+
                     setTimeout(() => {
                         console.log('[FRONTEND] Přesměrování nyní...');
-                        window.location.href = '/dashboard';
+                        // Použití absolutní URL s aktuální základní adresou
+                        const baseUrl = window.location.origin;
+                        console.log('[FRONTEND] Base URL:', baseUrl);
+
+                        // Získáme původní cílovou stránku, pokud existuje
+                        const urlParams = new URLSearchParams(window.location.search);
+                        const fromParam = urlParams.get('from');
+                        console.log('[FRONTEND] From parameter:', fromParam);
+
+                        // Zkusíme získat token z cookies jako zálohovou metodu
+                        console.log('[FRONTEND] Cookies při přesměrování:', document.cookie);
+
+                        // Přidáme token do query parametru jako zálohu pro případ, že cookie selže
+                        const token = localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
+
+                        // Určení cílové URL - buď původní stránka nebo dashboard
+                        let redirectUrl = baseUrl;
+                        if (fromParam && fromParam !== '/prihlaseni') {
+                            redirectUrl += fromParam;
+                            console.log('[FRONTEND] Přesměrování na původní stránku:', redirectUrl);
+                        } else {
+                            redirectUrl += '/dashboard';
+                            console.log('[FRONTEND] Přesměrování na dashboard');
+                        }
+
+                        // Přesměrování s záložním tokenem v URL
+                        // Přidání tokenu jako parametr, zachování existujících parametrů
+                        if (token) {
+                            // Kontrola, zda URL již obsahuje parametry
+                            redirectUrl += redirectUrl.includes('?') ? `&token=${token}` : `?token=${token}`;
+                        }
+                        window.location.href = redirectUrl;
                     }, 2000);
                 } else {
                     // Chyba při přihlášení
