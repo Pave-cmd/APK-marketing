@@ -3,6 +3,7 @@ import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { SECURITY_CONFIG } from '../config/config';
 import User from '../models/User';
+import { setAuthCookies } from '../utils/cookieUtils';
 
 // Rozšíření typů Express Request
 declare global {
@@ -15,83 +16,159 @@ declare global {
 }
 
 // Middleware pro ověření, že uživatel je přihlášen pomocí JWT tokenu
-export const auth = async (req: Request, res: Response, next: NextFunction) => {
+export const auth = async (req: Request, res: Response, next: NextFunction): Promise<void | Response> => {
   try {
-    console.log('Auth middleware - začátek ověření');
-    
+    console.log('[DEBUG AUTH] Auth middleware - začátek ověření');
+
+    // Zabránění nekonečné smyčce - pokud jdeme na přihlašovací stránku nebo je to opakované přesměrování,
+    // nikdy nepřesměrováváme zpět na přihlášení
+    if (req.path === '/prihlaseni' || req.path.includes('/prihlaseni?from=')) {
+      console.log('[DEBUG AUTH] Přístup na přihlašovací stránku - neautentizujeme');
+      return next();
+    }
+
+    // Detekce nekonečné smyčky přesměrování
+    const redirectCount = req.get('X-Redirect-Count') ? parseInt(req.get('X-Redirect-Count') || '0', 10) : 0;
+    if (redirectCount > 3) {
+      console.log('[DEBUG AUTH] Detekována možná nekonečná smyčka přesměrování, stav:', redirectCount);
+      return res.status(500).render('errors/500', {
+        title: 'Chyba serveru | APK-marketing',
+        description: 'Došlo k chybě při zpracování požadavku - příliš mnoho přesměrování'
+      });
+    }
+
+    // Pro API requesty vracíme JSON chyby místo přesměrování
+    const isApiRequest = req.path.startsWith('/api/');
+    console.log('[DEBUG AUTH] Je to API request?', isApiRequest, 'path:', req.path);
+
     // Získání tokenu z různých zdrojů (hlavička, cookie, query parametr)
     let token = '';
     const authHeader = req.headers.authorization;
-    
-    // Výpis všech cookies pro diagnostiku
-    console.log('Cookies:', req.cookies);
-    console.log('Query params:', req.query);
-    console.log('Headers:', req.headers);
-    
+
+    // Výpis všech cookies a hlaviček pro diagnostiku
+    console.log('[DEBUG AUTH] Kompletní cookies:', req.cookies);
+    console.log('[DEBUG AUTH] Auth cookie:', req.cookies?.authToken ? 'Existuje' : 'Chybí');
+    console.log('[DEBUG AUTH] LoggedIn cookie:', req.cookies?.loggedIn ? 'Existuje' : 'Chybí');
+    console.log('[DEBUG AUTH] Auth header:', req.headers.authorization ? 'Existuje' : 'Chybí');
+
     // Kontrola všech možných lokací tokenu
     if (authHeader && authHeader.startsWith('Bearer ')) {
       // Token z Authorization hlavičky
       token = authHeader.substring(7);
-      console.log('Token získán z Authorization hlavičky');
+      console.log('[DEBUG AUTH] Token získán z Authorization hlavičky');
     } else if (req.cookies && req.cookies.authToken) {
       // Token z cookies
       token = req.cookies.authToken;
-      console.log('Token získán z cookies');
+      console.log('[DEBUG AUTH] Token získán z cookies');
     } else if (req.query && req.query.token) {
       // Token z query parametru (z URL)
       token = req.query.token as string;
-      console.log('Token získán z query parametru');
-      
-      // Uložení tokenu do cookie pro další požadavky
-      res.cookie('authToken', token, { 
-        maxAge: 24 * 60 * 60 * 1000, // 1 den
-        httpOnly: true,
-        path: '/'
-      });
+      console.log('[DEBUG AUTH] Token získán z query parametru');
+
+      // Uložení tokenu do cookie pro další požadavky pomocí sdílené utility
+      setAuthCookies(res, token);
     } else {
       // Kontrola všech cookies
       const allCookies = req.headers.cookie;
-      console.log('Všechny cookies v hlavičce:', allCookies);
+      console.log('[DEBUG AUTH] Všechny cookies v hlavičce:', allCookies);
     }
 
     // Pokud token neexistuje
     if (!token) {
-      console.log('Token nebyl nalezen, přesměrování na přihlášení');
-      return res.redirect('/prihlaseni');
+      console.log('[DEBUG AUTH] Token nebyl nalezen');
+
+      if (isApiRequest) {
+        return res.status(401).json({
+          success: false,
+          message: 'Nejste přihlášeni. Přihlaste se a zkuste to znovu.'
+        });
+      } else {
+        // Přidání parametru from pro zabránění nekonečných přesměrování
+        const redirectUrl = '/prihlaseni?from=' + encodeURIComponent(req.path);
+        console.log('[DEBUG AUTH] Přesměrování na:', redirectUrl);
+        return res.redirect(redirectUrl);
+      }
     }
 
-    console.log('Token nalezen');
+    console.log('[DEBUG AUTH] Token nalezen');
 
     // Ověření tokenu
     const secretKey = Buffer.from(SECURITY_CONFIG.jwtSecret || 'default-secret-key', 'utf8');
-    
+
     try {
-      console.log('Ověřování JWT tokenu...');
+      console.log('[DEBUG AUTH] Ověřování JWT tokenu...');
       const decoded = jwt.verify(token, secretKey) as { id: string };
-      console.log('Token je platný, ID uživatele:', decoded.id);
-      
+      console.log('[DEBUG AUTH] Token je platný, ID uživatele:', decoded.id);
+
       // Vyhledání uživatele podle ID
-      const user = await User.findById(decoded.id);
-      
+      const user = await User.findById(decoded.id) as { _id: string, [key: string]: any } | null;
+
       if (!user) {
-        console.log('Uživatel s ID', decoded.id, 'nebyl nalezen v databázi');
-        return res.redirect('/prihlaseni');
+        console.log('[DEBUG AUTH] Uživatel s ID', decoded.id, 'nebyl nalezen v databázi');
+
+        if (isApiRequest) {
+          return res.status(401).json({
+            success: false,
+            message: 'Uživatel nebyl nalezen. Přihlaste se znovu.'
+          });
+        } else {
+          const redirectUrl = '/prihlaseni';
+          console.log('[DEBUG AUTH] Přesměrování na:', redirectUrl);
+          return res.redirect(redirectUrl);
+        }
       }
-      
+
       // Přidání informací o uživateli a tokenu do požadavku
-      req.user = user;
+      // Důležité - převést ID na string pro konzistentní použití
+      const userObj = user.toObject();
+      req.user = {
+        ...userObj,
+        id: user._id.toString()
+      };
       req.token = token;
-      
-      console.log('Uživatel úspěšně ověřen, pokračuji dál...');
-      next();
+
+      console.log('[DEBUG AUTH] Uživatel úspěšně ověřen:', {
+        id: req.user.id,
+        email: req.user.email,
+        websites: req.user.websites || []
+      });
+
+      // Kontrola, zda již nebyla odeslána odpověď
+      if (!res.headersSent) {
+        console.log('[DEBUG AUTH] Pokračuji do next() pro vykreslení chráněného obsahu');
+        return next();
+      } else {
+        console.log('[DEBUG AUTH] Hlavičky již byly odeslány, nevoláme next()');
+      }
     } catch (error) {
       // Neplatný token
-      console.error('Chyba ověření tokenu:', error);
-      return res.redirect('/prihlaseni');
+      console.error('[DEBUG AUTH] Chyba ověření tokenu:', error);
+
+      if (isApiRequest) {
+        return res.status(401).json({
+          success: false,
+          message: 'Platnost vašeho přihlášení vypršela. Přihlaste se znovu.'
+        });
+      } else {
+        // Přidání parametru from pro zabránění nekonečných přesměrování
+        const redirectUrl = '/prihlaseni?from=' + encodeURIComponent(req.path);
+        console.log('[DEBUG AUTH] Přesměrování na:', redirectUrl);
+        return res.redirect(redirectUrl);
+      }
     }
   } catch (error) {
-    console.error('Chyba v auth middleware:', error);
-    return res.redirect('/prihlaseni');
+    console.error('[DEBUG AUTH] Chyba v auth middleware:', error);
+
+    if (req.path.startsWith('/api/')) {
+      return res.status(500).json({
+        success: false,
+        message: 'Chyba při ověřování přihlášení.'
+      });
+    } else {
+      const redirectUrl = '/prihlaseni';
+      console.log('[DEBUG AUTH] Přesměrování na:', redirectUrl);
+      return res.redirect(redirectUrl);
+    }
   }
 };
 

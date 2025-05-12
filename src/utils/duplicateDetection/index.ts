@@ -1,6 +1,7 @@
 import { detectCodeDuplicates, DuplicityResult } from './codeDetector';
 import { detectDuplicateFiles, DuplicateFile } from './fileDetector';
-import { checkDirectoryFilesSizes, FileSizeReport, formatFileSizeReport, formatFileSize } from './fileSizeChecker';
+import { checkDirectoryFilesSizes, FileSizeReport, formatFileSizeReport } from './fileSizeChecker';
+import { formatFileSize } from '../formatters';
 import { runUnusedCodeCheck, UnusedCodeReport, formatUnusedCodeReport } from './unusedCodeDetector';
 
 /**

@@ -1,5 +1,6 @@
 import mongoose, { Document, Schema } from 'mongoose';
 import bcrypt from 'bcryptjs';
+import { normalizeUrl } from '../utils/urlUtils';
 
 // Rozhraní pro uživatele
 export interface IUser extends Document {
@@ -69,6 +70,8 @@ const UserSchema: Schema = new Schema({
   websites: [{
     type: String,
     trim: true,
+    set: (url: string) => normalizeUrl(url, { keepTrailingSlash: false }),
+    get: (url: string) => url
   }],
   socialNetworks: [{
     platform: {
@@ -109,7 +112,8 @@ UserSchema.pre<IUser>('save', async function(next) {
 UserSchema.methods.comparePassword = async function(password: string): Promise<boolean> {
   try {
     return await bcrypt.compare(password, this.password);
-  } catch (error) {
+  } catch {
+    // Ignorujeme konkrétní chybu a vracíme false
     return false;
   }
 };

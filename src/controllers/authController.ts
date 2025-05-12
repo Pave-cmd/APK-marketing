@@ -81,12 +81,23 @@ const createAuthResponse = (
   // Formátování odpovědi
   const userResponse = formatUserResponse(user);
   
-  // Nastavení cookie pro autentizaci - přidáno toto nastavení
+  // Nastavení cookie pro autentizaci - vylepšená verze
   console.log('[AUTH] Nastavuji cookie authToken pro uživatele:', user.email);
-  res.cookie('authToken', token, { 
+  res.cookie('authToken', token, {
     maxAge: 24 * 60 * 60 * 1000, // 1 den
     httpOnly: true,
-    path: '/'
+    path: '/',
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax' // 'strict' může blokovat přesměrování z jiných domén
+  });
+
+  // Nastavení druhé cookie (klientské) pro sledování přihlášení
+  res.cookie('loggedIn', 'true', {
+    maxAge: 24 * 60 * 60 * 1000, // 1 den
+    httpOnly: false, // Dostupné pro JavaScript
+    path: '/',
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax'
   });
   
   console.log('[AUTH] Cookie byla nastavena, odesílám odpověď');

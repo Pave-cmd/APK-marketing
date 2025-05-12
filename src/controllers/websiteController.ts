@@ -1,5 +1,15 @@
 import { Request, Response } from 'express';
-import User, { IUser } from '../models/User';
+import User from '../models/User';
+import mongoose from 'mongoose';
+import { PullOperator } from 'mongodb';
+// Import utilit pro práci s URL
+import { validateUrl, normalizeUrl, isUrlInList, findMatchingUrl } from '../utils/urlUtils';
+// Import loggeru
+import { logger, webLog } from '../utils/logger';
+
+// TEST LOGGERU - uvidíme, zda se zapíše při startu serveru
+logger.info('WebsiteController načten - test loggeru');
+webLog('Test webLogu - měl by se zobrazit v logu');
 
 /**
  * Přidá novou webovou stránku do uživatelského účtu
@@ -7,117 +17,174 @@ import User, { IUser } from '../models/User';
  * @param res Response
  */
 export const addWebsite = async (req: Request, res: Response) => {
-  console.log('[WEBSITE] Začátek přidání nové webové stránky');
-  console.log('[WEBSITE] Příchozí data:', req.body);
-  console.log('[WEBSITE] User objekt:', req.user);
-  
+  webLog('Začátek přidání nové webové stránky', { body: req.body, userId: req.user?.id || req.user?._id });
+  console.log('[DEBUG addWebsite] Request tělo:', req.body);
+  console.log('[DEBUG addWebsite] User objekt:', req.user);
+
   try {
     // Získáme ID uživatele z authentication middlewaru
-    // Podpora pro různé formáty ID v objektu user
     const userId = req.user?.id || req.user?._id;
-    
-    console.log('[WEBSITE] Nalezené ID uživatele:', userId);
-    
+
+    webLog('Nalezené ID uživatele', { userId });
+    console.log('[DEBUG addWebsite] User ID:', userId);
+
     if (!userId) {
-      console.error('[WEBSITE] Chybějící ID uživatele pro přidání webové stránky');
+      logger.error('Chybějící ID uživatele pro přidání webové stránky');
+      console.log('[DEBUG addWebsite] CHYBA: Chybí ID uživatele');
       return res.status(401).json({
         success: false,
         message: 'Pro tuto akci je nutné být přihlášen'
       });
     }
-    
-    const { url } = req.body;
-    
+
+    let { url } = req.body;
+    console.log('[DEBUG addWebsite] URL k přidání:', url);
+
     // Kontrola vstupních dat
     if (!url) {
-      console.error('[WEBSITE] Chybějící URL pro přidání webové stránky');
+      logger.error('Chybějící URL pro přidání webové stránky');
+      console.log('[DEBUG addWebsite] CHYBA: Chybí URL');
       return res.status(400).json({
         success: false,
         message: 'URL webové stránky je povinný údaj'
       });
     }
-    
-    // Validace URL formátu
+
+    // Validace URL pomocí nové utility
+    const urlValidation = validateUrl(url);
+
+    if (!urlValidation.isValid) {
+      logger.error('Neplatná URL', { url, error: urlValidation.message });
+      console.log('[DEBUG addWebsite] CHYBA:', urlValidation.message);
+      return res.status(400).json({
+        success: false,
+        message: urlValidation.message || 'Zadejte platnou URL webové stránky'
+      });
+    }
+
+    // Normalizace URL pro jednotný formát ukládání
+    url = normalizeUrl(url, { keepTrailingSlash: false });
+    webLog('URL byla normalizována', { url });
+    console.log('[DEBUG addWebsite] Normalizovaná URL:', url);
+
+    const readyState = mongoose.connection.readyState;
+    webLog('Aktivní připojení k MongoDB', { readyState });
+    console.log('[DEBUG addWebsite] MongoDB readyState:', readyState);
+
+    if (readyState !== 1) {
+      console.log('[DEBUG addWebsite] KRITICKÁ CHYBA: MongoDB není připojeno!');
+      return res.status(500).json({
+        success: false,
+        message: 'Databáze není dostupná, zkuste to prosím později'
+      });
+    }
+
+    // NOVÝ PŘÍSTUP: Použití jednodušší metody přidání webu
     try {
-      new URL(url);
-    } catch (e) {
-      console.error('[WEBSITE] Neplatný formát URL:', url);
-      return res.status(400).json({
+      // Převedeme userId na ObjectId
+      let userIdObj;
+      try {
+        userIdObj = new mongoose.Types.ObjectId(userId.toString());
+        console.log('[DEBUG addWebsite] User ID jako ObjectId:', userIdObj);
+      } catch (e) {
+        console.log('[DEBUG addWebsite] CHYBA při konverzi ID:', e);
+        return res.status(500).json({
+          success: false,
+          message: 'Chyba při zpracování ID uživatele'
+        });
+      }
+
+      // Najdeme uživatele pomocí Mongoose (spolehlivější způsob)
+      console.log('[DEBUG addWebsite] Hledám uživatele pomocí Mongoose');
+      const user = await User.findById(userIdObj);
+
+      if (!user) {
+        console.log('[DEBUG addWebsite] CHYBA: Uživatel nenalezen, ID:', userIdObj);
+        return res.status(404).json({
+          success: false,
+          message: 'Uživatel nebyl nalezen'
+        });
+      }
+
+      console.log('[DEBUG addWebsite] Uživatel nalezen:', {
+        id: user._id,
+        email: user.email,
+        websites: user.websites
+      });
+
+      // Kontrolujeme, zda už web není přidaný pomocí utility
+      if (user.websites && user.websites.length > 0) {
+        // Použití utility pro kontrolu URL v seznamu
+        if (isUrlInList(url, user.websites)) {
+          console.log('[DEBUG addWebsite] Web již existuje v seznamu');
+          return res.status(400).json({
+            success: false,
+            message: 'Tato webová stránka je již přidána ve vašem účtu'
+          });
+        }
+      }
+
+      // Kontrola limitu webů podle plánu
+      const maxWebsites = {
+        'basic': 1,
+        'standard': 1,
+        'premium': 3,
+        'enterprise': 10
+      };
+
+      const currentPlan = user.plan || 'basic';
+      const maxAllowed = maxWebsites[currentPlan as keyof typeof maxWebsites] || 1;
+
+      console.log('[DEBUG addWebsite] Plán:', currentPlan, 'Max webů:', maxAllowed, 'Aktuální počet:', user.websites ? user.websites.length : 0);
+
+      if (user.websites && user.websites.length >= maxAllowed) {
+        console.log('[DEBUG addWebsite] Překročen limit webů pro plán');
+        return res.status(400).json({
+          success: false,
+          message: `Váš plán ${currentPlan} umožňuje maximálně ${maxAllowed} webových stránek. Pro přidání dalších stránek aktualizujte svůj plán.`
+        });
+      }
+
+      // Přidáme web a uložíme
+      if (!user.websites) {
+        user.websites = [];
+      }
+
+      user.websites.push(url);
+      console.log('[DEBUG addWebsite] Ukládám aktualizovaného uživatele, weby:', user.websites);
+
+      // Uložení uživatele
+      await user.save();
+      console.log('[DEBUG addWebsite] Uživatel úspěšně uložen');
+
+      // Vracíme úspěšnou odpověď
+      return res.status(201).json({
+        success: true,
+        message: 'Webová stránka byla úspěšně přidána',
+        websites: user.websites
+      });
+    } catch (dbError) {
+      console.log('[DEBUG addWebsite] CHYBA při práci s databází:', dbError);
+
+      return res.status(500).json({
         success: false,
-        message: 'Zadejte platnou URL webové stránky'
+        message: 'Při přidávání webové stránky došlo k chybě databáze',
+        error: dbError instanceof Error ? dbError.message : 'Unknown error'
       });
     }
-    
-    // Vyhledání uživatele podle ID
-    console.log('[WEBSITE] Vyhledávání uživatele s ID:', userId);
-    const user = await User.findById(userId);
-    
-    if (!user) {
-      console.error('[WEBSITE] Uživatel nebyl nalezen:', userId);
-      return res.status(404).json({
-        success: false,
-        message: 'Uživatel nebyl nalezen'
-      });
-    }
-    
-    console.log('[WEBSITE] Uživatel nalezen:', user.email);
-    console.log('[WEBSITE] Aktuální seznam webů uživatele:', user.websites);
-    
-    // Kontrola, zda uživatel již nemá tuto URL přidanou
-    if (user.websites.includes(url)) {
-      console.log('[WEBSITE] Webová stránka již existuje v seznamu uživatele:', url);
-      return res.status(400).json({
-        success: false,
-        message: 'Tato webová stránka je již přidána ve vašem účtu'
-      });
-    }
-    
-    // Kontrola počtu webových stránek podle plánu uživatele
-    const maxWebsites = {
-      'basic': 1,
-      'standard': 1,
-      'premium': 3,
-      'enterprise': 10
-    };
-    
-    // Získání maximálního počtu webů pro uživatelův plán
-    const currentPlan = user.plan || 'basic';
-    const maxAllowed = maxWebsites[currentPlan as keyof typeof maxWebsites];
-    
-    // Kontrola limitu webových stránek podle plánu
-    if (user.websites.length >= maxAllowed) {
-      console.error('[WEBSITE] Překročen limit webových stránek pro plán:', currentPlan);
-      return res.status(400).json({
-        success: false,
-        message: `Váš plán ${currentPlan} umožňuje maximálně ${maxAllowed} webových stránek. Pro přidání dalších stránek aktualizujte svůj plán.`
-      });
-    }
-    
-    // Přidání nové URL do pole websites
-    user.websites.push(url);
-    console.log('[WEBSITE] Přidávám URL do seznamu webů uživatele:', url);
-    console.log('[WEBSITE] Nový seznam webů uživatele před uložením:', user.websites);
-    
-    // Uložení změn
-    await user.save();
-    console.log('[WEBSITE] Webová stránka úspěšně přidána a uložena do DB:', url);
-    console.log('[WEBSITE] Aktualizovaný seznam webů po uložení:', user.websites);
-    
-    return res.status(201).json({
-      success: true,
-      message: 'Webová stránka byla úspěšně přidána',
-      websites: user.websites
-    });
-    
   } catch (error) {
-    console.error('[WEBSITE] Chyba při přidávání webové stránky:', error);
+    logger.error('Chyba při přidávání webové stránky', { error: error instanceof Error ? error.message : String(error) });
+    console.log('[DEBUG addWebsite] KRITICKÁ CHYBA:', error);
+
     return res.status(500).json({
       success: false,
       message: 'Při přidávání webové stránky došlo k chybě',
-      error: (error as Error).message
+      error: error instanceof Error ? error.message : 'Unknown error'
     });
   }
 };
+
+// Funkce odstraněna, protože je nahrazena přímou implementací v addWebsite
 
 /**
  * Získá seznam webových stránek uživatele
@@ -125,65 +192,97 @@ export const addWebsite = async (req: Request, res: Response) => {
  * @param res Response
  */
 export const getWebsites = async (req: Request, res: Response) => {
-  console.log('[WEBSITE] Začátek získávání seznamu webových stránek uživatele');
-  console.log('[WEBSITE] User objekt v getWebsites:', req.user);
-  
+  webLog('Začátek získávání seznamu webových stránek uživatele', { userId: req.user?.id || req.user?._id });
+  console.log('[DEBUG getWebsites] Request začátek, User:', req.user);
+
   try {
     // Získáme ID uživatele z authentication middlewaru
-    // Podpora pro různé formáty ID v objektu user
     const userId = req.user?.id || req.user?._id;
-    
-    console.log('[WEBSITE] Nalezené ID uživatele v getWebsites:', userId);
-    
+
+    webLog('Nalezené ID uživatele v getWebsites', { userId });
+    console.log('[DEBUG getWebsites] UserId:', userId);
+
     if (!userId) {
-      console.error('[WEBSITE] Chybějící ID uživatele pro získání webových stránek');
+      logger.error('Chybějící ID uživatele pro získání webových stránek');
+      console.log('[DEBUG getWebsites] CHYBA: Chybí ID uživatele');
       return res.status(401).json({
         success: false,
         message: 'Pro tuto akci je nutné být přihlášen'
       });
     }
-    
-    // Vyhledání uživatele podle ID
-    console.log('[WEBSITE] Vyhledávání uživatele s ID:', userId);
-    const user = await User.findById(userId);
-    
-    if (!user) {
-      console.error('[WEBSITE] Uživatel nebyl nalezen:', userId);
-      return res.status(404).json({
+
+    // Zjednodušený a více spolehlivý přístup - používáme přímo Mongoose
+    try {
+      console.log('[DEBUG getWebsites] Hledání uživatele přes Mongoose, ID:', userId);
+
+      // Převedeme userId na ObjectId pro jistotu
+      let userIdObj;
+      try {
+        userIdObj = new mongoose.Types.ObjectId(userId.toString());
+        console.log('[DEBUG getWebsites] User ID jako ObjectId:', userIdObj);
+      } catch (e) {
+        console.log('[DEBUG getWebsites] CHYBA při konverzi ID:', e);
+        return res.status(500).json({
+          success: false,
+          message: 'Chyba při zpracování ID uživatele'
+        });
+      }
+
+      // Použití projekce pro získání pouze potřebných polí
+      const user = await User.findById(userIdObj).select('websites plan email');
+
+      if (!user) {
+        console.log('[DEBUG getWebsites] CHYBA: Uživatel nenalezen, ID:', userIdObj);
+        return res.status(404).json({
+          success: false,
+          message: 'Uživatel nebyl nalezen'
+        });
+      }
+
+      console.log('[DEBUG getWebsites] Uživatel nalezen:', {
+        id: user._id,
+        email: user.email,
+        websites: user.websites || []
+      });
+
+      // Nastavení maximálního počtu webů podle plánu
+      const maxWebsites = {
+        'basic': 1,
+        'standard': 1,
+        'premium': 3,
+        'enterprise': 10
+      };
+
+      // Získání maximálního počtu webů pro uživatelův plán
+      const currentPlan = user.plan || 'basic';
+      const maxAllowed = maxWebsites[currentPlan as keyof typeof maxWebsites] || 1;
+
+      const websites = user.websites || [];
+      console.log('[DEBUG getWebsites] Vracím weby:', websites, 'Max limit:', maxAllowed);
+
+      // Vrácení seznamu webových stránek a limitu
+      return res.status(200).json({
+        success: true,
+        websites: websites,
+        maxWebsites: maxAllowed
+      });
+    } catch (dbError) {
+      console.log('[DEBUG getWebsites] CHYBA při práci s databází:', dbError);
+
+      return res.status(500).json({
         success: false,
-        message: 'Uživatel nebyl nalezen'
+        message: 'Při získávání webových stránek došlo k chybě databáze',
+        error: dbError instanceof Error ? dbError.message : 'Unknown error'
       });
     }
-    
-    console.log('[WEBSITE] Uživatel nalezen:', user.email);
-    console.log('[WEBSITE] Aktuální seznam webů uživatele v getWebsites:', user.websites);
-    
-    // Nastavení maximálního počtu webů podle plánu
-    const maxWebsites = {
-      'basic': 1,
-      'standard': 1,
-      'premium': 3,
-      'enterprise': 10
-    };
-    
-    // Získání maximálního počtu webů pro uživatelův plán
-    const currentPlan = user.plan || 'basic';
-    const maxAllowed = maxWebsites[currentPlan as keyof typeof maxWebsites];
-    
-    // Vrácení seznamu webových stránek a limitu
-    console.log('[WEBSITE] Vracení seznamu webových stránek pro uživatele:', userId);
-    return res.status(200).json({
-      success: true,
-      websites: user.websites,
-      maxWebsites: maxAllowed
-    });
-    
   } catch (error) {
-    console.error('[WEBSITE] Chyba při získávání webových stránek:', error);
+    logger.error('Chyba při získávání webových stránek', { error: error instanceof Error ? error.message : String(error) });
+    console.log('[DEBUG getWebsites] KRITICKÁ CHYBA:', error);
+
     return res.status(500).json({
       success: false,
       message: 'Při získávání webových stránek došlo k chybě',
-      error: (error as Error).message
+      error: error instanceof Error ? error.message : 'Unknown error'
     });
   }
 };
@@ -194,14 +293,16 @@ export const getWebsites = async (req: Request, res: Response) => {
  * @param res Response
  */
 export const removeWebsite = async (req: Request, res: Response) => {
-  console.log('[WEBSITE] Začátek odstranění webové stránky');
+  webLog('Začátek odstranění webové stránky', { body: req.body, userId: req.user?.id || req.user?._id });
   
   try {
     // Získáme ID uživatele z authentication middlewaru
-    const userId = req.user?.id;
+    const userId = req.user?.id || req.user?._id;
+    
+    webLog('Nalezené ID uživatele', { userId });
     
     if (!userId) {
-      console.error('[WEBSITE] Chybějící ID uživatele pro odstranění webové stránky');
+      logger.error('Chybějící ID uživatele pro odstranění webové stránky');
       return res.status(401).json({
         success: false,
         message: 'Pro tuto akci je nutné být přihlášen'
@@ -212,49 +313,132 @@ export const removeWebsite = async (req: Request, res: Response) => {
     
     // Kontrola vstupních dat
     if (!url) {
-      console.error('[WEBSITE] Chybějící URL pro odstranění webové stránky');
+      logger.error('Chybějící URL pro odstranění webové stránky');
       return res.status(400).json({
         success: false,
         message: 'URL webové stránky je povinný údaj'
       });
     }
     
-    // Vyhledání uživatele podle ID
-    console.log('[WEBSITE] Vyhledávání uživatele s ID:', userId);
-    const user = await User.findById(userId);
-    
-    if (!user) {
-      console.error('[WEBSITE] Uživatel nebyl nalezen:', userId);
-      return res.status(404).json({
-        success: false,
-        message: 'Uživatel nebyl nalezen'
+    // NOVÝ PŘÍSTUP: Přímé dotazování MongoDB kolekce
+    try {
+      const usersCollection = mongoose.connection.collection('users');
+      
+      // Nejprve zkontrolujeme, zda uživatel s tímto ID existuje a má tuto URL
+      const user = await usersCollection.findOne({ _id: new mongoose.Types.ObjectId(userId) });
+      
+      if (!user) {
+        logger.error('Uživatel nebyl nalezen v MongoDB', { userId });
+        return res.status(404).json({
+          success: false,
+          message: 'Uživatel nebyl nalezen'
+        });
+      }
+      
+      // Kontrola, zda pole websites existuje a obsahuje URL
+      const userWebsites = user.websites || [];
+      webLog('Aktuální seznam webů uživatele', { websites: userWebsites });
+      
+      // Normalizace a ověření URL pomocí utility
+      const normalizedUrl = normalizeUrl(url);
+
+      // Kontrola, zda web existuje v seznamu
+      if (!isUrlInList(normalizedUrl, userWebsites)) {
+        webLog('Webová stránka nebyla nalezena v seznamu uživatele', { url });
+        return res.status(404).json({
+          success: false,
+          message: 'Tato webová stránka nebyla nalezena ve vašem účtu'
+        });
+      }
+
+      // Najdeme přesný záznam URL v seznamu (pro přesné odstranění)
+      const exactUrlToRemove = findMatchingUrl(normalizedUrl, userWebsites);
+
+      if (!exactUrlToRemove) {
+        webLog('Chyba při hledání přesné URL v seznamu', { url });
+        return res.status(500).json({
+          success: false,
+          message: 'Došlo k chybě při zpracování požadavku'
+        });
+      }
+
+      // Použijeme přesný tvar URL, který je uložen v databázi
+      const urlToRemove = exactUrlToRemove;
+      
+      // Přímá aktualizace dokumentu v MongoDB
+      webLog('Odstraňuji URL ze seznamu webů uživatele pomocí MongoDB', { url });
+      
+      // Použití správně typovaného objektu pro operaci pull
+      const updateResult = await usersCollection.updateOne(
+        { _id: new mongoose.Types.ObjectId(userId) },
+        { $pull: { websites: urlToRemove } as PullOperator<{ websites: string[] }> }
+      );
+      
+      webLog('Výsledek odstranění v MongoDB', { updateResult });
+      
+      if (updateResult.modifiedCount === 0) {
+        logger.error('Nepodařilo se aktualizovat uživatele v MongoDB');
+        return res.status(500).json({
+          success: false,
+          message: 'Nepodařilo se odstranit webovou stránku'
+        });
+      }
+      
+      // Získání aktualizovaného dokumentu
+      const updatedUser = await usersCollection.findOne({ _id: new mongoose.Types.ObjectId(userId) });
+      const updatedWebsites = updatedUser?.websites || [];
+      
+      webLog('Webová stránka úspěšně odstraněna z MongoDB');
+      webLog('Aktualizovaný seznam webů', { websites: updatedWebsites });
+      
+      return res.status(200).json({
+        success: true,
+        message: 'Webová stránka byla úspěšně odstraněna',
+        websites: updatedWebsites
+      });
+    } catch (dbError) {
+      logger.error('Chyba při práci s MongoDB', { error: dbError });
+      
+      // Záložní metoda: Použití Mongoose modelu
+      webLog('Zkouším záložní metodu s Mongoose modelem');
+      
+      const user = await User.findById(userId);
+      
+      if (!user) {
+        logger.error('Uživatel nebyl nalezen přes Mongoose', { userId });
+        return res.status(404).json({
+          success: false,
+          message: 'Uživatel nebyl nalezen'
+        });
+      }
+      
+      // Použití utility pro kontrolu URL v seznamu
+      if (!user.websites || !isUrlInList(url, user.websites)) {
+        webLog('Webová stránka nebyla nalezena v seznamu uživatele', { url });
+        return res.status(404).json({
+          success: false,
+          message: 'Tato webová stránka nebyla nalezena ve vašem účtu'
+        });
+      }
+
+      // Najít přesnou URL v seznamu
+      const exactUrl = findMatchingUrl(url, user.websites);
+
+      // Odebrání URL z pole a uložení
+      user.websites = user.websites.filter(website => website !== exactUrl);
+      await user.save();
+      
+      webLog('Webová stránka odstraněna pomocí Mongoose', { websites: user.websites });
+      
+      return res.status(200).json({
+        success: true,
+        message: 'Webová stránka byla úspěšně odstraněna (záložní metoda)',
+        websites: user.websites
       });
     }
-    
-    // Kontrola, zda uživatel má tuto URL v seznamu
-    if (!user.websites.includes(url)) {
-      console.log('[WEBSITE] Webová stránka nebyla nalezena v seznamu uživatele:', url);
-      return res.status(404).json({
-        success: false,
-        message: 'Tato webová stránka nebyla nalezena ve vašem účtu'
-      });
-    }
-    
-    // Odstranění URL ze seznamu
-    user.websites = user.websites.filter(website => website !== url);
-    
-    // Uložení změn
-    await user.save();
-    console.log('[WEBSITE] Webová stránka úspěšně odstraněna:', url);
-    
-    return res.status(200).json({
-      success: true,
-      message: 'Webová stránka byla úspěšně odstraněna',
-      websites: user.websites
-    });
     
   } catch (error) {
-    console.error('[WEBSITE] Chyba při odstraňování webové stránky:', error);
+    logger.error('Chyba při odstraňování webové stránky', { error: error instanceof Error ? error.message : String(error) });
     return res.status(500).json({
       success: false,
       message: 'Při odstraňování webové stránky došlo k chybě',
