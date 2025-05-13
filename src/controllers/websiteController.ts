@@ -20,6 +20,8 @@ export const addWebsite = async (req: Request, res: Response) => {
   webLog('Začátek přidání nové webové stránky', { body: req.body, userId: req.user?.id || req.user?._id });
   console.log('[DEBUG addWebsite] Request tělo:', req.body);
   console.log('[DEBUG addWebsite] User objekt:', req.user);
+  console.log('[DEBUG addWebsite] Request headers:', req.headers);
+  console.log('[DEBUG addWebsite] Request cookies:', req.cookies);
 
   try {
     // Získáme ID uživatele z authentication middlewaru
@@ -49,6 +51,8 @@ export const addWebsite = async (req: Request, res: Response) => {
         message: 'URL webové stránky je povinný údaj'
       });
     }
+
+    console.log('[DEBUG addWebsite] Přidávám URL:', url, 'pro uživatele s ID:', userId, 'a emailem:', req.user?.email);
 
     // Validace URL pomocí nové utility
     const urlValidation = validateUrl(url);
@@ -153,14 +157,51 @@ export const addWebsite = async (req: Request, res: Response) => {
       user.websites.push(url);
       console.log('[DEBUG addWebsite] Ukládám aktualizovaného uživatele, weby:', user.websites);
 
-      // Uložení uživatele
-      await user.save();
-      console.log('[DEBUG addWebsite] Uživatel úspěšně uložen');
+      // Uložení uživatele - zkusíme obejít možný problém s Mongoose
+      try {
+        // Ještě jednou zkontrolujeme, že user.websites je pole
+        if (!Array.isArray(user.websites)) {
+          console.error('[DEBUG addWebsite] user.websites není pole před uložením!', typeof user.websites);
+          user.websites = Array.isArray(user.websites) ? user.websites : (user.websites ? [user.websites] : []);
+        }
 
-      // Vracíme úspěšnou odpověď
+        console.log('[DEBUG addWebsite] Pokus o uložení uživatele, weby před uložením:', user.websites);
+
+        // Zkusíme přímo aktualizovat pomocí MongoDB
+        const result = await User.updateOne(
+          { _id: user._id },
+          { $addToSet: { websites: url } }
+        );
+
+        console.log('[DEBUG addWebsite] Výsledek přímé aktualizace MongoDB:', result);
+
+        // Kontrola, zda aktualizace proběhla
+        if (result.modifiedCount === 0 && result.matchedCount > 0) {
+          console.log('[DEBUG addWebsite] Záznam nalezen, ale nebyl aktualizován - URL již možná existuje');
+        }
+
+        // Načteme aktualizovaného uživatele
+        const updatedUser = await User.findById(user._id);
+        console.log('[DEBUG addWebsite] Aktualizovaný uživatel načten, weby:', updatedUser?.websites);
+
+        // Bezpečné přiřazení (TypeScript může protestovat proti přímému přiřazení)
+        if (updatedUser) {
+          user.websites = updatedUser.websites || [];
+        }
+      } catch (saveError) {
+        console.error('[DEBUG addWebsite] KRITICKÁ CHYBA při ukládání:', saveError);
+        return res.status(500).json({
+          success: false,
+          message: 'Chyba při ukládání do databáze',
+          error: saveError instanceof Error ? saveError.message : 'Unknown error'
+        });
+      }
+
+      // Vracíme úspěšnou odpověď s formatovanou zprávou
+      console.log('[DEBUG addWebsite] Odesílám úspěšnou odpověď s weby:', user.websites);
       return res.status(201).json({
         success: true,
-        message: 'Webová stránka byla úspěšně přidána',
+        message: 'Webová stránka byla úspěšně přidána!',
         websites: user.websites
       });
     } catch (dbError) {
@@ -260,7 +301,24 @@ export const getWebsites = async (req: Request, res: Response) => {
       const websites = user.websites || [];
       console.log('[DEBUG getWebsites] Vracím weby:', websites, 'Max limit:', maxAllowed);
 
+      // Kontrola, že websites jsou skutečně pole
+      if (!Array.isArray(websites)) {
+        console.error('[DEBUG getWebsites] CHYBA: websites není pole!', typeof websites);
+        // Pokusíme se o konverzi
+        const websiteArray = Array.isArray(websites) ? websites :
+                            websites ? [websites] : [];
+        console.log('[DEBUG getWebsites] Konvertované weby:', websiteArray);
+
+        // Vrácení seznamu webových stránek a limitu
+        return res.status(200).json({
+          success: true,
+          websites: websiteArray,
+          maxWebsites: maxAllowed
+        });
+      }
+
       // Vrácení seznamu webových stránek a limitu
+      console.log('[DEBUG getWebsites] Odesílám odpověď s weby:', websites);
       return res.status(200).json({
         success: true,
         websites: websites,

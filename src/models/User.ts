@@ -96,13 +96,25 @@ const UserSchema: Schema = new Schema({
 
 // Před uložením hashujeme heslo
 UserSchema.pre<IUser>('save', async function(next) {
-  if (!this.isModified('password')) return next();
-  
   try {
-    const salt = await bcrypt.genSalt(10);
-    this.password = await bcrypt.hash(this.password, salt);
+    // Logování aktualizace webových stránek
+    if (this.isModified('websites')) {
+      console.log('[USER MODEL] Ukládám uživatele s změněnými weby:', {
+        id: this._id,
+        email: this.email,
+        websites: this.websites
+      });
+    }
+
+    // Hashování hesla pouze pokud bylo změněno
+    if (this.isModified('password')) {
+      const salt = await bcrypt.genSalt(10);
+      this.password = await bcrypt.hash(this.password, salt);
+    }
+
     return next();
   } catch (e) {
+    console.error('[USER MODEL] Chyba při ukládání uživatele:', e);
     // Přidáno typování: zpracování chyby jako mongoose CallbackError
     return next(e as mongoose.CallbackError);
   }
