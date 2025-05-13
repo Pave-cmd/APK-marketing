@@ -177,6 +177,13 @@ app.get('/dashboard/weby', authenticate, (req: Request, res: Response): void => 
 app.get('/Dashboard', (req, res) => res.redirect('/dashboard'));
 app.get('/dashboard/websites', (req, res) => res.redirect('/dashboard/weby'));
 
+// Importovat emergency controller (nouzové řešení)
+import { renderEmergencyPage, directAdd } from './controllers/emergencyController';
+
+// Nouzové cesty pro přidání webu
+app.get('/dashboard/emergency-add', authenticate, renderEmergencyPage);
+app.post('/api/direct-add', express.json(), directAdd);
+
 // Další stránky
 app.get('/sluzby', (req: Request, res: Response): void => {
   res.render('services', {
