@@ -77,6 +77,11 @@ export const auth = async (req: Request, res: Response, next: NextFunction): Pro
     if (!token) {
       console.log('[DEBUG AUTH] Token nebyl nalezen');
 
+      if (res.headersSent) {
+        console.log('[DEBUG AUTH] Hlavičky již odeslány, nelze poslat odpověď');
+        return;
+      }
+      
       if (isApiRequest) {
         return res.status(401).json({
           success: false,
@@ -106,6 +111,11 @@ export const auth = async (req: Request, res: Response, next: NextFunction): Pro
       if (!user) {
         console.log('[DEBUG AUTH] Uživatel s ID', decoded.id, 'nebyl nalezen v databázi');
 
+        if (res.headersSent) {
+          console.log('[DEBUG AUTH] Hlavičky již odeslány, nelze poslat odpověď');
+          return;
+        }
+        
         if (isApiRequest) {
           return res.status(401).json({
             success: false,
@@ -136,7 +146,9 @@ export const auth = async (req: Request, res: Response, next: NextFunction): Pro
       // Kontrola, zda již nebyla odeslána odpověď
       if (!res.headersSent) {
         console.log('[DEBUG AUTH] Pokračuji do next() pro vykreslení chráněného obsahu');
-        return next();
+        next();
+        // Důležité: Nepoužíváme return next() - způsobuje, že middleware pokračuje dál
+        return;
       } else {
         console.log('[DEBUG AUTH] Hlavičky již byly odeslány, nevoláme next()');
       }
@@ -144,6 +156,11 @@ export const auth = async (req: Request, res: Response, next: NextFunction): Pro
       // Neplatný token
       console.error('[DEBUG AUTH] Chyba ověření tokenu:', error);
 
+      if (res.headersSent) {
+        console.log('[DEBUG AUTH] Hlavičky již odeslány, nelze poslat odpověď');
+        return;
+      }
+      
       if (isApiRequest) {
         return res.status(401).json({
           success: false,
@@ -159,6 +176,11 @@ export const auth = async (req: Request, res: Response, next: NextFunction): Pro
   } catch (error) {
     console.error('[DEBUG AUTH] Chyba v auth middleware:', error);
 
+    if (res.headersSent) {
+      console.log('[DEBUG AUTH] Hlavičky již odeslány, nelze poslat odpověď');
+      return;
+    }
+    
     if (req.path.startsWith('/api/')) {
       return res.status(500).json({
         success: false,

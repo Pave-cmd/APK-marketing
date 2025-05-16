@@ -64,6 +64,12 @@ const authenticate = async (req: Request, res: Response, next: NextFunction) => 
   }
   
   try {
+    // Kontrola, zda již nebyla odeslána odpověď
+    if (res.headersSent) {
+      console.log('[AUTH] Hlavičky již odeslány, nemohu provést autentizaci');
+      return;
+    }
+    
     // Kontrola tokenu v cookie
     const token = req.cookies?.authToken;
     
@@ -98,18 +104,38 @@ const authenticate = async (req: Request, res: Response, next: NextFunction) => 
       
       if (!user) {
         console.log('[AUTH] Uživatel nenalezen v DB');
+        
+        // Kontrola, zda již nebyla odeslána odpověď
+        if (res.headersSent) {
+          console.log('[AUTH] Hlavičky již odeslány, nemohu přesměrovat');
+          return;
+        }
+        
         res.clearCookie('authToken');
         res.clearCookie('loggedIn');
         return res.redirect('/prihlaseni');
       }
       
+      // Kontrola, zda již nebyla odeslána odpověď
+      if (res.headersSent) {
+        console.log('[AUTH] Hlavičky již odeslány, nemohu pokračovat s autentizací');
+        return;
+      }
+      
       // Uživatel nalezen, přidáme ho do requestu
       req.user = user;
       console.log('[AUTH] Uživatel nalezen a ověřen:', user.email);
-      return next();
+      next(); // Voláme next() bez return, abychom zabránili dvojitému volání response
       
     } catch (error) {
       console.error('[AUTH] Chyba při ověření tokenu:', error);
+      
+      // Kontrola, zda již nebyla odeslána odpověď
+      if (res.headersSent) {
+        console.log('[AUTH] Hlavičky již odeslány, nemohu přesměrovat po chybě tokenu');
+        return;
+      }
+      
       res.clearCookie('authToken');
       res.clearCookie('loggedIn');
       return res.redirect('/prihlaseni');
@@ -117,6 +143,13 @@ const authenticate = async (req: Request, res: Response, next: NextFunction) => 
     
   } catch (error) {
     console.error('[AUTH] Obecná chyba:', error);
+    
+    // Kontrola, zda již nebyla odeslána odpověď
+    if (res.headersSent) {
+      console.log('[AUTH] Hlavičky již odeslány, nemohu přesměrovat po obecné chybě');
+      return;
+    }
+    
     return res.redirect('/prihlaseni');
   }
 };
@@ -173,9 +206,27 @@ app.get('/dashboard/weby', authenticate, (req: Request, res: Response): void => 
   });
 });
 
+// Správa sociálních sítí
+app.get('/dashboard/socialni-site', authenticate, (req: Request, res: Response): void => {
+  console.log('[SERVER] Vykreslení sociálních sítí pro uživatele:', req.user.email);
+  
+  // Vytvoření dummy dat pro sociální sítě, pokud uživatel nemá žádné
+  if (!req.user.socialNetworks) {
+    req.user.socialNetworks = [];
+  }
+  
+  res.render('dashboard/socialni-site/index', {
+    title: 'Sociální sítě | APK-marketing',
+    description: 'Správa sociálních sítí pro AI marketing',
+    layout: 'layouts/dashboard',
+    user: req.user
+  });
+});
+
 // Alternativní cesty
 app.get('/Dashboard', (req, res) => res.redirect('/dashboard'));
 app.get('/dashboard/websites', (req, res) => res.redirect('/dashboard/weby'));
+app.get('/dashboard/social-networks', (req, res) => res.redirect('/dashboard/socialni-site'));
 
 // Importovat emergency controller (nouzové řešení)
 import { renderEmergencyPage, directAdd } from './controllers/emergencyController';
