@@ -7,7 +7,7 @@ import User from '../models/User';
 const router = express.Router();
 
 // Všechny routy vyžadují autentizaci
-router.use(async (req, res, next) => {
+router.use((req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
     console.log('[DEBUG websiteRoutes] Ověřování autentizace pro cestu:', req.path);
     console.log('[DEBUG websiteRoutes] Metoda:', req.method);
@@ -24,30 +24,55 @@ router.use(async (req, res, next) => {
         const secretKey = Buffer.from(process.env.JWT_SECRET || 'default-secret-key', 'utf8');
         const decoded = jwt.verify(req.cookies.authToken, secretKey) as { id: string };
 
-        // Vyhledání uživatele
-        const user = await User.findById(decoded.id);
-
-        if (user) {
-          // Uživatel nalezen, přidáme ho do requestu
-          req.user = user;
-          console.log('[DEBUG websiteRoutes] Uživatel byl ověřen přímo z cookie:', user.email);
-          return next();
-        }
+        // Použijeme synchronní způsob pro TypeScript
+        User.findById(decoded.id)
+          .then(user => {
+            if (user) {
+              // Uživatel nalezen, přidáme ho do requestu
+              req.user = user;
+              console.log('[DEBUG websiteRoutes] Uživatel byl ověřen přímo z cookie:', user.email);
+              return next();
+            } else {
+              // Použijeme standardní auth middleware
+              useAuthMiddleware();
+            }
+          })
+          .catch(e => {
+            console.error('[DEBUG websiteRoutes] Chyba při hledání uživatele:', e);
+            useAuthMiddleware();
+          });
+        
+        // Přerušíme další zpracování, protože čekáme na dokončení promise
+        return;
       } catch (e) {
         console.error('[DEBUG websiteRoutes] Chyba při verifikaci tokenu z cookie:', e);
       }
     }
-
-    // Pokud přímé ověření nefungovalo, použijeme standardní auth middleware
-    await auth(req, res, next);
-
-    // Pokud auth middleware neodešle odpověď, pokračujeme dál
-    if (!res.headersSent) {
-      console.log('[DEBUG websiteRoutes] Autentizace úspěšná, pokračuji');
-      return next();
-    } else {
-      console.log('[DEBUG websiteRoutes] Hlavičky již odeslány, nevolám next()');
+    
+    // Funkce pro použití standardního auth middleware
+    function useAuthMiddleware() {
+      // Pokud přímé ověření nefungovalo, použijeme standardní auth middleware
+      auth(req, res, () => {
+      // Tento callback se zavolá pouze při úspěšné autentizaci
+      if (!res.headersSent) {
+        console.log('[DEBUG websiteRoutes] Autentizace úspěšná, pokračuji');
+        next(); // Pouze volám next, ne return next() - aby se zabránilo dvojitému volání
+      } else {
+        console.log('[DEBUG websiteRoutes] Hlavičky již odeslány, nevolám next()');
+      }
+      }).catch(error => {
+        console.error('[DEBUG websiteRoutes] Chyba při autentizaci:', error);
+        if (!res.headersSent) {
+          res.status(500).json({
+            success: false,
+            message: 'Chyba při ověřování autentizace'
+          });
+        }
+      });
     }
+    
+    // Voláme auth middleware přímo, pokud jsme nepoužili přímé ověření
+    useAuthMiddleware();
   } catch (error) {
     console.error('[DEBUG websiteRoutes] Chyba při ověřování:', error);
     return next(error);

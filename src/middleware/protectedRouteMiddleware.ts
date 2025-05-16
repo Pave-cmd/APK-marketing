@@ -62,24 +62,46 @@ export function protectedDashboardRoute(viewPath: string, options: any) {
       // auth middleware zavolá next() v případě úspěchu, což způsobí vykonání tohoto callbacku
       // nebo přesměruje/odpoví přímo v případě chyby
       const authResult = await new Promise<boolean>((resolve) => {
-        // Vytvoření dočasného next callbacku pro auth middleware
-        const authNext = () => {
-          console.log('[DEBUG PROTECTED] Auth middleware byl úspěšný a zavolal next()');
-          resolve(true);
-        };
+        // Vytvoření dočasného next callbacku - používáme ho přímo níže v auth middleware
+        // const authNext = () => {
+        //   console.log('[DEBUG PROTECTED] Auth middleware byl úspěšný a zavolal next()');
+        //   resolve(true);
+        // };
 
         // Použití auth middleware s našim dočasným callbackem
-        auth(req, res, authNext).then((result) => {
-          // Pokud auth middleware vrátil Response, znamená to, že již odeslal odpověď
-          if (result) {
-            console.log('[DEBUG PROTECTED] Auth middleware vrátil odpověď přímo');
-            resolve(false);
+        try {
+          // Kontrola headersSent před voláním auth - další bezpečnostní opatření
+          if (res.headersSent) {
+            console.log('[DEBUG PROTECTED] Hlavičky již odeslány před auth middleware');
+            return resolve(false);
           }
-          // Jinak počkáme na callback
-        }).catch(error => {
-          console.error('[DEBUG PROTECTED] Auth middleware vyhodil chybu:', error);
+          
+          auth(req, res, () => {
+            // Tento callback se spustí pouze pokud auth middleware úspěšně ověřil uživatele
+            // a zavolal next() - což znamená, že uživatel je přihlášen
+            console.log('[DEBUG PROTECTED] Auth middleware úspěšně ověřil uživatele a zavolal next()');
+            
+            // Kontrola headersSent i po volání auth callbacku
+            if (res.headersSent) {
+              console.log('[DEBUG PROTECTED] Hlavičky odeslány během auth middleware callbacku');
+              return resolve(false);
+            }
+            
+            resolve(true);
+          }).then((result) => {
+            // Pokud auth middleware vrátil Response, znamená to, že již odeslal odpověď
+            if (result) {
+              console.log('[DEBUG PROTECTED] Auth middleware vrátil odpověď přímo');
+              resolve(false);
+            }
+          }).catch(error => {
+            console.error('[DEBUG PROTECTED] Auth middleware vyhodil chybu:', error);
+            resolve(false);
+          });
+        } catch (error) {
+          console.error('[DEBUG PROTECTED] Zachycena chyba při volání auth middleware:', error);
           resolve(false);
-        });
+        }
       });
 
       // Kontrola, zda auth middleware neodeslal odpověď sám nebo zda již není odpověď odeslána
@@ -100,19 +122,28 @@ export function protectedDashboardRoute(viewPath: string, options: any) {
 
       console.log('[DEBUG PROTECTED] Renderování pohledu', viewPath, 'pro uživatele', req.user.email);
 
+      // Kontrola, zda již nebyla odeslána odpověď před pokusem o renderování
+      if (res.headersSent) {
+        console.log('[DEBUG PROTECTED] Hlavičky již odeslány, nemohu renderovat');
+        return;
+      }
+      
       // Renderování pohledu - odpověď ještě nebyla odeslána, takže můžeme renderovat
       try {
-        return res.render(viewPath, {
+        res.render(viewPath, {
           ...options,
           layout: 'layouts/dashboard',
           user: req.user
         });
+        // Nekombinujeme return s render, aby nedošlo k dvojitému volání
       } catch (renderError) {
         console.error('[DEBUG PROTECTED] Chyba při renderování pohledu:', renderError);
-        return res.status(500).render('errors/500', {
-          title: 'Chyba serveru | APK-marketing',
-          description: 'Došlo k chybě při vykreslování stránky'
-        });
+        if (!res.headersSent) {
+          res.status(500).render('errors/500', {
+            title: 'Chyba serveru | APK-marketing',
+            description: 'Došlo k chybě při vykreslování stránky'
+          });
+        }
       }
     } catch (err) {
       // Pokud už byla odpověď odeslána, není potřeba znovu reagovat

@@ -1,14 +1,18 @@
 /**
- * Kompletně přepracovaný správce webových stránek - fungující verze
+ * Unified Website Manager - Sjednocená implementace správce webových stránek
+ * 
+ * Kombinuje funkčnost původních souborů website-manager.js a fixed-website-manager.js
+ * Odstraňuje duplicity a poskytuje konzistentní implementaci
  */
 document.addEventListener('DOMContentLoaded', function() {
-  console.log('[FIXED-WEBSITES] Inicializace správce webových stránek');
+  console.log('[WEBSITES] Inicializace sjednoceného správce webových stránek');
 
   // DOM elementy
   const websitesTableBody = document.getElementById('websitesTableBody');
   const emptyWebsitesMessage = document.getElementById('emptyWebsitesMessage');
   const websitesList = document.getElementById('websitesList');
   const addWebsiteForm = document.getElementById('addWebsiteForm');
+  const websiteLimit = document.getElementById('websiteLimit');
   const alertContainer = document.getElementById('alertContainer');
   const modalAlertContainer = document.getElementById('modalAlertContainer');
   
@@ -16,9 +20,9 @@ document.addEventListener('DOMContentLoaded', function() {
   const saveWebsiteBtn = document.getElementById('saveWebsiteBtn');
   const saveWebsiteSpinner = document.getElementById('saveWebsiteSpinner');
   
-  // Funkce pro zobrazení zprávy v modálním okně
+  // Pomocná funkce pro zobrazení zprávy v modálním okně
   function showModalAlert(message, type = 'info') {
-    console.log(`[FIXED-WEBSITES] Modal Alert (${type}):`, message);
+    console.log(`[WEBSITES] Modal Alert (${type}):`, message);
     
     if (modalAlertContainer) {
       modalAlertContainer.innerHTML = `
@@ -30,9 +34,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
   
-  // Funkce pro zobrazení zprávy na stránce
+  // Pomocná funkce pro zobrazení zprávy na stránce
   function displayAlert(message, type = 'info') {
-    console.log(`[FIXED-WEBSITES] Page Alert (${type}):`, message);
+    console.log(`[WEBSITES] Page Alert (${type}):`, message);
     
     if (alertContainer) {
       const alertElement = document.createElement('div');
@@ -58,12 +62,18 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Funkce pro načtení seznamu webů
   function loadWebsites() {
-    console.log('[FIXED-WEBSITES] Načítám seznam webů');
+    console.log('[WEBSITES] Načítám seznam webů');
     
     // Zobrazení loading stavu
     const loadingIndicator = document.getElementById('websitesLoadingIndicator');
     if (loadingIndicator) {
       loadingIndicator.classList.remove('d-none');
+    }
+    
+    // Skrytí případné předchozí chyby
+    const errorContainer = document.getElementById('websitesErrorContainer');
+    if (errorContainer) {
+      errorContainer.classList.add('d-none');
     }
     
     // API požadavek
@@ -76,18 +86,25 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     })
     .then(response => {
-      console.log('[FIXED-WEBSITES] Odpověď na GET /api/websites:', response.status);
+      console.log('[WEBSITES] Odpověď na GET /api/websites:', response.status);
       
-      if (!response.ok) {
-        throw new Error(`Server vrátil chybu: ${response.status}`);
+      // Kontrola chybových kódů
+      if (response.status === 401) {
+        throw new Error('Pro zobrazení webů se musíte přihlásit');
+      } else if (response.status === 403) {
+        throw new Error('Nemáte oprávnění pro zobrazení webů');
+      } else if (response.status >= 500) {
+        throw new Error('Server není momentálně dostupný (HTTP ' + response.status + ')');
+      } else if (!response.ok) {
+        throw new Error('Nepodařilo se načíst seznam webů (HTTP ' + response.status + ')');
       }
       
       return response.json().catch(err => {
-        throw new Error('Neplatná odpověď ze serveru');
+        throw new Error('Server vrátil neplatná data. Zkuste to znovu později.');
       });
     })
     .then(data => {
-      console.log('[FIXED-WEBSITES] Data webů:', data);
+      console.log('[WEBSITES] Data webů:', data);
       
       // Skrytí loading indikátoru
       if (loadingIndicator) {
@@ -100,16 +117,23 @@ document.addEventListener('DOMContentLoaded', function() {
       }
       
       // Nastavení limitu
-      const websiteLimit = document.getElementById('websiteLimit');
       if (websiteLimit && data.maxWebsites) {
         websiteLimit.textContent = data.maxWebsites;
       }
       
       // Zpracování seznamu webů
-      renderWebsites(data.websites || []);
+      // Normalizace dat na pole
+      let websitesArray = [];
+      if (Array.isArray(data.websites)) {
+        websitesArray = data.websites;
+      } else if (data.websites) {
+        websitesArray = [data.websites];
+      }
+      
+      renderWebsites(websitesArray);
     })
     .catch(error => {
-      console.error('[FIXED-WEBSITES] Chyba při načítání webů:', error);
+      console.error('[WEBSITES] Chyba při načítání webů:', error);
       
       // Skrytí loading indikátoru
       if (loadingIndicator) {
@@ -117,7 +141,26 @@ document.addEventListener('DOMContentLoaded', function() {
       }
       
       // Zobrazení chyby
-      displayAlert(`Chyba při načítání webů: ${error.message}`, 'danger');
+      displayAlert('Chyba: ' + error.message, 'danger');
+      
+      // Pomocná funkce pro zobrazení chyby
+      function showError(title, message) {
+        const errorContainer = document.getElementById('websitesErrorContainer');
+        if (errorContainer) {
+          errorContainer.classList.remove('d-none');
+          errorContainer.innerHTML = `
+            <div class="alert alert-danger">
+              <h5>${title}</h5>
+              <p>${message}</p>
+              <button class="btn btn-sm btn-outline-danger mt-2" onclick="loadWebsites()">
+                <i class="fas fa-sync-alt"></i> Zkusit znovu
+              </button>
+            </div>
+          `;
+        }
+      }
+      
+      showError('Problém při načítání webů', error.message);
       
       // Zobrazení prázdného stavu
       renderWebsites([]);
@@ -126,9 +169,8 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Funkce pro vykreslení seznamu webů
   function renderWebsites(websites) {
-    // Zajistit, že máme opravdu pole
     const websitesArray = Array.isArray(websites) ? websites : [];
-    console.log('[FIXED-WEBSITES] Vykreslování webů:', websitesArray);
+    console.log('[WEBSITES] Vykreslování webů:', websitesArray);
     
     // Kontrola prázdného stavu
     if (websitesArray.length === 0) {
@@ -192,11 +234,9 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Inicializace formuláře pro přidání webu
   if (addWebsiteForm) {
-    console.log('[FIXED-WEBSITES] Inicializace formuláře pro přidání webu');
-    
     addWebsiteForm.addEventListener('submit', function(e) {
       e.preventDefault();
-      console.log('[FIXED-WEBSITES] Zpracování formuláře pro přidání webu');
+      console.log('[WEBSITES] Zpracování formuláře pro přidání webu');
       
       // Získání URL z formuláře
       let url = document.getElementById('websiteUrl').value.trim();
@@ -223,10 +263,7 @@ document.addEventListener('DOMContentLoaded', function() {
       if (saveWebsiteBtn) saveWebsiteBtn.disabled = true;
       if (saveWebsiteSpinner) saveWebsiteSpinner.classList.remove('d-none');
       
-      // Odeslání požadavku na server
-      console.log('[FIXED-WEBSITES] Odesílám požadavek na přidání webu:', url);
-      
-      // Použití direct-add endpointu, který funguje spolehlivě
+      // Odeslání požadavku na server - preferujeme direct-add, který funguje spolehlivě
       fetch('/api/direct-add', {
         method: 'POST',
         headers: {
@@ -240,10 +277,10 @@ document.addEventListener('DOMContentLoaded', function() {
         credentials: 'include'
       })
       .then(response => {
-        console.log('[FIXED-WEBSITES] Odpověď na přidání webu:', response.status);
+        console.log('[WEBSITES] Odpověď na přidání webu:', response.status);
         
         return response.text().then(text => {
-          console.log('[FIXED-WEBSITES] Surová odpověď:', text);
+          console.log('[WEBSITES] Surová odpověď:', text);
           try {
             return JSON.parse(text);
           } catch (e) {
@@ -252,11 +289,32 @@ document.addEventListener('DOMContentLoaded', function() {
         });
       })
       .then(data => {
-        console.log('[FIXED-WEBSITES] Zpracovaná odpověď:', data);
+        console.log('[WEBSITES] Zpracovaná odpověď:', data);
         
         if (data.success) {
-          // Úspěšné přidání
-          displayAlert('Webová stránka byla úspěšně přidána!', 'success');
+          // Formátujeme seznam webů do čitelnější podoby
+          let websiteList = '';
+          if (Array.isArray(data.websites) && data.websites.length > 0) {
+              websiteList = '<ul class="mb-0 ps-3">';
+              data.websites.forEach(website => {
+                  websiteList += `<li><a href="${website}" target="_blank">${website}</a></li>`;
+              });
+              websiteList += '</ul>';
+          }
+          
+          // Úspěšné přidání s formátovaným seznamem webů
+          displayAlert(`
+              <div class="d-flex align-items-center">
+                  <div class="me-3">
+                      <i class="fas fa-check-circle text-success fa-2x"></i>
+                  </div>
+                  <div>
+                      <strong>Webová stránka byla úspěšně přidána!</strong>
+                      <div class="mt-1">Vaše aktivní webové stránky:</div>
+                      ${websiteList}
+                  </div>
+              </div>
+          `, 'success');
           
           // Resetování formuláře
           addWebsiteForm.reset();
@@ -269,7 +327,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const closeButton = document.querySelector('#addWebsiteModal .btn-close');
             if (closeButton) closeButton.click();
           } catch (e) {
-            console.error('[FIXED-WEBSITES] Chyba při zavírání modálu:', e);
+            console.error('[WEBSITES] Chyba při zavírání modálu:', e);
           }
         } else {
           // Chyba
@@ -277,7 +335,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
       })
       .catch(error => {
-        console.error('[FIXED-WEBSITES] Chyba při přidání webu:', error);
+        console.error('[WEBSITES] Chyba při přidání webu:', error);
         showModalAlert(`Chyba při komunikaci se serverem: ${error.message}`, 'danger');
       })
       .finally(() => {
@@ -291,8 +349,6 @@ document.addEventListener('DOMContentLoaded', function() {
   // Inicializace formuláře pro odstranění webu
   const removeWebsiteForm = document.getElementById('removeWebsiteForm');
   if (removeWebsiteForm) {
-    console.log('[FIXED-WEBSITES] Inicializace formuláře pro odstranění webu');
-    
     removeWebsiteForm.addEventListener('submit', function(e) {
       e.preventDefault();
       
@@ -325,7 +381,7 @@ document.addEventListener('DOMContentLoaded', function() {
           const closeButton = document.querySelector('#removeWebsiteModal .btn-close');
           if (closeButton) closeButton.click();
         } catch (e) {
-          console.error('[FIXED-WEBSITES] Chyba při zavírání modálu:', e);
+          console.error('[WEBSITES] Chyba při zavírání modálu:', e);
         }
         
         if (data.success) {
@@ -340,13 +396,13 @@ document.addEventListener('DOMContentLoaded', function() {
         }
       })
       .catch(error => {
-        console.error('[FIXED-WEBSITES] Chyba při odstraňování webu:', error);
+        console.error('[WEBSITES] Chyba při odstraňování webu:', error);
         
         try {
           const closeButton = document.querySelector('#removeWebsiteModal .btn-close');
           if (closeButton) closeButton.click();
         } catch (e) {
-          console.error('[FIXED-WEBSITES] Chyba při zavírání modálu:', e);
+          console.error('[WEBSITES] Chyba při zavírání modálu:', e);
         }
         
         displayAlert('Chyba při komunikaci se serverem', 'danger');
@@ -359,8 +415,84 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
   
+  // Nástroje pro testování
+  function initTestButton() {
+    const testButton = document.getElementById('testDirectRequestBtn');
+    if (testButton) {
+      testButton.addEventListener('click', function(e) {
+        e.preventDefault();
+        runDirectTest();
+      });
+    }
+  }
+  
+  function runDirectTest() {
+    console.log('[TEST] Spouštím přímý test');
+    addTestMessage("Test začal...");
+
+    const url = document.getElementById('websiteUrl').value.trim() || 'https://example.com';
+    addTestMessage("Testovaná URL: " + url);
+
+    fetch('/api/test-auth', {
+        method: 'GET',
+        credentials: 'include'
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error("Auth test selhal se statusem: " + response.status);
+        }
+        addTestMessage("Auth test úspěšný (status: " + response.status + ")");
+        return response.json();
+    })
+    .then(authData => {
+        addTestMessage("Přihlášen jako: " + (authData.user?.email || "neznámý"));
+
+        return fetch('/api/websites/add', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ url }),
+            credentials: 'include'
+        });
+    })
+    .then(response => {
+        addTestMessage("Add Website status: " + response.status);
+        return response.text();
+    })
+    .then(text => {
+        try {
+            const data = JSON.parse(text);
+            addTestMessage(data.success ? "Úspěch: " + data.message : "Chyba: " + data.message);
+
+            if (data.success) {
+                setTimeout(loadWebsites, 1000);
+            }
+        } catch (e) {
+            addTestMessage("Nelze parsovat odpověď jako JSON: " + text, true);
+        }
+    })
+    .catch(error => {
+        addTestMessage("Chyba: " + error.message, true);
+    });
+  }
+  
+  function addTestMessage(message, isError = false) {
+    console.log(`[TEST] ${message}`);
+    
+    const testContainer = document.getElementById('testOutputContainer');
+    if (testContainer) {
+      const msgElement = document.createElement('div');
+      msgElement.className = isError ? 'test-error' : 'test-info';
+      msgElement.textContent = message;
+      testContainer.appendChild(msgElement);
+      testContainer.scrollTop = testContainer.scrollHeight;
+    }
+  }
+  
   // Načtení webů při inicializaci
   loadWebsites();
   
-  console.log('[FIXED-WEBSITES] Inicializace dokončena');
+  // Inicializace testovacího tlačítka
+  initTestButton();
+  
+  console.log('[WEBSITES] Inicializace dokončena');
 });
