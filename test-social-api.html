@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Social API</title>
+</head>
+<body>
+    <h1>Test Social Network API</h1>
+    <button onclick="testAPI()">Test Add Social Network</button>
+    <div id="result"></div>
+
+    <script>
+        async function testAPI() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.textContent = 'Testing...';
+            
+            try {
+                const response = await fetch('/api/social-networks/add', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'same-origin',
+                    body: JSON.stringify({
+                        platform: 'facebook',
+                        accountId: 'testuser',
+                        profileUrl: 'https://facebook.com/testuser'
+                    })
+                });
+                
+                const data = await response.json();
+                resultDiv.textContent = JSON.stringify(data, null, 2);
+                console.log('Response:', data);
+            } catch (error) {
+                resultDiv.textContent = 'Error: ' + error.message;
+                console.error('Error:', error);
+            }
+        }
+    </script>
+</body>
+</html>

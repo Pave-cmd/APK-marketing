@@ -8,6 +8,8 @@ import { SERVER_CONFIG, SECURITY_CONFIG } from './config/config';
 import User from './models/User';
 import authRoutes from './routes/authRoutes';
 import websiteRoutes from './routes/websiteRoutes';
+import socialNetworkRoutes from './routes/socialNetworkRoutes';
+import apiConfigRoutes from './routes/apiConfigRoutes';
 import jwt from 'jsonwebtoken';
 import { setAuthCookies } from './utils/cookieUtils';
 
@@ -20,6 +22,10 @@ connectDB();
 console.log('Připojování k MongoDB Atlas...');
 
 // Middleware
+app.use((req, res, next) => {
+  console.log(`[HTTP] ${req.method} ${req.originalUrl}`);
+  next();
+});
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -34,8 +40,14 @@ console.log('[SERVER] Cesta ke statickým souborům:', staticPath);
 app.use(express.static(staticPath));
 
 // API Routes
+console.log('[SERVER] Registering API routes');
 app.use('/api/auth', authRoutes);
 app.use('/api/websites', websiteRoutes);
+app.use('/api/social-networks', socialNetworkRoutes);
+app.use('/api/config', (req, res, next) => {
+  console.log('[SERVER] API config route hit:', req.method, req.path);
+  next();
+}, apiConfigRoutes);
 
 // EJS šablony a layout
 app.use(expressLayouts);
@@ -218,6 +230,28 @@ app.get('/dashboard/socialni-site', authenticate, (req: Request, res: Response):
   res.render('dashboard/socialni-site/index', {
     title: 'Sociální sítě | APK-marketing',
     description: 'Správa sociálních sítí pro AI marketing',
+    layout: 'layouts/dashboard',
+    user: req.user
+  });
+});
+
+// API konfigurace
+app.get('/dashboard/api-config', authenticate, (req: Request, res: Response): void => {
+  console.log('[SERVER] Vykreslení API konfigurace pro uživatele:', req.user.email);
+  
+  // Pouze admin může přistupovat k této stránce
+  if (req.user.email !== 'fa@fa.com') { // Změňte na správný admin email
+    return res.status(403).render('errors/403', {
+      title: 'Přístup odepřen | APK-marketing',
+      description: 'Nemáte oprávnění k této stránce',
+      layout: 'layouts/dashboard',
+      user: req.user
+    });
+  }
+  
+  res.render('dashboard/api-config', {
+    title: 'API konfigurace | APK-marketing',
+    description: 'Správa API klíčů pro sociální sítě',
     layout: 'layouts/dashboard',
     user: req.user
   });

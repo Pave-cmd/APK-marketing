@@ -1,0 +1,159 @@
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h1 class="h2 mb-3">Nastavení API klíčů</h1>
+            <p class="lead">Zde můžete spravovat API klíče pro připojení k sociálním sítím.</p>
+            <div id="debug-output" class="alert alert-info mt-3">
+                <strong>Debug Info:</strong>
+                <div id="debug-messages"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Facebook -->
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fab fa-facebook me-2"></i>Facebook
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form id="facebook-config-form">
+                        <div class="mb-3">
+                            <label for="fb-app-id" class="form-label">App ID</label>
+                            <input type="text" class="form-control" id="fb-app-id" placeholder="Váš Facebook App ID">
+                        </div>
+                        <div class="mb-3">
+                            <label for="fb-app-secret" class="form-label">App Secret</label>
+                            <input type="password" class="form-control" id="fb-app-secret" placeholder="Váš Facebook App Secret">
+                            <small class="text-muted">Hodnota je šifrována v databázi</small>
+                        </div>
+                        <div class="mb-3">
+                            <label for="fb-redirect-uri" class="form-label">Redirect URI</label>
+                            <input type="text" class="form-control" id="fb-redirect-uri" readonly value="">
+                            <small class="text-muted">Použijte tuto URL v nastavení Facebook aplikace</small>
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i>Uložit
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary ms-2 test-config-btn" data-platform="facebook">
+                            <i class="fas fa-check me-2"></i>Testovat
+                        </button>
+                        <button type="button" class="btn btn-outline-info ms-2" data-bs-toggle="modal" data-bs-target="#facebookGuideModal">
+                            <i class="fas fa-question-circle me-2"></i>Návod
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Twitter -->
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-info text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fab fa-twitter me-2"></i>Twitter/X
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form id="twitter-config-form">
+                        <div class="mb-3">
+                            <label for="tw-client-id" class="form-label">Client ID</label>
+                            <input type="text" class="form-control" id="tw-client-id" placeholder="Váš Twitter Client ID">
+                        </div>
+                        <div class="mb-3">
+                            <label for="tw-client-secret" class="form-label">Client Secret</label>
+                            <input type="password" class="form-control" id="tw-client-secret" placeholder="Váš Twitter Client Secret">
+                            <small class="text-muted">Hodnota je šifrována v databázi</small>
+                        </div>
+                        <div class="mb-3">
+                            <label for="tw-redirect-uri" class="form-label">Redirect URI</label>
+                            <input type="text" class="form-control" id="tw-redirect-uri" readonly value="">
+                            <small class="text-muted">Použijte tuto URL v nastavení Twitter aplikace</small>
+                        </div>
+                        <button type="submit" class="btn btn-info text-white">
+                            <i class="fas fa-save me-2"></i>Uložit
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary ms-2 test-config-btn" data-platform="twitter">
+                            <i class="fas fa-check me-2"></i>Testovat
+                        </button>
+                        <button type="button" class="btn btn-outline-info ms-2" data-bs-toggle="modal" data-bs-target="#twitterGuideModal">
+                            <i class="fas fa-question-circle me-2"></i>Návod
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- LinkedIn -->
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fab fa-linkedin me-2"></i>LinkedIn
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form id="linkedin-config-form">
+                        <div class="mb-3">
+                            <label for="li-client-id" class="form-label">Client ID</label>
+                            <input type="text" class="form-control" id="li-client-id" placeholder="Váš LinkedIn Client ID">
+                        </div>
+                        <div class="mb-3">
+                            <label for="li-client-secret" class="form-label">Client Secret</label>
+                            <input type="password" class="form-control" id="li-client-secret" placeholder="Váš LinkedIn Client Secret">
+                            <small class="text-muted">Hodnota je šifrována v databázi</small>
+                        </div>
+                        <div class="mb-3">
+                            <label for="li-redirect-uri" class="form-label">Redirect URI</label>
+                            <input type="text" class="form-control" id="li-redirect-uri" readonly value="">
+                            <small class="text-muted">Použijte tuto URL v nastavení LinkedIn aplikace</small>
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i>Uložit
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary ms-2 test-config-btn" data-platform="linkedin">
+                            <i class="fas fa-check me-2"></i>Testovat
+                        </button>
+                        <button type="button" class="btn btn-outline-info ms-2" data-bs-toggle="modal" data-bs-target="#linkedinGuideModal">
+                            <i class="fas fa-question-circle me-2"></i>Návod
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Návod -->
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-info-circle me-2"></i>Návod
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <h6>Jak získat API klíče:</h6>
+                    <ul>
+                        <li><strong>Facebook:</strong> <a href="https://developers.facebook.com/" target="_blank">Facebook Developers</a></li>
+                        <li><strong>Twitter:</strong> <a href="https://developer.twitter.com/" target="_blank">Twitter Developer Portal</a></li>
+                        <li><strong>LinkedIn:</strong> <a href="https://www.linkedin.com/developers/" target="_blank">LinkedIn Developers</a></li>
+                    </ul>
+                    
+                    <h6 class="mt-4">Důležité upozornění:</h6>
+                    <ul>
+                        <li>API klíče jsou bezpečně šifrovány v databázi</li>
+                        <li>Nikdy nesdílejte svoje API klíče</li>
+                        <li>Pro každou doménu vytvořte vlastní aplikaci</li>
+                        <li>Nastavte správné redirect URI v aplikacích</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/js/api-config.js"></script>
+
+<%- include('../partials/api-guide') %>

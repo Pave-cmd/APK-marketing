@@ -1,4 +1,4 @@
-import express, { RequestHandler, Request, Response } from 'express';
+import express, { RequestHandler } from 'express';
 import * as authController from '../controllers/authController';
 import { auth } from '../middleware/authMiddleware';
 

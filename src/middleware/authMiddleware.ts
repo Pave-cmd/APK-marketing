@@ -19,6 +19,7 @@ declare global {
 export const auth = async (req: Request, res: Response, next: NextFunction): Promise<void | Response> => {
   try {
     console.log('[DEBUG AUTH] Auth middleware - začátek ověření');
+    console.log('[DEBUG AUTH] Method:', req.method, 'Original URL:', req.originalUrl, 'Path:', req.path);
 
     // Zabránění nekonečné smyčce - pokud jdeme na přihlašovací stránku nebo je to opakované přesměrování,
     // nikdy nepřesměrováváme zpět na přihlášení
@@ -38,8 +39,8 @@ export const auth = async (req: Request, res: Response, next: NextFunction): Pro
     }
 
     // Pro API requesty vracíme JSON chyby místo přesměrování
-    const isApiRequest = req.path.startsWith('/api/');
-    console.log('[DEBUG AUTH] Je to API request?', isApiRequest, 'path:', req.path);
+    const isApiRequest = req.originalUrl.startsWith('/api/');
+    console.log('[DEBUG AUTH] Je to API request?', isApiRequest, 'path:', req.path, 'originalUrl:', req.originalUrl);
 
     // Získání tokenu z různých zdrojů (hlavička, cookie, query parametr)
     let token = '';
@@ -181,7 +182,7 @@ export const auth = async (req: Request, res: Response, next: NextFunction): Pro
       return;
     }
     
-    if (req.path.startsWith('/api/')) {
+    if (req.originalUrl.startsWith('/api/')) {
       return res.status(500).json({
         success: false,
         message: 'Chyba při ověřování přihlášení.'

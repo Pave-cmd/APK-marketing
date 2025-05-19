@@ -36,27 +36,27 @@
                                                 <i class="fab fa-twitter text-info me-2"></i>Twitter
                                             <% } else if (network.platform === 'linkedin') { %>
                                                 <i class="fab fa-linkedin text-primary me-2"></i>LinkedIn
-                                            <% } else if (network.platform === 'pinterest') { %>
-                                                <i class="fab fa-pinterest text-danger me-2"></i>Pinterest
-                                            <% } else if (network.platform === 'tiktok') { %>
-                                                <i class="fab fa-tiktok text-dark me-2"></i>TikTok
-                                            <% } else if (network.platform === 'youtube') { %>
-                                                <i class="fab fa-youtube text-danger me-2"></i>YouTube
                                             <% } %>
                                         </td>
                                         <td><%= network.accountId %></td>
                                         <td>
-                                            <% if (network.isConnected) { %>
-                                                <span class="badge bg-success">Aktivní</span>
+                                            <% if (network.isConnected && network.accessToken && network.accessToken !== 'temp-token') { %>
+                                                <span class="badge bg-success">Autentizováno</span>
                                             <% } else { %>
-                                                <span class="badge bg-warning">Neaktivní</span>
+                                                <span class="badge bg-warning">Vyžaduje autentizaci</span>
                                             <% } %>
                                         </td>
                                         <td>
-                                            <button class="btn btn-sm btn-outline-primary me-1" data-network-id="<%= network.id %>">
-                                                <i class="fas fa-cog"></i>
-                                            </button>
-                                            <button class="btn btn-sm btn-outline-danger network-remove" data-network-id="<%= network.id %>">
+                                            <% if (!network.isConnected || !network.accessToken || network.accessToken === 'temp-token') { %>
+                                                <button class="btn btn-sm btn-outline-success authenticate-btn" data-network-id="<%= network._id %>" data-platform="<%= network.platform %>">
+                                                    <i class="fas fa-check"></i> Autentizovat
+                                                </button>
+                                            <% } else { %>
+                                                <button class="btn btn-sm btn-outline-info test-post-btn" data-network-id="<%= network._id %>" data-platform="<%= network.platform %>">
+                                                    <i class="fas fa-paper-plane"></i> Test příspěvku
+                                                </button>
+                                            <% } %>
+                                            <button class="btn btn-sm btn-outline-danger network-remove" data-network-id="<%= network._id %>">
                                                 <i class="fas fa-trash"></i>
                                             </button>
                                         </td>
@@ -76,65 +76,6 @@
                         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addNetworkModal">
                             <i class="fas fa-plus me-2"></i>Přidat sociální síť
                         </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <div class="row">
-        <div class="col-md-6 mb-4">
-            <div class="card shadow-sm h-100">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="card-title mb-0">Automatické publikování</h5>
-                </div>
-                <div class="card-body">
-                    <p>Nastavte automatické publikování obsahu na vašich sociálních sítích:</p>
-                    <div class="form-check form-switch mb-3">
-                        <input class="form-check-input" type="checkbox" id="autoPublish">
-                        <label class="form-check-label" for="autoPublish">Povolit automatické publikování</label>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label for="publishFrequency" class="form-label">Frekvence publikování</label>
-                        <select class="form-select" id="publishFrequency">
-                            <option value="daily">Denně</option>
-                            <option value="weekly">Týdně</option>
-                            <option value="biweekly">Dvakrát týdně</option>
-                            <option value="monthly">Měsíčně</option>
-                        </select>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label for="contentType" class="form-label">Typ obsahu</label>
-                        <select class="form-select" id="contentType">
-                            <option value="blog">Blogové příspěvky</option>
-                            <option value="news">Novinky</option>
-                            <option value="products">Produkty</option>
-                            <option value="mix">Kombinovaný obsah</option>
-                        </select>
-                    </div>
-                    
-                    <button class="btn btn-primary">
-                        <i class="fas fa-save me-2"></i>Uložit nastavení
-                    </button>
-                </div>
-            </div>
-        </div>
-        
-        <div class="col-md-6 mb-4">
-            <div class="card shadow-sm h-100">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="card-title mb-0">Statistiky sociálních sítí</h5>
-                </div>
-                <div class="card-body">
-                    <div class="alert alert-primary">
-                        <i class="fas fa-chart-line me-2"></i>
-                        Statistiky budou dostupné po připojení sociálních sítí a publikování prvních příspěvků.
-                    </div>
-                    <div class="text-center py-4">
-                        <i class="fas fa-chart-bar fa-4x text-muted mb-3"></i>
-                        <p>Sledujte dosah a engagement vašich příspěvků na sociálních sítích.</p>
                     </div>
                 </div>
             </div>
@@ -176,17 +117,18 @@
                     <div class="alert alert-info">
                         <small>
                             <i class="fas fa-info-circle me-1"></i>
-                            Pro propojení sociální sítě budete přesměrováni na přihlašovací stránku vybrané platformy.
+                            Zadejte název a URL vašeho profilu nebo stránky na sociální síti.
                         </small>
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Zrušit</button>
-                <button type="button" class="btn btn-primary" id="addNetworkBtn">Připojit síť</button>
+                <button type="button" class="btn btn-primary" id="addNetworkBtn">Uložit profil</button>
+                <button type="button" class="btn btn-success" id="authenticateBtn" style="display: none;">Autentizovat</button>
             </div>
         </div>
     </div>
 </div>
 
-<script src="/js/socialni-site.js"></script>
+<!-- Scripts are now in the layout file -->

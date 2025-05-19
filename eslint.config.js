@@ -7,6 +7,7 @@ module.exports = [
   js.configs.recommended,
   {
     files: ['**/*.js', '**/*.ts'],
+    ignores: ['dist/**/*', 'node_modules/**/*', 'jscpd-report/**/*', 'src/public/js/**/*'],
     plugins: {
       '@typescript-eslint': tseslint,
       'unused-imports': unusedImports
@@ -24,7 +25,8 @@ module.exports = [
         module: 'readonly',
         __dirname: 'readonly',
         require: 'readonly',
-        Buffer: 'readonly'
+        Buffer: 'readonly',
+        URL: 'readonly'
       }
     },
     rules: {
@@ -40,7 +42,24 @@ module.exports = [
           'argsIgnorePattern': '^_'
         }
       ]
-    },
-    ignores: ['dist/**/*', 'node_modules/**/*', 'jscpd-report/**/*']
+    }
+  },
+  {
+    files: ['src/public/js/**/*.js'],
+    languageOptions: {
+      globals: {
+        document: 'readonly',
+        window: 'readonly',
+        bootstrap: 'readonly',
+        localStorage: 'readonly',
+        sessionStorage: 'readonly',
+        Response: 'readonly',
+        Headers: 'readonly',
+        fetch: 'readonly',
+        setInterval: 'readonly',
+        location: 'readonly',
+        HTMLElement: 'readonly'
+      }
+    }
   }
 ];

@@ -1,0 +1,256 @@
+<!-- Návod pro Facebook -->
+<div class="modal fade" id="facebookGuideModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">
+                    <i class="fab fa-facebook me-2"></i>Návod pro získání Facebook API klíčů
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="step-by-step">
+                    <h6>Krok 1: Přihlaste se na Facebook Developers</h6>
+                    <ol>
+                        <li>Otevřete stránku <a href="https://developers.facebook.com/" target="_blank">developers.facebook.com</a></li>
+                        <li>Klikněte na tlačítko "Začít" nebo "Get Started"</li>
+                        <li>Přihlaste se svým běžným Facebook účtem</li>
+                        <li>Souhlaste s podmínkami pro vývojáře</li>
+                    </ol>
+                    
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Tip:</strong> Použijte stejný účet, kterým spravujete své Facebook stránky.
+                    </div>
+                    
+                    <h6 class="mt-4">Krok 2: Vytvořte novou aplikaci</h6>
+                    <ol>
+                        <li>Klikněte na "Moje aplikace" v horním menu</li>
+                        <li>Klikněte na zelené tlačítko "Vytvořit aplikaci"</li>
+                        <li>Vyberte typ aplikace "Podnikání" (Business)</li>
+                        <li>Zadejte název aplikace, např. "Moje firma - marketing"</li>
+                        <li>Zadejte váš email</li>
+                        <li>Klikněte na "Vytvořit aplikaci"</li>
+                    </ol>
+                    
+                    <h6 class="mt-4">Krok 3: Najděte App ID a App Secret</h6>
+                    <ol>
+                        <li>Po vytvoření aplikace budete přesměrováni na dashboard</li>
+                        <li><strong>App ID</strong> najdete hned nahoře (dlouhé číslo)</li>
+                        <li>Pro <strong>App Secret</strong>:
+                            <ul>
+                                <li>Klikněte na "Nastavení" → "Základní"</li>
+                                <li>U pole "App Secret" klikněte na "Zobrazit"</li>
+                                <li>Zadejte své Facebook heslo</li>
+                                <li>Zkopírujte zobrazený kód</li>
+                            </ul>
+                        </li>
+                    </ol>
+                    
+                    <h6 class="mt-4">Krok 4: Aktivujte Facebook Login</h6>
+                    <ol>
+                        <li>V levém menu klikněte na "Produkty"</li>
+                        <li>Najděte "Facebook Login" a klikněte na "Nastavit"</li>
+                        <li>Vyberte "Web"</li>
+                        <li>Do pole "URL webu" zadejte: <code><%= process.env.APP_URL || 'http://localhost:3000' %></code></li>
+                        <li>Klikněte na "Uložit"</li>
+                    </ol>
+                    
+                    <h6 class="mt-4">Krok 5: Nastavte platné OAuth URI</h6>
+                    <ol>
+                        <li>Jděte na "Facebook Login" → "Nastavení"</li>
+                        <li>Do pole "Platné URI pro přesměrování OAuth" vložte:
+                            <div class="bg-light p-2 mt-2">
+                                <code><%= process.env.APP_URL || 'http://localhost:3000' %>/api/social-networks/callback/facebook</code>
+                            </div>
+                        </li>
+                        <li>Klikněte na "Uložit změny"</li>
+                    </ol>
+                    
+                    <div class="alert alert-success mt-4">
+                        <i class="fas fa-check-circle me-2"></i>
+                        <strong>Hotovo!</strong> Nyní zkopírujte App ID a App Secret do formuláře výše a uložte.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Návod pro Twitter -->
+<div class="modal fade" id="twitterGuideModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title">
+                    <i class="fab fa-twitter me-2"></i>Návod pro získání Twitter API klíčů
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="step-by-step">
+                    <h6>Krok 1: Registrace na Twitter Developer Portal</h6>
+                    <ol>
+                        <li>Otevřete stránku <a href="https://developer.twitter.com/" target="_blank">developer.twitter.com</a></li>
+                        <li>Klikněte na "Sign up" (Registrovat)</li>
+                        <li>Přihlaste se svým Twitter/X účtem</li>
+                        <li>Vyplňte důvod použití API:
+                            <ul>
+                                <li>Vyberte "Making a bot"</li>
+                                <li>Popište: "Automatické publikování marketingového obsahu"</li>
+                            </ul>
+                        </li>
+                        <li>Souhlaste s podmínkami</li>
+                    </ol>
+                    
+                    <h6 class="mt-4">Krok 2: Vytvořte projekt a aplikaci</h6>
+                    <ol>
+                        <li>Po schválení klikněte na "Create a project"</li>
+                        <li>Pojmenujte projekt, např. "Marketing automatizace"</li>
+                        <li>Vyberte účel: "Publishing tweets and analyzing data"</li>
+                        <li>Vytvořte aplikaci v rámci projektu</li>
+                        <li>Pojmenujte aplikaci, např. "Moje firma bot"</li>
+                    </ol>
+                    
+                    <h6 class="mt-4">Krok 3: Získejte API klíče</h6>
+                    <ol>
+                        <li>Po vytvoření aplikace uvidíte:
+                            <ul>
+                                <li><strong>API Key</strong> = Client ID</li>
+                                <li><strong>API Key Secret</strong> = Client Secret</li>
+                            </ul>
+                        </li>
+                        <li><strong>DŮLEŽITÉ:</strong> Okamžitě si klíče zkopírujte!</li>
+                        <li>Twitter je znovu nezobrazí</li>
+                    </ol>
+                    
+                    <h6 class="mt-4">Krok 4: Nastavte OAuth 2.0</h6>
+                    <ol>
+                        <li>V nastavení aplikace najděte "User authentication settings"</li>
+                        <li>Klikněte na "Set up"</li>
+                        <li>Zapněte OAuth 2.0</li>
+                        <li>Nastavte:
+                            <ul>
+                                <li>Type of App: "Web App"</li>
+                                <li>Callback URI: 
+                                    <div class="bg-light p-2 mt-2">
+                                        <code><%= process.env.APP_URL || 'http://localhost:3000' %>/api/social-networks/callback/twitter</code>
+                                    </div>
+                                </li>
+                                <li>Website URL: <code><%= process.env.APP_URL || 'http://localhost:3000' %></code></li>
+                            </ul>
+                        </li>
+                        <li>Klikněte na "Save"</li>
+                    </ol>
+                    
+                    <div class="alert alert-warning mt-4">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>Poznámka:</strong> Twitter může schvalování trvat až 24 hodin.
+                    </div>
+                    
+                    <div class="alert alert-success">
+                        <i class="fas fa-check-circle me-2"></i>
+                        <strong>Hotovo!</strong> Zkopírujte Client ID a Client Secret do formuláře výše.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Návod pro LinkedIn -->
+<div class="modal fade" id="linkedinGuideModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">
+                    <i class="fab fa-linkedin me-2"></i>Návod pro získání LinkedIn API klíčů
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="step-by-step">
+                    <h6>Krok 1: Vytvoření LinkedIn aplikace</h6>
+                    <ol>
+                        <li>Otevřete <a href="https://www.linkedin.com/developers/" target="_blank">linkedin.com/developers</a></li>
+                        <li>Klikněte na "Create app" (Vytvořit aplikaci)</li>
+                        <li>Přihlaste se svým LinkedIn účtem</li>
+                    </ol>
+                    
+                    <h6 class="mt-4">Krok 2: Vyplňte informace o aplikaci</h6>
+                    <ol>
+                        <li><strong>App name:</strong> např. "Moje firma Marketing"</li>
+                        <li><strong>LinkedIn Page:</strong> vyberte vaši firemní stránku</li>
+                        <li><strong>App logo:</strong> nahrajte logo (min. 100x100px)</li>
+                        <li><strong>Legal agreement:</strong> zaškrtněte souhlas</li>
+                        <li>Klikněte "Create app"</li>
+                    </ol>
+                    
+                    <h6 class="mt-4">Krok 3: Najděte Client ID a Client Secret</h6>
+                    <ol>
+                        <li>Po vytvoření jděte na záložku "Auth"</li>
+                        <li>Zde najdete:
+                            <ul>
+                                <li><strong>Client ID</strong> - veřejný identifikátor</li>
+                                <li><strong>Client Secret</strong> - klikněte na "Show" a zadejte heslo</li>
+                            </ul>
+                        </li>
+                        <li>Zkopírujte oba klíče</li>
+                    </ol>
+                    
+                    <h6 class="mt-4">Krok 4: Nastavte redirect URL</h6>
+                    <ol>
+                        <li>Ve stejné záložce "Auth" najděte "OAuth 2.0 settings"</li>
+                        <li>Do pole "Authorized redirect URLs" přidejte:
+                            <div class="bg-light p-2 mt-2">
+                                <code><%= process.env.APP_URL || 'http://localhost:3000' %>/api/social-networks/callback/linkedin</code>
+                            </div>
+                        </li>
+                        <li>Klikněte na "Add" a pak "Update"</li>
+                    </ol>
+                    
+                    <h6 class="mt-4">Krok 5: Požádejte o Marketing API</h6>
+                    <ol>
+                        <li>Jděte na záložku "Products"</li>
+                        <li>Najděte "Marketing Developer Platform"</li>
+                        <li>Klikněte na "Request access"</li>
+                        <li>Vyplňte formulář s popisem použití</li>
+                        <li>Počkejte na schválení (obvykle 1-3 dny)</li>
+                    </ol>
+                    
+                    <div class="alert alert-info mt-4">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Tip:</strong> Základní publikování funguje i bez Marketing API, ale je omezené.
+                    </div>
+                    
+                    <div class="alert alert-success">
+                        <i class="fas fa-check-circle me-2"></i>
+                        <strong>Hotovo!</strong> Vložte Client ID a Client Secret do formuláře výše.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.step-by-step ol {
+    padding-left: 1.5rem;
+}
+.step-by-step li {
+    margin-bottom: 0.5rem;
+}
+.step-by-step h6 {
+    color: var(--primary-color);
+    font-weight: bold;
+}
+.step-by-step code {
+    background-color: #f8f9fa;
+    padding: 2px 6px;
+    border-radius: 3px;
+    color: #e83e8c;
+}
+.bg-light code {
+    background-color: transparent;
+}
+</style>

@@ -4,7 +4,9 @@
  * Kombinuje funkčnost původních souborů website-manager.js a fixed-website-manager.js
  * Odstraňuje duplicity a poskytuje konzistentní implementaci
  */
-document.addEventListener('DOMContentLoaded', function() {
+console.log('[WEBSITES] unified-website-manager.js soubor načten');
+
+function initWebsiteManager() {
   console.log('[WEBSITES] Inicializace sjednoceného správce webových stránek');
 
   // DOM elementy
@@ -105,6 +107,8 @@ document.addEventListener('DOMContentLoaded', function() {
     })
     .then(data => {
       console.log('[WEBSITES] Data webů:', data);
+      console.log('[WEBSITES] websites typu:', typeof data.websites);
+      console.log('[WEBSITES] websites hodnota:', data.websites);
       
       // Skrytí loading indikátoru
       if (loadingIndicator) {
@@ -126,10 +130,13 @@ document.addEventListener('DOMContentLoaded', function() {
       let websitesArray = [];
       if (Array.isArray(data.websites)) {
         websitesArray = data.websites;
+        console.log('[WEBSITES] Je to pole:', websitesArray);
       } else if (data.websites) {
         websitesArray = [data.websites];
+        console.log('[WEBSITES] Není pole, konvertuji:', websitesArray);
       }
       
+      console.log('[WEBSITES] Před renderWebsites:', websitesArray);
       renderWebsites(websitesArray);
     })
     .catch(error => {
@@ -188,8 +195,11 @@ document.addEventListener('DOMContentLoaded', function() {
     if (websitesTableBody) {
       websitesTableBody.innerHTML = '';
       
-      websitesArray.forEach(url => {
+      websitesArray.forEach(website => {
+        const url = typeof website === 'string' ? website : (website.url || website);
         const row = document.createElement('tr');
+        const currentDate = new Date().toLocaleDateString('cs-CZ');
+        
         row.innerHTML = `
           <td>
             <a href="${url}" target="_blank" class="text-decoration-none">
@@ -197,7 +207,7 @@ document.addEventListener('DOMContentLoaded', function() {
               <i class="fas fa-external-link-alt ms-2 small"></i>
             </a>
           </td>
-          <td>Dnes</td>
+          <td>${currentDate}</td>
           <td><span class="badge bg-success">Aktivní</span></td>
           <td>
             <button type="button" class="btn btn-sm btn-outline-danger remove-website-btn" data-url="${url}" data-bs-toggle="modal" data-bs-target="#removeWebsiteModal">
@@ -495,4 +505,13 @@ document.addEventListener('DOMContentLoaded', function() {
   initTestButton();
   
   console.log('[WEBSITES] Inicializace dokončena');
-});
+}
+
+// Volání inicializace
+if (document.readyState === 'loading') {
+  console.log('[WEBSITES] DOM loading, čekám na DOMContentLoaded');
+  document.addEventListener('DOMContentLoaded', initWebsiteManager);
+} else {
+  console.log('[WEBSITES] DOM již načten, volám initWebsiteManager');
+  initWebsiteManager();
+}

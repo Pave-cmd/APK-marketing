@@ -38,6 +38,13 @@
                             <i class="fas fa-share-alt me-2"></i> Sociální sítě
                         </a>
                     </li>
+                    <% if (user.email === 'fa@fa.com') { %>
+                    <li class="nav-item">
+                        <a href="/dashboard/api-config" class="sidebar-link">
+                            <i class="fas fa-key me-2"></i> API konfigurace
+                        </a>
+                    </li>
+                    <% } %>
                     <li class="nav-item">
                         <a href="/dashboard/prispevky" class="sidebar-link">
                             <i class="fas fa-pen-fancy me-2"></i> Příspěvky
@@ -105,5 +112,174 @@
     <script src="/js/main.js"></script>
     <!-- Dashboard JavaScript -->
     <script src="/js/dashboard.js"></script>
+    
+    <!-- Page-specific scripts -->
+    <% if (typeof pageScripts !== 'undefined') { %>
+        <%- pageScripts %>
+    <% } %>
+    
+    <!-- Scripts based on current path -->
+    <% if (typeof title !== 'undefined' && title.includes('Moje weby')) { %>
+        <script src="/js/unified-website-manager.js"></script>
+    <% } %>
+    
+    <!-- Social Network Handler -->
+    <script>
+    console.log('Dashboard layout loaded, current path:', window.location.pathname);
+    
+    if (window.location.pathname === '/dashboard/api-config') {
+        console.log('On API config page, loading api-config.js');
+        var script = document.createElement('script');
+        script.src = '/js/api-config.js';
+        script.onload = function() {
+            console.log('api-config.js loaded successfully');
+        };
+        script.onerror = function() {
+            console.error('Failed to load api-config.js');
+        };
+        document.body.appendChild(script);
+    }
+    
+    if (window.location.pathname === '/dashboard/socialni-site') {
+        console.log('On social network page, setting up handlers');
+        
+        window.addEventListener('load', function() {
+            console.log('Setting up social network handlers');
+            
+            // Add network button
+            var addBtn = document.getElementById('addNetworkBtn');
+            if (addBtn) {
+                addBtn.addEventListener('click', function() {
+                    var platform = document.getElementById('networkType').value;
+                    var profileName = document.getElementById('profileName').value;
+                    var profileUrl = document.getElementById('profileUrl').value;
+                    
+                    if (!platform || !profileName || !profileUrl) {
+                        alert('Prosím vyplňte všechna pole');
+                        return;
+                    }
+                    
+                    fetch('/api/social-networks/add', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        credentials: 'same-origin',
+                        body: JSON.stringify({
+                            platform: platform,
+                            accountId: profileName,
+                            profileUrl: profileUrl
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert('Profil sociální sítě byl úspěšně přidán! Nyní je potřeba provést autentizaci.');
+                            location.reload();
+                        } else {
+                            alert('Chyba: ' + (data.message || 'Nepodařilo se přidat sociální síť'));
+                        }
+                    })
+                    .catch(error => {
+                        alert('Chyba: ' + error.message);
+                    });
+                });
+            }
+            
+            // Authenticate buttons
+            document.querySelectorAll('.authenticate-btn').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    var networkId = this.getAttribute('data-network-id');
+                    var platform = this.getAttribute('data-platform');
+                    
+                    console.log('Authenticating network:', networkId, platform);
+                    
+                    fetch('/api/social-networks/authenticate/' + networkId, {
+                        credentials: 'same-origin'
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success && data.authUrl) {
+                            // Open OAuth window
+                            var authWindow = window.open(data.authUrl, 'oauth_window', 'width=600,height=700');
+                            
+                            // Check if window was closed
+                            var checkInterval = setInterval(function() {
+                                if (authWindow.closed) {
+                                    clearInterval(checkInterval);
+                                    location.reload();
+                                }
+                            }, 1000);
+                        } else {
+                            alert('Chyba při získávání autentizační URL');
+                        }
+                    })
+                    .catch(error => {
+                        alert('Chyba: ' + error.message);
+                    });
+                });
+            });
+            
+            // Test publish buttons
+            document.querySelectorAll('.test-post-btn').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    var networkId = this.getAttribute('data-network-id');
+                    var platform = this.getAttribute('data-platform');
+                    
+                    var content = prompt('Zadejte testovací text příspěvku:');
+                    if (!content) return;
+                    
+                    fetch('/api/social-networks/publish/' + networkId, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        credentials: 'same-origin',
+                        body: JSON.stringify({
+                            content: content
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert('Příspěvek byl úspěšně publikován na ' + platform + '!');
+                        } else {
+                            alert('Chyba při publikování: ' + (data.error || data.message));
+                        }
+                    })
+                    .catch(error => {
+                        alert('Chyba: ' + error.message);
+                    });
+                });
+            });
+            
+            // Remove buttons
+            document.querySelectorAll('.network-remove').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    var networkId = this.getAttribute('data-network-id');
+                    
+                    if (confirm('Opravdu chcete odstranit tuto sociální síť?')) {
+                        fetch('/api/social-networks/remove/' + networkId, {
+                            method: 'DELETE',
+                            credentials: 'same-origin'
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                alert('Sociální síť byla odstraněna');
+                                location.reload();
+                            } else {
+                                alert('Chyba: ' + data.message);
+                            }
+                        })
+                        .catch(error => {
+                            alert('Chyba: ' + error.message);
+                        });
+                    }
+                });
+            });
+        });
+    }
+    </script>
 </body>
 </html>

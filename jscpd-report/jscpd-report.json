@@ -1,6 +1,6 @@
 {
   "statistics": {
-    "detectionDate": "2025-05-13T11:46:34.971Z",
+    "detectionDate": "2025-05-16T11:16:05.599Z",
     "formats": {
       "typescript": {
         "sources": {
@@ -124,9 +124,21 @@
             "newDuplicatedLines": 0,
             "newClones": 0
           },
+          "src/routes/socialNetworkRoutes.ts": {
+            "lines": 26,
+            "tokens": 198,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
           "src/routes/authRoutes.ts": {
             "lines": 29,
-            "tokens": 291,
+            "tokens": 285,
             "sources": 1,
             "clones": 0,
             "duplicatedLines": 0,
@@ -137,8 +149,8 @@
             "newClones": 0
           },
           "src/models/User.ts": {
-            "lines": 132,
-            "tokens": 982,
+            "lines": 143,
+            "tokens": 1054,
             "sources": 1,
             "clones": 0,
             "duplicatedLines": 0,
@@ -196,6 +208,18 @@
             "newDuplicatedLines": 0,
             "newClones": 0
           },
+          "src/controllers/socialNetworkController.ts": {
+            "lines": 463,
+            "tokens": 3632,
+            "sources": 1,
+            "clones": 2,
+            "duplicatedLines": 44,
+            "duplicatedTokens": 344,
+            "percentage": 9.5,
+            "percentageTokens": 9.47,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
           "src/controllers/emergencyController.ts": {
             "lines": 205,
             "tokens": 1522,
@@ -245,8 +269,8 @@
             "newClones": 0
           },
           "src/server.ts": {
-            "lines": 259,
-            "tokens": 2075,
+            "lines": 279,
+            "tokens": 2254,
             "sources": 1,
             "clones": 0,
             "duplicatedLines": 0,
@@ -294,14 +318,14 @@
           }
         },
         "total": {
-          "lines": 3806,
-          "tokens": 29799,
-          "sources": 24,
-          "clones": 1,
-          "duplicatedLines": 5,
-          "duplicatedTokens": 81,
-          "percentage": 0.13,
-          "percentageTokens": 0.27,
+          "lines": 4326,
+          "tokens": 33874,
+          "sources": 26,
+          "clones": 2,
+          "duplicatedLines": 27,
+          "duplicatedTokens": 253,
+          "percentage": 0.62,
+          "percentageTokens": 0.75,
           "newDuplicatedLines": 0,
           "newClones": 0
         }
@@ -344,9 +368,45 @@
             "newDuplicatedLines": 0,
             "newClones": 0
           },
+          "src/public/js/test-social-button.js": {
+            "lines": 44,
+            "tokens": 354,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/public/js/socialni-site.js": {
+            "lines": 226,
+            "tokens": 1848,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
           "src/public/js/main.js": {
             "lines": 243,
             "tokens": 1595,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/public/js/debug-social.js": {
+            "lines": 34,
+            "tokens": 279,
             "sources": 1,
             "clones": 0,
             "duplicatedLines": 0,
@@ -429,8 +489,8 @@
             "newClones": 0
           },
           "eslint.config.js": {
-            "lines": 45,
-            "tokens": 295,
+            "lines": 64,
+            "tokens": 415,
             "sources": 1,
             "clones": 0,
             "duplicatedLines": 0,
@@ -442,9 +502,9 @@
           }
         },
         "total": {
-          "lines": 1396,
-          "tokens": 10143,
-          "sources": 11,
+          "lines": 1719,
+          "tokens": 12744,
+          "sources": 14,
           "clones": 0,
           "duplicatedLines": 0,
           "duplicatedTokens": 0,
@@ -457,8 +517,8 @@
       "css": {
         "sources": {
           "src/public/css/style.css": {
-            "lines": 315,
-            "tokens": 1635,
+            "lines": 332,
+            "tokens": 1731,
             "sources": 1,
             "clones": 0,
             "duplicatedLines": 0,
@@ -470,8 +530,8 @@
           }
         },
         "total": {
-          "lines": 315,
-          "tokens": 1635,
+          "lines": 332,
+          "tokens": 1731,
           "sources": 1,
           "clones": 0,
           "duplicatedLines": 0,
@@ -484,19 +544,55 @@
       }
     },
     "total": {
-      "lines": 5517,
-      "tokens": 41577,
-      "sources": 36,
-      "clones": 1,
-      "duplicatedLines": 5,
-      "duplicatedTokens": 81,
-      "percentage": 0.09,
-      "percentageTokens": 0.19,
+      "lines": 6377,
+      "tokens": 48349,
+      "sources": 41,
+      "clones": 2,
+      "duplicatedLines": 27,
+      "duplicatedTokens": 253,
+      "percentage": 0.42,
+      "percentageTokens": 0.52,
       "newDuplicatedLines": 0,
       "newClones": 0
     }
   },
   "duplicates": [
+    {
+      "format": "typescript",
+      "lines": 23,
+      "fragment": ";\n    const userId = req.user._id;\n    \n    const user = await User.findById(userId);\n    if (!user) {\n      return res.status(404).json({\n        success: false,\n        message: 'User not found'\n      });\n    }\n    \n    const network = user.socialNetworks.find(\n      (net: any) => net._id.toString() === networkId\n    );\n    \n    if (!network) {\n      return res.status(404).json({\n        success: false,\n        message: 'Social network not found'\n      });\n    }\n    \n    if",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src/controllers/socialNetworkController.ts",
+        "start": 320,
+        "end": 342,
+        "startLoc": {
+          "line": 320,
+          "column": 5,
+          "position": 2616
+        },
+        "endLoc": {
+          "line": 342,
+          "column": 3,
+          "position": 2788
+        }
+      },
+      "secondFile": {
+        "name": "src/controllers/socialNetworkController.ts",
+        "start": 132,
+        "end": 154,
+        "startLoc": {
+          "line": 132,
+          "column": 7,
+          "position": 1084
+        },
+        "endLoc": {
+          "line": 154,
+          "column": 40,
+          "position": 1252
+        }
+      }
+    },
     {
       "format": "typescript",
       "lines": 6,

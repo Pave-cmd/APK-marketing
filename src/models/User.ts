@@ -15,10 +15,13 @@ export interface IUser extends Document {
   lastLogin?: Date;
   websites: string[];
   socialNetworks: {
+    _id?: any;
     platform: string;
     accountId: string;
     accessToken: string;
+    refreshToken?: string;
     isConnected: boolean;
+    connectedAt?: Date;
   }[];
   comparePassword(password: string): Promise<boolean>;
 }
@@ -87,9 +90,17 @@ const UserSchema: Schema = new Schema({
       type: String,
       required: true,
     },
+    refreshToken: {
+      type: String,
+      required: false,
+    },
     isConnected: {
       type: Boolean,
       default: true,
+    },
+    connectedAt: {
+      type: Date,
+      required: false,
     },
   }],
 });

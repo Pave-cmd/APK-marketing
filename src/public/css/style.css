@@ -314,3 +314,20 @@ a {
     padding: 1rem 0;
   }
 }
+/* Toast notification styles for social networks */
+.notification-toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    min-width: 300px;
+    max-width: 500px;
+    padding: 16px;
+    margin-bottom: 10px;
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.notification-toast.show {
+    opacity: 1;
+}
