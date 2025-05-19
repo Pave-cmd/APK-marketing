@@ -10,6 +10,9 @@ router.post('/register', (authController.register as unknown) as RequestHandler)
 // Přihlášení uživatele
 router.post('/login', (authController.login as unknown) as RequestHandler);
 
+// Odhlášení uživatele
+router.get('/logout', (authController.logout as unknown) as RequestHandler);
+
 // Testovací endpoint pro ověření autentizace
 router.get('/test-auth',
   (req: express.Request, res: express.Response, next: express.NextFunction) => {

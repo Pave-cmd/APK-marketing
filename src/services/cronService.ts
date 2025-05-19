@@ -1,14 +1,17 @@
 import * as cron from 'node-cron';
 import { logger } from '../utils/logger';
 import { WebAnalysisService } from './webAnalysisService';
+import { ContentService } from './contentService';
 
 export class CronService {
   private static instance: CronService;
   private webAnalysisService: WebAnalysisService;
+  private contentService: ContentService;
   private jobs: Map<string, cron.ScheduledTask> = new Map();
 
   private constructor() {
     this.webAnalysisService = new WebAnalysisService();
+    this.contentService = ContentService.getInstance();
   }
 
   public static getInstance(): CronService {
@@ -36,8 +39,19 @@ export class CronService {
 
     this.jobs.set('website-analysis', analysisJob);
 
-    // Můžeme přidat další joby podle potřeby
-    // Například čištění starých záznamů
+    // Job pro zpracování naplánovaných příspěvků - každých 5 minut
+    const scheduledContentJob = cron.schedule('*/5 * * * *', async () => {
+      logger.info('Zpracovávám naplánované příspěvky');
+      try {
+        await this.contentService.processScheduledContent();
+      } catch (error) {
+        logger.error('Chyba při zpracování naplánovaných příspěvků:', error);
+      }
+    });
+
+    this.jobs.set('scheduled-content', scheduledContentJob);
+
+    // Job pro čištění starých záznamů - jednou denně
     const cleanupJob = cron.schedule('0 0 * * *', async () => {
       logger.info('Spouštím čištění starých záznamů');
       // Implementace čištění

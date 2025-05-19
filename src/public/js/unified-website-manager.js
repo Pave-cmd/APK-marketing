@@ -209,7 +209,9 @@ function initWebsiteManager() {
           </td>
           <td>${currentDate}</td>
           <td><span class="badge bg-success">Aktivní</span></td>
-          <td><span class="text-muted">Zatím žádná</span></td>
+          <td id="analysis-status-${btoa(url)}" class="analysis-status">
+            <span class="text-muted">Načítání...</span>
+          </td>
           <td>
             <button type="button" class="btn btn-sm btn-primary analyze-website-btn me-2" 
                     data-url="${url}" 
@@ -227,11 +229,68 @@ function initWebsiteManager() {
           </td>
         `;
         websitesTableBody.appendChild(row);
+        
+        // Načíst stav analýzy pro každý web
+        loadAnalysisStatus(url);
       });
       
       // Přidání událostí pro tlačítka odstranění
       setupRemoveButtons();
     }
+  }
+  
+  // Funkce pro načtení stavu analýzy
+  function loadAnalysisStatus(websiteUrl) {
+    const statusCellId = `analysis-status-${btoa(websiteUrl)}`;
+    
+    fetch(`/api/analysis/status/${encodeURIComponent(websiteUrl)}`, {
+      credentials: 'include'
+    })
+    .then(response => response.json())
+    .then(data => {
+      const statusCell = document.getElementById(statusCellId);
+      if (!statusCell) return;
+      
+      if (data.success && data.analysis) {
+        const analysis = data.analysis;
+        let statusHtml = '';
+        
+        switch (analysis.status) {
+          case 'scanning':
+            statusHtml = '<span class="badge bg-info"><i class="fas fa-spinner fa-spin me-1"></i>Skenování</span>';
+            break;
+          case 'extracting':
+            statusHtml = '<span class="badge bg-info"><i class="fas fa-spinner fa-spin me-1"></i>Extrakce obsahu</span>';
+            break;
+          case 'generating':
+            statusHtml = '<span class="badge bg-warning"><i class="fas fa-spinner fa-spin me-1"></i>Generování</span>';
+            break;
+          case 'publishing':
+            statusHtml = '<span class="badge bg-primary"><i class="fas fa-spinner fa-spin me-1"></i>Publikace</span>';
+            break;
+          case 'completed':
+            const lastScan = new Date(analysis.lastScan).toLocaleDateString('cs-CZ');
+            statusHtml = `<span class="text-success">Dokončeno ${lastScan}</span>`;
+            break;
+          case 'failed':
+            statusHtml = '<span class="badge bg-danger">Selhalo</span>';
+            break;
+          default:
+            statusHtml = '<span class="text-muted">Zatím žádná</span>';
+        }
+        
+        statusCell.innerHTML = statusHtml;
+      } else {
+        statusCell.innerHTML = '<span class="text-muted">Zatím žádná</span>';
+      }
+    })
+    .catch(error => {
+      console.error('[WEBSITES] Chyba při načítání stavu analýzy:', error);
+      const statusCell = document.getElementById(statusCellId);
+      if (statusCell) {
+        statusCell.innerHTML = '<span class="text-muted">Chyba načítání</span>';
+      }
+    });
   }
   
   // Funkce pro nastavení tlačítek odstranění webu
@@ -364,6 +423,45 @@ function initWebsiteManager() {
         if (saveWebsiteBtn) saveWebsiteBtn.disabled = false;
         if (saveWebsiteSpinner) saveWebsiteSpinner.classList.add('d-none');
       });
+    });
+  }
+  
+  // Funkce pro spuštění analýzy všech webů
+  function runAllAnalyses() {
+    console.log('[WEBSITES] Spouštím analýzu všech webů');
+    
+    const button = document.getElementById('runAllAnalyses');
+    if (button) {
+      button.disabled = true;
+      button.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Analyzuji...';
+    }
+    
+    fetch('/api/analysis/run-all', {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        displayAlert(data.message, 'success');
+        // Aktualizovat stav analýz po 2 sekundách
+        setTimeout(() => loadWebsites(), 2000);
+      } else {
+        displayAlert(data.message || 'Chyba při spouštění analýz', 'danger');
+      }
+    })
+    .catch(error => {
+      console.error('[WEBSITES] Chyba při spouštění analýz:', error);
+      displayAlert('Chyba při komunikaci se serverem', 'danger');
+    })
+    .finally(() => {
+      if (button) {
+        button.disabled = false;
+        button.innerHTML = '<i class="fas fa-sync-alt me-2"></i> Analyzovat všechny weby';
+      }
     });
   }
   
@@ -514,6 +612,12 @@ function initWebsiteManager() {
   
   // Inicializace testovacího tlačítka
   initTestButton();
+  
+  // Inicializace tlačítka pro analýzu všech webů
+  const runAllButton = document.getElementById('runAllAnalyses');
+  if (runAllButton) {
+    runAllButton.addEventListener('click', runAllAnalyses);
+  }
   
   console.log('[WEBSITES] Inicializace dokončena');
 }

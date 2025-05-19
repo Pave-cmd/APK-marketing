@@ -259,6 +259,54 @@ app.get('/dashboard/api-config', authenticate, (req: Request, res: Response): vo
   });
 });
 
+// Stránka příspěvků
+app.get('/dashboard/prispevky', authenticate, (req: Request, res: Response): void => {
+  console.log('[SERVER] Vykreslení příspěvků pro uživatele:', req.user.email);
+  
+  res.render('dashboard/posts/index', {
+    title: 'Příspěvky | APK-marketing',
+    description: 'Správa a plánování příspěvků pro sociální sítě',
+    layout: 'layouts/dashboard',
+    user: req.user
+  });
+});
+
+// Stránka analýzy
+app.get('/dashboard/analyza', authenticate, (req: Request, res: Response): void => {
+  console.log('[SERVER] Vykreslení analýzy pro uživatele:', req.user.email);
+  
+  res.render('dashboard/analytics/index', {
+    title: 'Analýza | APK-marketing',
+    description: 'Přehled výkonnosti a statistik',
+    layout: 'layouts/dashboard',
+    user: req.user
+  });
+});
+
+// Stránka nastavení
+app.get('/dashboard/nastaveni', authenticate, (req: Request, res: Response): void => {
+  console.log('[SERVER] Vykreslení nastavení pro uživatele:', req.user.email);
+  
+  res.render('dashboard/settings/index', {
+    title: 'Nastavení | APK-marketing',
+    description: 'Nastavení účtu a aplikace',
+    layout: 'layouts/dashboard',
+    user: req.user
+  });
+});
+
+// Stránka předplatného
+app.get('/dashboard/predplatne', authenticate, (req: Request, res: Response): void => {
+  console.log('[SERVER] Vykreslení předplatného pro uživatele:', req.user.email);
+  
+  res.render('dashboard/subscription/index', {
+    title: 'Předplatné | APK-marketing',
+    description: 'Správa vašeho předplatného',
+    layout: 'layouts/dashboard',
+    user: req.user
+  });
+});
+
 // Alternativní cesty
 app.get('/Dashboard', (req, res) => res.redirect('/dashboard'));
 app.get('/dashboard/websites', (req, res) => res.redirect('/dashboard/weby'));

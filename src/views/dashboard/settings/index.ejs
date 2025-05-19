@@ -1,0 +1,334 @@
+<!-- Nadpis stránky -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 mb-0">Nastavení</h1>
+</div>
+
+<!-- Navigace nastavení -->
+<div class="row">
+    <div class="col-md-3">
+        <div class="card mb-4">
+            <div class="card-body p-0">
+                <div class="list-group list-group-flush">
+                    <a href="#account" class="list-group-item list-group-item-action active" data-bs-toggle="list">
+                        <i class="fas fa-user me-2"></i> Účet
+                    </a>
+                    <a href="#marketing" class="list-group-item list-group-item-action" data-bs-toggle="list">
+                        <i class="fas fa-bullhorn me-2"></i> Marketing
+                    </a>
+                    <a href="#notifications" class="list-group-item list-group-item-action" data-bs-toggle="list">
+                        <i class="fas fa-bell me-2"></i> Notifikace
+                    </a>
+                    <a href="#security" class="list-group-item list-group-item-action" data-bs-toggle="list">
+                        <i class="fas fa-shield-alt me-2"></i> Zabezpečení
+                    </a>
+                    <a href="#integrations" class="list-group-item list-group-item-action" data-bs-toggle="list">
+                        <i class="fas fa-plug me-2"></i> Integrace
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-9">
+        <div class="tab-content">
+            <!-- Nastavení účtu -->
+            <div class="tab-pane fade show active" id="account">
+                <div class="card">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0">Nastavení účtu</h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="accountSettingsForm">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="firstName" class="form-label">Jméno</label>
+                                    <input type="text" class="form-control" id="firstName" value="<%= user.firstName %>">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="lastName" class="form-label">Příjmení</label>
+                                    <input type="text" class="form-control" id="lastName" value="<%= user.lastName %>">
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="email" class="form-label">E-mail</label>
+                                <input type="email" class="form-control" id="email" value="<%= user.email %>" readonly>
+                                <div class="form-text">E-mail nelze změnit</div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="company" class="form-label">Společnost</label>
+                                <input type="text" class="form-control" id="company" value="<%= user.company %>">
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i> Uložit změny
+                            </button>
+                        </form>
+                        
+                        <hr class="my-4">
+                        
+                        <h6>Změna hesla</h6>
+                        <form id="passwordChangeForm">
+                            <div class="mb-3">
+                                <label for="currentPassword" class="form-label">Současné heslo</label>
+                                <input type="password" class="form-control" id="currentPassword">
+                            </div>
+                            <div class="mb-3">
+                                <label for="newPassword" class="form-label">Nové heslo</label>
+                                <input type="password" class="form-control" id="newPassword">
+                            </div>
+                            <div class="mb-3">
+                                <label for="confirmPassword" class="form-label">Potvrdit nové heslo</label>
+                                <input type="password" class="form-control" id="confirmPassword">
+                            </div>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-key me-2"></i> Změnit heslo
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Marketingové preference -->
+            <div class="tab-pane fade" id="marketing">
+                <div class="card">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0">Marketingové preference</h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="marketingSettingsForm">
+                            <div class="mb-4">
+                                <label for="tone" class="form-label">Tón komunikace</label>
+                                <select class="form-select" id="tone">
+                                    <option value="professional">Profesionální</option>
+                                    <option value="friendly">Přátelský</option>
+                                    <option value="casual">Neformální</option>
+                                    <option value="formal">Formální</option>
+                                    <option value="creative">Kreativní</option>
+                                </select>
+                                <div class="form-text">Určuje, jak bude AI psát vaše příspěvky</div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label for="targetAudience" class="form-label">Cílová skupina</label>
+                                <textarea class="form-control" id="targetAudience" rows="3" placeholder="Popište svou cílovou skupinu..."></textarea>
+                                <div class="form-text">Pomůže AI lépe zacílit obsah</div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label class="form-label">Frekvence publikování</label>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <label class="form-label small">Facebook</label>
+                                        <select class="form-select form-select-sm">
+                                            <option value="1">1x denně</option>
+                                            <option value="2">2x denně</option>
+                                            <option value="3">3x denně</option>
+                                            <option value="7">1x týdně</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label small">Twitter</label>
+                                        <select class="form-select form-select-sm">
+                                            <option value="3">3x denně</option>
+                                            <option value="5">5x denně</option>
+                                            <option value="7">7x denně</option>
+                                            <option value="10">10x denně</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label small">LinkedIn</label>
+                                        <select class="form-select form-select-sm">
+                                            <option value="1">1x denně</option>
+                                            <option value="3">3x týdně</option>
+                                            <option value="7">1x týdně</option>
+                                            <option value="14">1x za 2 týdny</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label class="form-label">Preferované časy publikování</label>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label class="form-label small">Ranní (6:00 - 12:00)</label>
+                                        <input type="range" class="form-range" min="0" max="100" value="50">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small">Odpolední (12:00 - 18:00)</label>
+                                        <input type="range" class="form-range" min="0" max="100" value="75">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small">Večerní (18:00 - 22:00)</label>
+                                        <input type="range" class="form-range" min="0" max="100" value="100">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small">Noční (22:00 - 6:00)</label>
+                                        <input type="range" class="form-range" min="0" max="100" value="0">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label for="hashtags" class="form-label">Preferované hashtagy</label>
+                                <input type="text" class="form-control" id="hashtags" placeholder="#marketing #ai #business">
+                                <div class="form-text">Oddělte mezerou</div>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i> Uložit preference
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Notifikace -->
+            <div class="tab-pane fade" id="notifications">
+                <div class="card">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0">Nastavení notifikací</h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="notificationSettingsForm">
+                            <h6>E-mailové notifikace</h6>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="notifyNewPost" checked>
+                                <label class="form-check-label" for="notifyNewPost">
+                                    Nový příspěvek byl publikován
+                                </label>
+                            </div>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="notifyWeeklyReport" checked>
+                                <label class="form-check-label" for="notifyWeeklyReport">
+                                    Týdenní report výkonu
+                                </label>
+                            </div>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="notifyMonthlyReport" checked>
+                                <label class="form-check-label" for="notifyMonthlyReport">
+                                    Měsíční report výkonu
+                                </label>
+                            </div>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="notifyErrors">
+                                <label class="form-check-label" for="notifyErrors">
+                                    Chyby při publikování
+                                </label>
+                            </div>
+                            <div class="form-check mb-4">
+                                <input class="form-check-input" type="checkbox" id="notifyLowCredit">
+                                <label class="form-check-label" for="notifyLowCredit">
+                                    Nízký kredit účtu
+                                </label>
+                            </div>
+                            
+                            <h6 class="mt-4">Frekvence shrnutí</h6>
+                            <select class="form-select mb-4">
+                                <option value="daily">Denně</option>
+                                <option value="weekly" selected>Týdně</option>
+                                <option value="monthly">Měsíčně</option>
+                                <option value="never">Nikdy</option>
+                            </select>
+                            
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i> Uložit nastavení
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Zabezpečení -->
+            <div class="tab-pane fade" id="security">
+                <div class="card">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0">Zabezpečení</h5>
+                    </div>
+                    <div class="card-body">
+                        <h6>Dvoufaktorové ověření</h6>
+                        <p>Zvyšte zabezpečení svého účtu aktivací dvoufaktorového ověření.</p>
+                        <button class="btn btn-primary mb-4" disabled>
+                            <i class="fas fa-mobile-alt me-2"></i> Aktivovat 2FA
+                        </button>
+                        
+                        <h6>Aktivní relace</h6>
+                        <div class="list-group mb-4">
+                            <div class="list-group-item">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <strong>Aktuální relace</strong>
+                                        <small class="d-block text-muted">Windows 10 - Chrome</small>
+                                    </div>
+                                    <span class="badge bg-success">Aktivní</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <h6>Historie přihlášení</h6>
+                        <p class="text-muted">Zatím žádná historie</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Integrace -->
+            <div class="tab-pane fade" id="integrations">
+                <div class="card">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0">Integrace</h5>
+                    </div>
+                    <div class="card-body">
+                        <h6>Propojené účty</h6>
+                        <div class="list-group mb-4">
+                            <div class="list-group-item">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <i class="fab fa-facebook text-primary me-2"></i>
+                                        <strong>Facebook</strong>
+                                    </div>
+                                    <div>
+                                        <span class="badge bg-success me-2">Propojeno</span>
+                                        <button class="btn btn-sm btn-outline-danger">Odpojit</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="list-group-item">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <i class="fab fa-twitter text-info me-2"></i>
+                                        <strong>Twitter</strong>
+                                    </div>
+                                    <div>
+                                        <button class="btn btn-sm btn-primary">Propojit</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="list-group-item">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <i class="fab fa-linkedin text-primary me-2"></i>
+                                        <strong>LinkedIn</strong>
+                                    </div>
+                                    <div>
+                                        <button class="btn btn-sm btn-primary">Propojit</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <h6>Webhooky</h6>
+                        <p>Nastavte webhooky pro automatizaci vašich procesů.</p>
+                        <button class="btn btn-outline-primary" disabled>
+                            <i class="fas fa-plus me-2"></i> Přidat webhook
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript pro nastavení -->
+<script src="/js/settings.js"></script>

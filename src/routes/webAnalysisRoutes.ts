@@ -1,5 +1,5 @@
 import express, { RequestHandler } from 'express';
-import { startAnalysis, getAnalysisStatus, getUserAnalyses } from '../controllers/webAnalysisController';
+import { startAnalysis, getAnalysisStatus, getUserAnalyses, runUserAnalyses } from '../controllers/webAnalysisController';
 import { auth } from '../middleware/authMiddleware';
 
 const router = express.Router();
@@ -15,5 +15,8 @@ router.get('/status/:websiteUrl', (getAnalysisStatus as unknown) as RequestHandl
 
 // Získat všechny analýzy uživatele
 router.get('/list', (getUserAnalyses as unknown) as RequestHandler);
+
+// Manuálně spustit analýzu všech webů uživatele (debug)
+router.post('/run-all', (runUserAnalyses as unknown) as RequestHandler);
 
 export default router;

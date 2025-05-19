@@ -1,0 +1,219 @@
+<!-- Nadpis stránky -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 mb-0">Analýza a statistiky</h1>
+    <div>
+        <select class="form-select form-select-sm" id="analyticsTimeRange">
+            <option value="7">Posledních 7 dní</option>
+            <option value="30" selected>Posledních 30 dní</option>
+            <option value="90">Posledních 90 dní</option>
+            <option value="365">Poslední rok</option>
+        </select>
+    </div>
+</div>
+
+<!-- Hlavní metriky -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="flex-grow-1">
+                        <h6 class="card-subtitle mb-2 text-muted">Celkový dosah</h6>
+                        <h3 class="mb-0">0</h3>
+                        <small class="text-success">+0%</small>
+                    </div>
+                    <div class="ms-3">
+                        <i class="fas fa-eye fa-2x text-primary"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="flex-grow-1">
+                        <h6 class="card-subtitle mb-2 text-muted">Interakce</h6>
+                        <h3 class="mb-0">0</h3>
+                        <small class="text-success">+0%</small>
+                    </div>
+                    <div class="ms-3">
+                        <i class="fas fa-heart fa-2x text-danger"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="flex-grow-1">
+                        <h6 class="card-subtitle mb-2 text-muted">Kliknutí</h6>
+                        <h3 class="mb-0">0</h3>
+                        <small class="text-danger">-0%</small>
+                    </div>
+                    <div class="ms-3">
+                        <i class="fas fa-mouse-pointer fa-2x text-info"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="flex-grow-1">
+                        <h6 class="card-subtitle mb-2 text-muted">Engagement rate</h6>
+                        <h3 class="mb-0">0%</h3>
+                        <small class="text-muted">±0%</small>
+                    </div>
+                    <div class="ms-3">
+                        <i class="fas fa-chart-line fa-2x text-success"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Graf výkonu -->
+<div class="card mb-4">
+    <div class="card-header bg-white">
+        <h5 class="mb-0">Výkon v čase</h5>
+    </div>
+    <div class="card-body">
+        <div id="performanceChart" style="height: 300px;">
+            <div class="text-center text-muted py-5">
+                <i class="fas fa-chart-area fa-3x mb-3"></i>
+                <p>Graf bude dostupný po nashromáždění dat</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Výkon podle platformy -->
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Výkon podle platformy</h5>
+            </div>
+            <div class="card-body">
+                <div class="platform-stats">
+                    <div class="d-flex align-items-center mb-3">
+                        <i class="fab fa-facebook fa-2x text-primary me-3"></i>
+                        <div class="flex-grow-1">
+                            <h6 class="mb-0">Facebook</h6>
+                            <small class="text-muted">0 příspěvků</small>
+                        </div>
+                        <div>
+                            <strong>0</strong> <small>dosah</small>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center mb-3">
+                        <i class="fab fa-twitter fa-2x text-info me-3"></i>
+                        <div class="flex-grow-1">
+                            <h6 class="mb-0">Twitter</h6>
+                            <small class="text-muted">0 příspěvků</small>
+                        </div>
+                        <div>
+                            <strong>0</strong> <small>dosah</small>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <i class="fab fa-linkedin fa-2x text-primary me-3"></i>
+                        <div class="flex-grow-1">
+                            <h6 class="mb-0">LinkedIn</h6>
+                            <small class="text-muted">0 příspěvků</small>
+                        </div>
+                        <div>
+                            <strong>0</strong> <small>dosah</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Nejlepší příspěvky</h5>
+            </div>
+            <div class="card-body">
+                <div id="topPosts">
+                    <div class="text-center text-muted py-4">
+                        <i class="fas fa-trophy fa-3x mb-3"></i>
+                        <p>Zatím žádné příspěvky k zobrazení</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Analýza publika -->
+<div class="card mb-4">
+    <div class="card-header bg-white">
+        <h5 class="mb-0">Analýza publika</h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-4">
+                <h6>Nejaktivnější časy</h6>
+                <div id="activeTimesChart">
+                    <div class="text-center text-muted py-3">
+                        <i class="fas fa-clock fa-2x mb-2"></i>
+                        <p class="small">Data budou dostupná brzy</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <h6>Demografické údaje</h6>
+                <div id="demographicsChart">
+                    <div class="text-center text-muted py-3">
+                        <i class="fas fa-users fa-2x mb-2"></i>
+                        <p class="small">Data budou dostupná brzy</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <h6>Top lokace</h6>
+                <div id="locationsChart">
+                    <div class="text-center text-muted py-3">
+                        <i class="fas fa-map-marker-alt fa-2x mb-2"></i>
+                        <p class="small">Data budou dostupná brzy</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Export dat -->
+<div class="card">
+    <div class="card-header bg-white">
+        <h5 class="mb-0">Export dat</h5>
+    </div>
+    <div class="card-body">
+        <p>Stáhněte si detailní report svých marketingových aktivit.</p>
+        <div class="d-flex gap-2">
+            <button class="btn btn-outline-primary" disabled>
+                <i class="fas fa-file-csv me-2"></i> Export CSV
+            </button>
+            <button class="btn btn-outline-primary" disabled>
+                <i class="fas fa-file-pdf me-2"></i> Export PDF
+            </button>
+            <button class="btn btn-outline-primary" disabled>
+                <i class="fas fa-file-excel me-2"></i> Export Excel
+            </button>
+        </div>
+        <small class="text-muted d-block mt-2">Export bude dostupný po nashromáždění dat</small>
+    </div>
+</div>
+
+<!-- JavaScript pro analýzu -->
+<script src="/js/analytics.js"></script>

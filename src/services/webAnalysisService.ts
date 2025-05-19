@@ -1,17 +1,20 @@
 import { logger } from '../utils/logger';
 import WebAnalysis, { IWebAnalysis } from '../models/WebAnalysis';
 import { WebsiteScraperService } from './websiteScraperService';
+import { AdvancedWebsiteScraperService } from './advancedWebsiteScraperService';
 import { ContentGeneratorService } from './contentGeneratorService';
 import { SocialPublisherService } from './socialPublisherService';
 import User from '../models/User';
 
 export class WebAnalysisService {
   private scraperService: WebsiteScraperService;
+  private advancedScraperService: AdvancedWebsiteScraperService;
   private generatorService: ContentGeneratorService;
   private publisherService: SocialPublisherService;
 
   constructor() {
     this.scraperService = WebsiteScraperService.getInstance();
+    this.advancedScraperService = AdvancedWebsiteScraperService.getInstance();
     this.generatorService = ContentGeneratorService.getInstance();
     this.publisherService = SocialPublisherService.getInstance();
   }
@@ -39,7 +42,16 @@ export class WebAnalysisService {
       analysis.status = 'scanning';
       await analysis.save();
 
-      const scrapedContent = await this.scraperService.scrapeWebsite(websiteUrl);
+      // Nejprve zkusíme pokročilý scraper pro dynamické weby
+      let scrapedContent;
+      try {
+        scrapedContent = await this.advancedScraperService.scrapeWebsite(websiteUrl);
+        logger.info(`Použit pokročilý scraper pro: ${websiteUrl}`);
+      } catch (error) {
+        logger.warn(`Pokročilý scraper selhal, používám základní scraper pro: ${websiteUrl}`);
+        // Pokud pokročilý scraper selže, použijeme základní
+        scrapedContent = await this.scraperService.scrapeWebsite(websiteUrl);
+      }
       
       // 2. Extrakce obsahu
       analysis.status = 'extracting';

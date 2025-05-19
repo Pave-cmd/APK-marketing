@@ -118,3 +118,58 @@ export const getUserAnalyses = async (req: Request, res: Response) => {
     });
   }
 };
+
+/**
+ * Manuálně spustí analýzu všech webů uživatele (debugovací endpoint)
+ */
+export const runUserAnalyses = async (req: Request, res: Response) => {
+  try {
+    const userId = req.user?.id || req.user?._id;
+
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        message: 'Pro tuto akci je nutné být přihlášen'
+      });
+    }
+
+    logger.info(`Manuální spuštění analýzy pro uživatele: ${userId}`);
+
+    // Získáme seznam webů z uživatele
+    const User = require('../models/User').default;
+    const user = await User.findById(userId);
+    
+    if (!user || !user.websites || user.websites.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Uživatel nemá žádné weby k analýze'
+      });
+    }
+
+    // Spustíme analýzu pro každý web
+    const analysisPromises = user.websites.map((websiteUrl: string) => 
+      webAnalysisService.analyzeWebsite(userId.toString(), websiteUrl)
+        .catch(error => {
+          logger.error(`Chyba při analýze ${websiteUrl}:`, error);
+          return null;
+        })
+    );
+
+    const results = await Promise.all(analysisPromises);
+    const successful = results.filter(r => r !== null).length;
+
+    return res.status(200).json({
+      success: true,
+      message: `Analýza spuštěna pro ${successful} z ${user.websites.length} webů`,
+      analyses: results.filter(r => r !== null)
+    });
+
+  } catch (error) {
+    logger.error('Chyba při manuálním spuštění analýz:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Při spouštění analýz došlo k chybě',
+      error: error instanceof Error ? error.message : 'Neznámá chyba'
+    });
+  }
+};

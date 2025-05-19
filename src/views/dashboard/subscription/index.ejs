@@ -1,0 +1,263 @@
+<!-- Nadpis stránky -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 mb-0">Předplatné</h1>
+</div>
+
+<!-- Aktuální plán -->
+<div class="card mb-4">
+    <div class="card-header bg-white">
+        <h5 class="mb-0">Váš aktuální plán</h5>
+    </div>
+    <div class="card-body">
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <h3 class="text-primary">
+                    <%= user.plan.charAt(0).toUpperCase() + user.plan.slice(1) %>
+                </h3>
+                <p class="mb-1">
+                    <% if (user.plan === 'basic') { %>
+                        1 web, 1 sociální síť
+                    <% } else if (user.plan === 'standard') { %>
+                        1 web, 3 sociální sítě
+                    <% } else if (user.plan === 'premium') { %>
+                        3 weby, 5 sociálních sítí
+                    <% } else { %>
+                        Vlastní konfigurace
+                    <% } %>
+                </p>
+                <p class="text-muted">
+                    Další platba: <strong>1. <%= new Date(Date.now() + 30*24*60*60*1000).toLocaleDateString('cs-CZ', { month: 'long', year: 'numeric' }) %></strong>
+                </p>
+            </div>
+            <div class="col-md-6 text-md-end">
+                <h2 class="mb-0">
+                    <% if (user.plan === 'basic') { %>
+                        490 Kč
+                    <% } else if (user.plan === 'standard') { %>
+                        990 Kč
+                    <% } else if (user.plan === 'premium') { %>
+                        1990 Kč
+                    <% } else { %>
+                        Individuální
+                    <% } %>
+                    <small class="text-muted">/měsíc</small>
+                </h2>
+                <button class="btn btn-outline-danger mt-3">
+                    <i class="fas fa-times-circle me-2"></i> Zrušit předplatné
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Dostupné plány -->
+<div class="card mb-4">
+    <div class="card-header bg-white">
+        <h5 class="mb-0">Změnit plán</h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <!-- Basic -->
+            <div class="col-md-3">
+                <div class="card h-100 <%= user.plan === 'basic' ? 'border-primary' : '' %>">
+                    <div class="card-header text-center <%= user.plan === 'basic' ? 'bg-primary text-white' : '' %>">
+                        <h5 class="mb-0">Basic</h5>
+                    </div>
+                    <div class="card-body text-center">
+                        <h3 class="my-3">
+                            490 Kč
+                            <small class="text-muted">/měsíc</small>
+                        </h3>
+                        <ul class="list-unstyled">
+                            <li class="mb-2"><i class="fas fa-check text-success me-2"></i> 1 web</li>
+                            <li class="mb-2"><i class="fas fa-check text-success me-2"></i> 1 sociální síť</li>
+                            <li class="mb-2"><i class="fas fa-check text-success me-2"></i> 30 příspěvků/měsíc</li>
+                            <li class="mb-2"><i class="fas fa-check text-success me-2"></i> Základní analytika</li>
+                            <li class="mb-2"><i class="fas fa-times text-danger me-2"></i> AI generování obrázků</li>
+                        </ul>
+                        <% if (user.plan === 'basic') { %>
+                            <button class="btn btn-primary w-100" disabled>Aktuální plán</button>
+                        <% } else { %>
+                            <button class="btn btn-outline-primary w-100">Přejít na Basic</button>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Standard -->
+            <div class="col-md-3">
+                <div class="card h-100 <%= user.plan === 'standard' ? 'border-primary' : '' %>">
+                    <div class="card-header text-center <%= user.plan === 'standard' ? 'bg-primary text-white' : '' %>">
+                        <h5 class="mb-0">Standard</h5>
+                    </div>
+                    <div class="card-body text-center">
+                        <h3 class="my-3">
+                            990 Kč
+                            <small class="text-muted">/měsíc</small>
+                        </h3>
+                        <ul class="list-unstyled">
+                            <li class="mb-2"><i class="fas fa-check text-success me-2"></i> 1 web</li>
+                            <li class="mb-2"><i class="fas fa-check text-success me-2"></i> 3 sociální sítě</li>
+                            <li class="mb-2"><i class="fas fa-check text-success me-2"></i> 100 příspěvků/měsíc</li>
+                            <li class="mb-2"><i class="fas fa-check text-success me-2"></i> Pokročilá analytika</li>
+                            <li class="mb-2"><i class="fas fa-check text-success me-2"></i> AI generování obrázků</li>
+                        </ul>
+                        <% if (user.plan === 'standard') { %>
+                            <button class="btn btn-primary w-100" disabled>Aktuální plán</button>
+                        <% } else { %>
+                            <button class="btn btn-outline-primary w-100">Přejít na Standard</button>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Premium -->
+            <div class="col-md-3">
+                <div class="card h-100 <%= user.plan === 'premium' ? 'border-primary' : '' %>">
+                    <div class="card-header text-center <%= user.plan === 'premium' ? 'bg-primary text-white' : '' %>">
+                        <h5 class="mb-0">Premium</h5>
+                        <span class="badge bg-warning text-dark">Populární</span>
+                    </div>
+                    <div class="card-body text-center">
+                        <h3 class="my-3">
+                            1990 Kč
+                            <small class="text-muted">/měsíc</small>
+                        </h3>
+                        <ul class="list-unstyled">
+                            <li class="mb-2"><i class="fas fa-check text-success me-2"></i> 3 weby</li>
+                            <li class="mb-2"><i class="fas fa-check text-success me-2"></i> 5 sociálních sítí</li>
+                            <li class="mb-2"><i class="fas fa-check text-success me-2"></i> Neomezené příspěvky</li>
+                            <li class="mb-2"><i class="fas fa-check text-success me-2"></i> Pokročilá analytika</li>
+                            <li class="mb-2"><i class="fas fa-check text-success me-2"></i> AI generování obrázků</li>
+                            <li class="mb-2"><i class="fas fa-check text-success me-2"></i> Prioritní podpora</li>
+                        </ul>
+                        <% if (user.plan === 'premium') { %>
+                            <button class="btn btn-primary w-100" disabled>Aktuální plán</button>
+                        <% } else { %>
+                            <button class="btn btn-primary w-100">Přejít na Premium</button>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Enterprise -->
+            <div class="col-md-3">
+                <div class="card h-100 <%= user.plan === 'enterprise' ? 'border-primary' : '' %>">
+                    <div class="card-header text-center <%= user.plan === 'enterprise' ? 'bg-primary text-white' : '' %>">
+                        <h5 class="mb-0">Enterprise</h5>
+                    </div>
+                    <div class="card-body text-center">
+                        <h3 class="my-3">
+                            Individuální
+                            <small class="text-muted">cena</small>
+                        </h3>
+                        <ul class="list-unstyled">
+                            <li class="mb-2"><i class="fas fa-check text-success me-2"></i> Neomezené weby</li>
+                            <li class="mb-2"><i class="fas fa-check text-success me-2"></i> Všechny sociální sítě</li>
+                            <li class="mb-2"><i class="fas fa-check text-success me-2"></i> Neomezené příspěvky</li>
+                            <li class="mb-2"><i class="fas fa-check text-success me-2"></i> Pokročilá analytika</li>
+                            <li class="mb-2"><i class="fas fa-check text-success me-2"></i> AI generování obsahu</li>
+                            <li class="mb-2"><i class="fas fa-check text-success me-2"></i> Dedikovaná podpora</li>
+                            <li class="mb-2"><i class="fas fa-check text-success me-2"></i> API přístup</li>
+                        </ul>
+                        <button class="btn btn-outline-primary w-100">Kontaktovat prodej</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Platební údaje -->
+<div class="row">
+    <div class="col-md-6">
+        <div class="card mb-4">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Platební metoda</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-flex align-items-center mb-3">
+                    <i class="fas fa-credit-card fa-2x text-primary me-3"></i>
+                    <div>
+                        <strong>Visa končící ****1234</strong>
+                        <small class="d-block text-muted">Platnost do 12/25</small>
+                    </div>
+                </div>
+                <button class="btn btn-outline-primary">
+                    <i class="fas fa-edit me-2"></i> Změnit platební metodu
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card mb-4">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Fakturační údaje</h5>
+            </div>
+            <div class="card-body">
+                <address>
+                    <strong><%= user.company || user.firstName + ' ' + user.lastName %></strong><br>
+                    <% if (user.address) { %>
+                        <%= user.address.street %><br>
+                        <%= user.address.city %>, <%= user.address.zipCode %><br>
+                        <%= user.address.country %><br>
+                    <% } else { %>
+                        <em>Fakturační údaje nejsou vyplněny</em><br>
+                    <% } %>
+                </address>
+                <button class="btn btn-outline-primary">
+                    <i class="fas fa-edit me-2"></i> Upravit údaje
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Historie plateb -->
+<div class="card">
+    <div class="card-header bg-white">
+        <h5 class="mb-0">Historie plateb</h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Datum</th>
+                        <th>Popis</th>
+                        <th>Částka</th>
+                        <th>Stav</th>
+                        <th>Faktura</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><%= new Date().toLocaleDateString('cs-CZ') %></td>
+                        <td>Předplatné <%= user.plan %></td>
+                        <td>
+                            <% if (user.plan === 'basic') { %>
+                                490 Kč
+                            <% } else if (user.plan === 'standard') { %>
+                                990 Kč
+                            <% } else if (user.plan === 'premium') { %>
+                                1990 Kč
+                            <% } else { %>
+                                -
+                            <% } %>
+                        </td>
+                        <td><span class="badge bg-success">Uhrazeno</span></td>
+                        <td>
+                            <a href="#" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-download"></i> PDF
+                            </a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript pro předplatné -->
+<script src="/js/subscription.js"></script>

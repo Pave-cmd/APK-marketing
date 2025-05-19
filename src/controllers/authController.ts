@@ -246,3 +246,36 @@ export const login = async (req: Request, res: Response) => {
     });
   }
 };
+
+// Odhlášení uživatele
+export const logout = async (req: Request, res: Response) => {
+  console.log('[AUTH] Začíná odhlášení uživatele');
+  
+  try {
+    // Vymažeme cookies
+    res.clearCookie('authToken', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax'
+    });
+    
+    res.clearCookie('loggedIn', {
+      httpOnly: false,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax'
+    });
+    
+    console.log('[AUTH] Cookies byly vymazány, uživatel odhlášen');
+    
+    // Přesměrování na hlavní stránku po odhlášení
+    return res.redirect('/');
+    
+  } catch (error) {
+    console.error('[AUTH] Chyba při odhlášení:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Při odhlášení došlo k chybě',
+      error: (error as Error).message
+    });
+  }
+};
