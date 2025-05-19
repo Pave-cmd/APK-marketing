@@ -23,6 +23,57 @@ a {
   text-decoration: none;
 }
 
+/* Analýza webu */
+.analysis-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin: 20px 0;
+}
+
+.analysis-steps .step {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px;
+    border-radius: 8px;
+    background: #f8f9fa;
+    transition: all 0.3s ease;
+}
+
+.analysis-steps .step.active {
+    background: #e3f2fd;
+    border-left: 4px solid #2196F3;
+}
+
+.analysis-steps .step.completed {
+    background: #e8f5e9;
+    border-left: 4px solid #4CAF50;
+}
+
+.analysis-steps .step i:first-child {
+    font-size: 24px;
+    color: #6c757d;
+    width: 30px;
+}
+
+.analysis-steps .step.active i:first-child {
+    color: #2196F3;
+}
+
+.analysis-steps .step.completed i:first-child {
+    color: #4CAF50;
+}
+
+.analysis-steps .step span {
+    flex: 1;
+    font-weight: 500;
+}
+
+.analysis-steps .status-icon {
+    margin-left: auto;
+}
+
 /* Navigační lišta */
 .navbar-brand {
   font-weight: 700;

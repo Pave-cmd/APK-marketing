@@ -10,6 +10,7 @@ import authRoutes from './routes/authRoutes';
 import websiteRoutes from './routes/websiteRoutes';
 import socialNetworkRoutes from './routes/socialNetworkRoutes';
 import apiConfigRoutes from './routes/apiConfigRoutes';
+import webAnalysisRoutes from './routes/webAnalysisRoutes';
 import jwt from 'jsonwebtoken';
 import { setAuthCookies } from './utils/cookieUtils';
 
@@ -48,6 +49,7 @@ app.use('/api/config', (req, res, next) => {
   console.log('[SERVER] API config route hit:', req.method, req.path);
   next();
 }, apiConfigRoutes);
+app.use('/api/analysis', webAnalysisRoutes);
 
 // EJS šablony a layout
 app.use(expressLayouts);
@@ -306,7 +308,23 @@ app.use((req: Request, res: Response): void => {
   });
 });
 
+// Import cron služby
+import { CronService } from './services/cronService';
+
 // Spuštění serveru
 app.listen(port, () => {
   console.log(`Server běží na portu ${port} v režimu ${SERVER_CONFIG.environment}`);
+  
+  // Spuštění cron jobů
+  const cronService = CronService.getInstance();
+  cronService.startAllJobs();
+  console.log('Cron joby spuštěny');
+});
+
+// Graceful shutdown
+process.on('SIGTERM', () => {
+  console.log('SIGTERM signal received: closing HTTP server');
+  const cronService = CronService.getInstance();
+  cronService.stopAllJobs();
+  process.exit(0);
 });

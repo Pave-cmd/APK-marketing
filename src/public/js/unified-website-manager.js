@@ -209,8 +209,19 @@ function initWebsiteManager() {
           </td>
           <td>${currentDate}</td>
           <td><span class="badge bg-success">Aktivní</span></td>
+          <td><span class="text-muted">Zatím žádná</span></td>
           <td>
-            <button type="button" class="btn btn-sm btn-outline-danger remove-website-btn" data-url="${url}" data-bs-toggle="modal" data-bs-target="#removeWebsiteModal">
+            <button type="button" class="btn btn-sm btn-primary analyze-website-btn me-2" 
+                    data-url="${url}" 
+                    onclick="startWebsiteAnalysis('${url}')"
+                    title="Spustit analýzu">
+              <i class="fas fa-sync-alt"></i>
+            </button>
+            <button type="button" class="btn btn-sm btn-outline-danger remove-website-btn" 
+                    data-url="${url}" 
+                    data-bs-toggle="modal" 
+                    data-bs-target="#removeWebsiteModal"
+                    title="Odstranit web">
               <i class="fas fa-trash-alt"></i>
             </button>
           </td>
