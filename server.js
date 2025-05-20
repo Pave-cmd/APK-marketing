@@ -65,8 +65,18 @@ app.get('/', (req, res) => {
   `);
 });
 
-// Redirect all other requests to homepage
-app.get('*', (req, res) => {
+// Handle all other routes without route parameters
+app.get('/dashboard', (req, res) => {
+  res.redirect('/');
+});
+
+// Simple API response
+app.get('/api/status', (req, res) => {
+  res.json({ status: 'maintenance', message: 'Server is currently in maintenance mode' });
+});
+
+// Catch-all route without regex parameters
+app.use((req, res) => {
   res.redirect('/');
 });
 

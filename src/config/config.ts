@@ -12,7 +12,12 @@ export const SERVER_CONFIG = {
 // Konfigurace MongoDB
 export const DB_CONFIG = {
   // Heroku sets MONGODB_URI for MongoDB addons
-  uri: process.env.MONGODB_URI || process.env.MONGODB_URI_HEROKU || 'mongodb://localhost:27017/apk-marketing',
+  uri: process.env.MONGODB_URI || process.env.MONGODB_URI_HEROKU || process.env.MONGODB_URL || 'mongodb://localhost:27017/apk-marketing',
+  // Add a larger timeout for Heroku
+  options: {
+    serverSelectionTimeoutMS: 30000,
+    connectTimeoutMS: 30000,
+  }
 };
 
 // Konfigurace zabezpečení

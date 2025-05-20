@@ -4,11 +4,17 @@ import { DB_CONFIG } from './config';
 // Připojení k MongoDB
 export const connectDB = async (): Promise<void> => {
   try {
-    await mongoose.connect(DB_CONFIG.uri);
+    const uri = DB_CONFIG.uri;
+    console.log(`Connecting to MongoDB with URI: ${uri.substring(0, 20)}...`);
+    
+    await mongoose.connect(uri, DB_CONFIG.options);
     console.log('MongoDB připojeno úspěšně');
   } catch (error) {
     console.error('Chyba při připojení k MongoDB:', error);
-    process.exit(1);
+    // Don't exit the process immediately to allow fallback server to start
+    if (process.env.NODE_ENV !== 'production') {
+      process.exit(1);
+    }
   }
 };
 
