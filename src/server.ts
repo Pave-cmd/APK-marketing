@@ -170,10 +170,19 @@ const authenticate = async (req: Request, res: Response, next: NextFunction) => 
 
 // Základní stránky
 app.get('/', (req: Request, res: Response): void => {
-  res.render('index', {
-    title: 'APK-marketing - AI Marketingová platforma',
-    description: 'Automatizovaný marketing pro vaše webové stránky pomocí umělé inteligence'
-  });
+  // V produkčním prostředí zobrazit "Coming Soon" stránku
+  if (SERVER_CONFIG.environment === 'production') {
+    res.render('coming-soon', {
+      title: 'BekpaShop - Ve výstavbě',
+      description: 'Pracujeme na spuštění nové verze webu',
+      layout: false // Bez layoutu pro čistou stránku
+    });
+  } else {
+    res.render('index', {
+      title: 'APK-marketing - AI Marketingová platforma',
+      description: 'Automatizovaný marketing pro vaše webové stránky pomocí umělé inteligence'
+    });
+  }
 });
 
 // Přihlášení stránka

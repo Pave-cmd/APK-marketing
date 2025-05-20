@@ -1,0 +1,31 @@
+{
+  "name": "bekpashop",
+  "description": "BekpaShop eCommerce Platform",
+  "repository": "https://github.com/yourusername/bekpashop",
+  "logo": "https://node-js-sample.herokuapp.com/node.png",
+  "keywords": ["node", "express", "typescript", "mongodb"],
+  "env": {
+    "NODE_ENV": {
+      "description": "Environment for the application",
+      "value": "production"
+    },
+    "JWT_SECRET": {
+      "description": "A secret key for JWT tokens",
+      "generator": "secret"
+    }
+  },
+  "addons": [
+    {
+      "plan": "mongolab:sandbox",
+      "as": "MONGODB"
+    }
+  ],
+  "buildpacks": [
+    {
+      "url": "heroku/nodejs"
+    }
+  ],
+  "scripts": {
+    "postdeploy": "npm run build"
+  }
+}

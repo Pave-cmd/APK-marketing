@@ -9,7 +9,8 @@
     "build": "tsc",
     "watch": "tsc -w",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "check-duplicates": "ts-node scripts/check-duplicates.ts"
+    "check-duplicates": "ts-node scripts/check-duplicates.ts",
+    "heroku-postbuild": "npm run build"
   },
   "keywords": [
     "ai",

@@ -11,7 +11,8 @@ export const SERVER_CONFIG = {
 
 // Konfigurace MongoDB
 export const DB_CONFIG = {
-  uri: process.env.MONGODB_URI || 'mongodb://localhost:27017/apk-marketing',
+  // Heroku sets MONGODB_URI for MongoDB addons
+  uri: process.env.MONGODB_URI || process.env.MONGODB_URI_HEROKU || 'mongodb://localhost:27017/apk-marketing',
 };
 
 // Konfigurace zabezpečení
