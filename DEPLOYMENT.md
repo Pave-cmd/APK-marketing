@@ -107,6 +107,49 @@ If you encounter errors like "Failed to lookup view X", make sure the view files
    git push heroku main
    ```
 
+### Application Crashes
+
+If the application crashes on Heroku with errors related to missing files or directories:
+
+1. Check the Heroku logs:
+   ```bash
+   heroku logs --tail
+   ```
+
+2. Run the debug script to check the build environment:
+   ```bash
+   heroku run node scripts/build-debug.js
+   ```
+
+3. If necessary, manually copy files on Heroku:
+   ```bash
+   heroku run bash
+   
+   # Once in the Heroku bash shell
+   mkdir -p dist/views
+   cp -R src/views/* dist/views/
+   mkdir -p dist/public
+   cp -R src/public/* dist/public/
+   exit
+   ```
+
+4. Restart the application:
+   ```bash
+   heroku restart
+   ```
+
+### Fallback Server
+
+If the main application still fails to start, a simple fallback server will automatically run to display a "Coming Soon" page. This ensures that your site remains online even if there are issues with the main application.
+
+To manually run the fallback server:
+
+```bash
+heroku run node server.js
+```
+
+If you need to modify the fallback server, edit `server.js` in the project root.
+
 ## Domain Configuration
 
 To use the custom domain bekpashop.cz:

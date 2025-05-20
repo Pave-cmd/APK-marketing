@@ -170,18 +170,86 @@ const authenticate = async (req: Request, res: Response, next: NextFunction) => 
 
 // Základní stránky
 app.get('/', (req: Request, res: Response): void => {
-  // V produkčním prostředí zobrazit "Coming Soon" stránku
-  if (SERVER_CONFIG.environment === 'production') {
-    res.render('coming-soon', {
-      title: 'BekpaShop - Ve výstavbě',
-      description: 'Pracujeme na spuštění nové verze webu',
-      layout: false // Bez layoutu pro čistou stránku
-    });
-  } else {
-    res.render('index', {
-      title: 'APK-marketing - AI Marketingová platforma',
-      description: 'Automatizovaný marketing pro vaše webové stránky pomocí umělé inteligence'
-    });
+  try {
+    // V produkčním prostředí zobrazit "Coming Soon" stránku
+    if (SERVER_CONFIG.environment === 'production') {
+      // Check if the view exists first
+      const fs = require('fs');
+      const path = require('path');
+      const viewsPath = path.join(__dirname, 'views');
+      const viewFile = path.join(viewsPath, 'coming-soon.ejs');
+
+      console.log('[SERVER] Checking for coming-soon view at:', viewFile);
+      console.log('[SERVER] Views directory contents:', fs.readdirSync(viewsPath));
+
+      if (fs.existsSync(viewFile)) {
+        console.log('[SERVER] Coming soon view exists, rendering it');
+        return res.render('coming-soon', {
+          title: 'BekpaShop - Ve výstavbě',
+          description: 'Pracujeme na spuštění nové verze webu',
+          layout: false // Bez layoutu pro čistou stránku
+        });
+      } else {
+        console.log('[SERVER] Coming soon view does not exist, falling back to index');
+        // Fallback to index if coming-soon doesn't exist
+        return res.render('index', {
+          title: 'BekpaShop',
+          description: 'Online nákupy na BekpaShop'
+        });
+      }
+    } else {
+      return res.render('index', {
+        title: 'APK-marketing - AI Marketingová platforma',
+        description: 'Automatizovaný marketing pro vaše webové stránky pomocí umělé inteligence'
+      });
+    }
+  } catch (error) {
+    console.error('[SERVER] Error rendering homepage:', error);
+    // Fallback to a basic HTML response
+    res.send(`
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>BekpaShop - Ve výstavbě</title>
+        <style>
+          body { 
+            font-family: Arial, sans-serif; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            height: 100vh; 
+            margin: 0;
+            background-color: #f8f9fa;
+          }
+          .container {
+            text-align: center;
+            padding: 2rem;
+            max-width: 600px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+          }
+          .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            margin-top: 20px;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <h1>BekpaShop</h1>
+          <p>Pracujeme na spuštění nové verze webu.</p>
+          <p>Děkujeme za trpělivost.</p>
+          <a href="/dashboard" class="btn">Pokračovat</a>
+        </div>
+      </body>
+      </html>
+    `);
   }
 });
 

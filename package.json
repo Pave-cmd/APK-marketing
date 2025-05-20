@@ -11,7 +11,9 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "check-duplicates": "ts-node scripts/check-duplicates.ts",
     "copy-assets": "mkdir -p dist/views && cp -R src/views/* dist/views/ && mkdir -p dist/public && cp -R src/public/* dist/public/",
-    "heroku-postbuild": "npm run build"
+    "heroku-postbuild": "npm run build && node scripts/build-debug.js",
+    "heroku-start": "node scripts/heroku-start.js",
+    "build-debug": "node scripts/build-debug.js"
   },
   "keywords": [
     "ai",
