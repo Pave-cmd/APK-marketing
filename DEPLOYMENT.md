@@ -51,12 +51,30 @@ heroku config:set FACEBOOK_APP_SECRET=your-facebook-app-secret
 # Add other social media configurations as needed
 ```
 
-### 5. Deploy the Application
+### 5. Build and Deploy
 
-Push your code to Heroku:
+#### Manual Deployment
+
+Build the application locally and push to Heroku:
 
 ```bash
+# Build the application (compiles TS and copies views/assets)
+npm run build
+
+# Push to Heroku
 git push heroku main
+```
+
+#### Using the Deploy Script
+
+For convenience, you can use the included deploy script:
+
+```bash
+# Make sure the script is executable
+chmod +x scripts/deploy-heroku.sh
+
+# Run the deploy script
+./scripts/deploy-heroku.sh
 ```
 
 ### 6. Ensure at least one instance is running
@@ -70,6 +88,24 @@ heroku ps:scale web=1
 ```bash
 heroku open
 ```
+
+## Troubleshooting
+
+### Missing Views or Assets
+
+If you encounter errors like "Failed to lookup view X", make sure the view files are properly copied to the dist directory:
+
+1. On your local machine:
+   ```bash
+   # Manually run the asset copying
+   npm run copy-assets
+   ```
+
+2. On Heroku, you can trigger a rebuild:
+   ```bash
+   git commit --allow-empty -m "Trigger rebuild"
+   git push heroku main
+   ```
 
 ## Domain Configuration
 

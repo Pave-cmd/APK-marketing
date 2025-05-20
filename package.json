@@ -6,10 +6,11 @@
   "scripts": {
     "start": "node dist/server.js",
     "dev": "nodemon --exec ts-node src/server.ts",
-    "build": "tsc",
+    "build": "tsc && npm run copy-assets",
     "watch": "tsc -w",
     "test": "echo \"Error: no test specified\" && exit 1",
     "check-duplicates": "ts-node scripts/check-duplicates.ts",
+    "copy-assets": "mkdir -p dist/views && cp -R src/views/* dist/views/ && mkdir -p dist/public && cp -R src/public/* dist/public/",
     "heroku-postbuild": "npm run build"
   },
   "keywords": [
