@@ -165,7 +165,7 @@ export const authenticateSocialNetwork = async (req: Request, res: Response) => 
     
     // Generate OAuth URL based on platform
     let authUrl = '';
-    const redirectUri = `${process.env.APP_URL || 'http://localhost:3000'}/api/social-networks/callback/${network.platform}`;
+    const redirectUri = process.env.APP_URL ? `${process.env.APP_URL}/api/social-networks/callback/${network.platform}` : `http://localhost:3000/api/social-networks/callback/${network.platform}`;
     
     switch (network.platform) {
       case 'facebook':
@@ -175,7 +175,7 @@ export const authenticateSocialNetwork = async (req: Request, res: Response) => 
             message: 'Facebook API klíče nejsou nastaveny'
           });
         }
-        authUrl = `https://www.facebook.com/v17.0/dialog/oauth?client_id=${decryptedConfig.appId}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=pages_manage_posts,pages_read_engagement&state=${networkId}`;
+        authUrl = `https://www.facebook.com/v17.0/dialog/oauth?client_id=${decryptedConfig.appId}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=pages_read_engagement,public_profile&state=${networkId}`;
         break;
       case 'instagram':
         // Instagram uses Facebook login
@@ -265,7 +265,7 @@ export const handleOAuthCallback = async (req: Request, res: Response) => {
                 client_id: decryptedConfig.appId,
                 client_secret: decryptedConfig.appSecret,
                 code: code as string,
-                redirect_uri: `${process.env.APP_URL}/api/social-networks/callback/facebook`
+                redirect_uri: process.env.APP_URL ? `${process.env.APP_URL}/api/social-networks/callback/facebook` : `http://localhost:3000/api/social-networks/callback/facebook`
               }
             }
           );
