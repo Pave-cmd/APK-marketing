@@ -3,6 +3,8 @@ import User from '../models/User';
 import ApiConfig from '../models/ApiConfig';
 import { webLog } from '../utils/logger';
 import axios from 'axios';
+import { TokenManagerService } from '../services/tokenManagerService';
+import { SocialApiService } from '../services/socialApiService';
 
 export const addSocialNetwork = async (req: Request, res: Response) => {
   try {
@@ -225,7 +227,18 @@ function generateCodeChallenge(): string {
 export const handleOAuthCallback = async (req: Request, res: Response) => {
   try {
     const { platform } = req.params;
-    const { code, state } = req.query;
+    const { code, state, error, error_reason, error_description } = req.query;
+    
+    // Kontrola chyb z OAuth poskytovatele
+    if (error) {
+      webLog('OAuth error from provider', { 
+        platform, 
+        error, 
+        error_reason, 
+        error_description 
+      });
+      return res.status(400).redirect(`/dashboard/socialni-site?error=${error}&error_description=${error_description}`);
+    }
     
     if (!code || !state) {
       return res.status(400).redirect('/dashboard/socialni-site?error=missing_params');
@@ -245,9 +258,14 @@ export const handleOAuthCallback = async (req: Request, res: Response) => {
       return res.status(404).redirect('/dashboard/socialni-site?error=network_not_found');
     }
     
+    // Nastavíme status na "in_progress" dokud není autentizace kompletní
+    network.status = 'pending';
+    await user.save();
+    
     // Exchange code for access token based on platform
     let accessToken = '';
     let refreshToken = '';
+    let tokenExpiry: Date | undefined;
     
     try {
       switch (platform) {
@@ -257,6 +275,8 @@ export const handleOAuthCallback = async (req: Request, res: Response) => {
             throw new Error('Facebook API config not found');
           }
           const decryptedConfig = apiConfig.getDecryptedConfig();
+          
+          webLog('Vyměňuji Facebook auth kód za token', { userId: user._id });
           
           const fbResponse = await axios.get(
             `https://graph.facebook.com/v17.0/oauth/access_token`,
@@ -271,7 +291,12 @@ export const handleOAuthCallback = async (req: Request, res: Response) => {
           );
           accessToken = fbResponse.data.access_token;
           
+          // Nastavit expirace pro krátkodobý token (2 hodiny)
+          const shortTokenExpiry = new Date();
+          shortTokenExpiry.setHours(shortTokenExpiry.getHours() + 2);
+          
           // Exchange for long-lived token
+          webLog('Získávám dlouhodobý Facebook token', { userId: user._id });
           const longLivedResponse = await axios.get(
             `https://graph.facebook.com/v17.0/oauth/access_token`,
             {
@@ -284,6 +309,19 @@ export const handleOAuthCallback = async (req: Request, res: Response) => {
             }
           );
           accessToken = longLivedResponse.data.access_token;
+          
+          // Nastavit expiraci pro dlouhodobý token (60 dní)
+          const expiresIn = longLivedResponse.data.expires_in || 5184000; // 60 dní v sekundách
+          tokenExpiry = new Date();
+          tokenExpiry.setSeconds(tokenExpiry.getSeconds() + expiresIn);
+          
+          // Získáme tokeny pro stránky a uložíme je do ApiConfig
+          await TokenManagerService.getFacebookPageTokens(
+            accessToken,
+            user._id as unknown as string,
+            network._id.toString()
+          );
+          
           break;
         }
           
@@ -344,20 +382,44 @@ export const handleOAuthCallback = async (req: Request, res: Response) => {
         }
       }
       
-      // Update the network with the access token
+      // Update the network with the access token and metadata
       network.accessToken = accessToken;
       network.refreshToken = refreshToken;
       network.isConnected = true;
       network.connectedAt = new Date();
+      network.lastTokenRefresh = new Date();
+      network.tokenExpiry = tokenExpiry;
+      network.status = 'active';
+      network.errorMessage = undefined;
+      
+      // Nastavíme výchozí hodnoty pro nastavení publikování
+      if (!network.publishSettings) {
+        network.publishSettings = {
+          autoPublish: true,
+          frequency: 'weekly',
+          contentType: 'mix',
+          bestTimeToPost: true
+        };
+      }
       
       await user.save();
       
-      webLog(`OAuth successful for ${platform}`, { userId: user._id, networkId: network._id });
+      webLog(`OAuth successful for ${platform}`, { 
+        userId: user._id, 
+        networkId: network._id,
+        pageId: network.pageId,
+        pageName: network.pageName
+      });
       
       res.redirect('/dashboard/socialni-site?auth=success');
     } catch (error) {
+      // Zaznamenáme chybu do sítě
+      network.status = 'error';
+      network.errorMessage = error instanceof Error ? error.message : 'Neznámá chyba při autentizaci';
+      await user.save();
+      
       webLog(`OAuth error for ${platform}`, { error });
-      res.redirect('/dashboard/socialni-site?auth=error');
+      res.redirect(`/dashboard/socialni-site?auth=error&error_message=${encodeURIComponent(network.errorMessage)}`);
     }
   } catch (error) {
     webLog('OAuth callback error', { error });
@@ -368,7 +430,7 @@ export const handleOAuthCallback = async (req: Request, res: Response) => {
 export const publishToSocialNetwork = async (req: Request, res: Response) => {
   try {
     const { networkId } = req.params;
-    const { content, imageUrl } = req.body;
+    const { content, imageUrl, link } = req.body;
     const userId = req.user._id;
     
     const user = await User.findById(userId);
@@ -390,10 +452,33 @@ export const publishToSocialNetwork = async (req: Request, res: Response) => {
       });
     }
     
+    // Validace stavu sítě
     if (!network.isConnected || !network.accessToken || network.accessToken === 'temp-token') {
       return res.status(400).json({
         success: false,
         message: 'Network not authenticated'
+      });
+    }
+    
+    if (network.status === 'error') {
+      return res.status(400).json({
+        success: false,
+        message: `Síť je ve stavu chyby: ${network.errorMessage || 'Neznámá chyba'}`
+      });
+    }
+    
+    if (network.status === 'expired') {
+      return res.status(400).json({
+        success: false,
+        message: 'Token pro síť expiroval, je potřeba znovu autentizovat síť'
+      });
+    }
+    
+    // Validace obsahu
+    if (!content || content.trim() === '') {
+      return res.status(400).json({
+        success: false,
+        message: 'Obsah příspěvku nemůže být prázdný'
       });
     }
     
@@ -402,33 +487,22 @@ export const publishToSocialNetwork = async (req: Request, res: Response) => {
     try {
       switch (network.platform) {
         case 'facebook': {
-          // Get page access token if posting to page
-          const pagesResponse = await axios.get(
-            `https://graph.facebook.com/v17.0/me/accounts`,
-            {
-              params: {
-                access_token: network.accessToken
-              }
-            }
+          // Ověřit, že máme pageId
+          if (!network.pageId) {
+            return res.status(400).json({
+              success: false,
+              message: 'Není nastaven ID stránky pro publikování'
+            });
+          }
+          
+          // Použití SocialApiService pro publikování
+          result = await SocialApiService.publishFacebookPost(
+            network.pageId,
+            content,
+            imageUrl,
+            link
           );
           
-          const pages = pagesResponse.data.data;
-          const pageAccessToken = pages.length > 0 ? pages[0].access_token : network.accessToken;
-          const pageId = pages.length > 0 ? pages[0].id : 'me';
-          
-          // Post to Facebook
-          result = await axios.post(
-            `https://graph.facebook.com/v17.0/${pageId}/feed`,
-            {
-              message: content,
-              ...(imageUrl && { picture: imageUrl })
-            },
-            {
-              params: {
-                access_token: pageAccessToken
-              }
-            }
-          );
           break;
         }
           
@@ -493,19 +567,60 @@ export const publishToSocialNetwork = async (req: Request, res: Response) => {
           });
       }
       
-      webLog(`Successfully published to ${network.platform}`, { networkId, userId });
+      // Aktualizace metadat sítě
+      network.lastPostAt = new Date();
+      await user.save();
+      
+      webLog(`Successfully published to ${network.platform}`, { 
+        networkId, 
+        userId,
+        pageId: network.pageId
+      });
       
       res.json({
         success: true,
         message: 'Successfully published to ' + network.platform,
-        result: result.data
+        result
       });
     } catch (error: any) {
+      // Zaznamenáme chybu do sítě
+      network.errorMessage = error.message || 'Neznámá chyba při publikování';
+      await user.save();
+      
       webLog(`Error publishing to ${network.platform}`, { error, networkId });
-      res.status(500).json({
+      
+      // Pro lepší UI zobrazení vracíme specifické chybové kódy
+      let statusCode = 500;
+      let errorType = 'unknown';
+      
+      // Rozpoznání typů Facebook API chyb
+      if (error.response?.data?.error) {
+        const fbError = error.response.data.error;
+        
+        // Chyba s přístupovým tokenem
+        if (fbError.code === 190) {
+          statusCode = 401;
+          errorType = 'token_expired';
+          network.status = 'expired';
+          await user.save();
+        }
+        // Chyba s oprávněními
+        else if (fbError.code === 200 || fbError.code === 10) {
+          statusCode = 403;
+          errorType = 'permission_denied';
+        }
+        // Rate limiting
+        else if (fbError.code === 4 || fbError.code === 32) {
+          statusCode = 429;
+          errorType = 'rate_limit';
+        }
+      }
+      
+      res.status(statusCode).json({
         success: false,
         message: 'Failed to publish to ' + network.platform,
-        error: error.message
+        error: error.message,
+        errorType
       });
     }
   } catch (error) {

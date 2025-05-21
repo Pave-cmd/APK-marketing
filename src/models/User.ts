@@ -22,6 +22,21 @@ export interface IUser extends Document {
     refreshToken?: string;
     isConnected: boolean;
     connectedAt?: Date;
+    // Facebook specifické pole
+    pageId?: string;       // ID stránky pro publikování
+    pageName?: string;     // Název stránky
+    // Metadata pro všechny sítě
+    lastTokenRefresh?: Date; // Kdy byl token naposledy obnoven
+    tokenExpiry?: Date;      // Kdy vyprší token
+    status?: string;         // Status připojení (active, error, expired)
+    lastPostAt?: Date;       // Kdy byl naposledy publikován příspěvek
+    errorMessage?: string;   // Poslední chybová zpráva
+    publishSettings?: {      // Nastavení publikování
+      autoPublish: boolean;  // Automatické publikování
+      frequency: string;     // Jak často publikovat (daily, weekly, monthly)
+      contentType: string;   // Jaký typ obsahu publikovat (blog, products, news)
+      bestTimeToPost: boolean; // Publikovat v optimální čas
+    };
   }[];
   comparePassword(password: string): Promise<boolean>;
 }
@@ -101,6 +116,57 @@ const UserSchema: Schema = new Schema({
     connectedAt: {
       type: Date,
       required: false,
+    },
+    // Facebook specifická pole
+    pageId: {
+      type: String,
+      required: false,
+    },
+    pageName: {
+      type: String,
+      required: false,
+    },
+    // Obecná metadata
+    lastTokenRefresh: {
+      type: Date,
+      required: false,
+    },
+    tokenExpiry: {
+      type: Date,
+      required: false,
+    },
+    status: {
+      type: String,
+      enum: ['active', 'error', 'expired', 'pending'],
+      default: 'pending',
+    },
+    lastPostAt: {
+      type: Date,
+      required: false,
+    },
+    errorMessage: {
+      type: String,
+      required: false,
+    },
+    publishSettings: {
+      autoPublish: {
+        type: Boolean,
+        default: true,
+      },
+      frequency: {
+        type: String,
+        enum: ['daily', 'weekly', 'monthly'],
+        default: 'weekly',
+      },
+      contentType: {
+        type: String,
+        enum: ['blog', 'products', 'news', 'mix'],
+        default: 'mix',
+      },
+      bestTimeToPost: {
+        type: Boolean,
+        default: true,
+      },
     },
   }],
 });

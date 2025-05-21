@@ -9,6 +9,14 @@ export interface IApiConfig extends Document {
   clientId?: string;
   clientSecret?: string;
   redirectUri?: string;
+  longLivedToken?: string; // dlouhodobý token pro aplikaci
+  tokenExpiry?: Date;       // datum expirace tokenu
+  pageTokens?: {
+    pageId: string;
+    accessToken: string;
+    name: string;
+    expiresAt?: Date;
+  }[];
   isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -21,6 +29,14 @@ export interface IApiConfig extends Document {
     clientId?: string;
     clientSecret?: string;
     redirectUri?: string;
+    longLivedToken?: string;
+    tokenExpiry?: Date;
+    pageTokens?: {
+      pageId: string;
+      accessToken: string;
+      name: string;
+      expiresAt?: Date;
+    }[];
   };
 }
 
@@ -28,7 +44,7 @@ export interface IApiConfig extends Document {
 const ApiConfigSchema: Schema = new Schema({
   platform: {
     type: String,
-    enum: ['facebook', 'twitter', 'linkedin', 'instagram'],
+    enum: ['facebook', 'twitter', 'linkedin', 'instagram', 'pinterest', 'tiktok', 'youtube'],
     required: true,
     unique: true,
   },
@@ -52,6 +68,32 @@ const ApiConfigSchema: Schema = new Schema({
     type: String,
     required: false,
   },
+  longLivedToken: {
+    type: String,
+    required: false,
+  },
+  tokenExpiry: {
+    type: Date,
+    required: false,
+  },
+  pageTokens: [{
+    pageId: {
+      type: String,
+      required: true
+    },
+    accessToken: {
+      type: String,
+      required: true
+    },
+    name: {
+      type: String,
+      required: true
+    },
+    expiresAt: {
+      type: Date,
+      required: false
+    }
+  }],
   isActive: {
     type: Boolean,
     default: true,
@@ -120,7 +162,9 @@ ApiConfigSchema.pre<IApiConfig>('save', function(next) {
       appId: this.appId,
       appSecret: this.appSecret ? 'Has value' : 'No value',
       clientId: this.clientId,
-      clientSecret: this.clientSecret ? 'Has value' : 'No value'
+      clientSecret: this.clientSecret ? 'Has value' : 'No value',
+      longLivedToken: this.longLivedToken ? 'Has value' : 'No value',
+      pageTokens: this.pageTokens ? `${this.pageTokens.length} tokens` : 'No tokens'
     });
     
     if (this.isModified('appSecret') && this.appSecret) {
@@ -130,6 +174,24 @@ ApiConfigSchema.pre<IApiConfig>('save', function(next) {
     if (this.isModified('clientSecret') && this.clientSecret) {
       this.clientSecret = this.encrypt(this.clientSecret);  
       console.log('Encrypted clientSecret');
+    }
+    if (this.isModified('longLivedToken') && this.longLivedToken) {
+      this.longLivedToken = this.encrypt(this.longLivedToken);
+      console.log('Encrypted longLivedToken');
+    }
+    
+    // Šifrujeme i tokeny pro stránky, pokud byly modifikovány
+    if (this.isModified('pageTokens') && this.pageTokens && this.pageTokens.length > 0) {
+      this.pageTokens = this.pageTokens.map(token => {
+        if (token.accessToken && !token.accessToken.includes(':')) { // Jednoduchá kontrola, jestli token není již zašifrovaný
+          return {
+            ...token,
+            accessToken: this.encrypt(token.accessToken)
+          };
+        }
+        return token;
+      });
+      console.log('Encrypted page tokens');
     }
     
     this.updatedAt = new Date();
@@ -142,6 +204,14 @@ ApiConfigSchema.pre<IApiConfig>('save', function(next) {
 
 // Helper metoda pro získání dešifrovaných hodnot
 ApiConfigSchema.methods.getDecryptedConfig = function() {
+  // Dešifrujeme tokeny pro stránky, pokud existují
+  const decryptedPageTokens = this.pageTokens?.map((token: { pageId: string; name: string; accessToken?: string; expiresAt?: Date }) => ({
+    pageId: token.pageId,
+    name: token.name,
+    accessToken: token.accessToken ? this.decrypt(token.accessToken) : undefined,
+    expiresAt: token.expiresAt
+  }));
+  
   return {
     platform: this.platform,
     appId: this.appId,
@@ -149,6 +219,9 @@ ApiConfigSchema.methods.getDecryptedConfig = function() {
     clientId: this.clientId,
     clientSecret: this.clientSecret ? this.decrypt(this.clientSecret) : undefined,
     redirectUri: this.redirectUri,
+    longLivedToken: this.longLivedToken ? this.decrypt(this.longLivedToken) : undefined,
+    tokenExpiry: this.tokenExpiry,
+    pageTokens: decryptedPageTokens
   };
 };
 

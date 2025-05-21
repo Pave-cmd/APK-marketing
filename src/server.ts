@@ -11,6 +11,7 @@ import websiteRoutes from './routes/websiteRoutes';
 import socialNetworkRoutes from './routes/socialNetworkRoutes';
 import apiConfigRoutes from './routes/apiConfigRoutes';
 import webAnalysisRoutes from './routes/webAnalysisRoutes';
+import scheduledPostRoutes from './routes/scheduledPostRoutes';
 import jwt from 'jsonwebtoken';
 import { setAuthCookies } from './utils/cookieUtils';
 
@@ -50,6 +51,7 @@ app.use('/api/config', (req, res, next) => {
   next();
 }, apiConfigRoutes);
 app.use('/api/analysis', webAnalysisRoutes);
+app.use('/api/scheduled-posts', scheduledPostRoutes);
 
 // EJS šablony a layout
 app.use(expressLayouts);
@@ -435,6 +437,7 @@ app.use((req: Request, res: Response): void => {
 
 // Import cron služby
 import { CronService } from './services/cronService';
+import { setupTokenRefresh } from './services/tokenManagerService';
 
 // Spuštění serveru
 app.listen(port, () => {
@@ -444,6 +447,10 @@ app.listen(port, () => {
   const cronService = CronService.getInstance();
   cronService.startAllJobs();
   console.log('Cron joby spuštěny');
+  
+  // Inicializace obnovy tokenů
+  setupTokenRefresh();
+  console.log('Token refresh service initialized');
 });
 
 // Graceful shutdown
