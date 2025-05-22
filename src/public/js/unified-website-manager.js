@@ -215,7 +215,6 @@ function initWebsiteManager() {
           <td>
             <button type="button" class="btn btn-sm btn-primary analyze-website-btn me-2" 
                     data-url="${url}" 
-                    onclick="startWebsiteAnalysis('${url}')"
                     title="Spustit analýzu">
               <i class="fas fa-sync-alt"></i>
             </button>
@@ -234,27 +233,109 @@ function initWebsiteManager() {
         loadAnalysisStatus(url);
       });
       
-      // Přidání událostí pro tlačítka odstranění
+      // Přidání událostí pro tlačítka
       setupRemoveButtons();
+      setupAnalyzeButtons();
     }
+  }
+  
+  // Funkce pro nastavení tlačítek analýzy
+  function setupAnalyzeButtons() {
+    document.querySelectorAll('.analyze-website-btn').forEach(button => {
+      button.addEventListener('click', function() {
+        const url = this.getAttribute('data-url');
+        startAnalysis(url);
+      });
+    });
+  }
+  
+  // Funkce pro spuštění analýzy
+  function startAnalysis(websiteUrl) {
+    console.log('[WEBSITES] Spouštím analýzu webu:', websiteUrl);
+    
+    // Aktualizace UI
+    const statusCellId = `analysis-status-${btoa(websiteUrl)}`;
+    const statusCell = document.getElementById(statusCellId);
+    
+    if (statusCell) {
+      statusCell.innerHTML = '<span class="badge bg-info"><i class="fas fa-spinner fa-spin me-1"></i>Zahajuji analýzu...</span>';
+    }
+    
+    // API požadavek
+    fetch('/api/analysis/start', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ websiteUrl }),
+      credentials: 'include'
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        // Průběžná aktualizace UI
+        if (statusCell) {
+          statusCell.innerHTML = '<span class="badge bg-info"><i class="fas fa-spinner fa-spin me-1"></i>Analýza zahájena</span>';
+        }
+        
+        // Periodická kontrola stavu
+        setTimeout(() => loadAnalysisStatus(websiteUrl), 2000);
+      } else {
+        // Chyba
+        if (statusCell) {
+          statusCell.innerHTML = '<span class="badge bg-danger">Chyba spuštění</span>';
+        }
+        displayAlert(data.message || 'Chyba při spouštění analýzy', 'danger');
+      }
+    })
+    .catch(error => {
+      console.error('[WEBSITES] Chyba při spouštění analýzy:', error);
+      
+      if (statusCell) {
+        statusCell.innerHTML = '<span class="badge bg-danger">Chyba spuštění</span>';
+      }
+      
+      displayAlert('Chyba komunikace se serverem', 'danger');
+    });
+  }
+  
+  // Funkce pro restartování analýzy
+  function restartAnalysis(websiteUrl) {
+    startAnalysis(websiteUrl);
   }
   
   // Funkce pro načtení stavu analýzy
   function loadAnalysisStatus(websiteUrl) {
     const statusCellId = `analysis-status-${btoa(websiteUrl)}`;
+    const statusCell = document.getElementById(statusCellId);
+    
+    if (!statusCell) return;
+    
+    // Dočasně zobrazit načítání
+    if (statusCell.innerHTML.indexOf('Načítání') === -1) {
+      statusCell.innerHTML = '<span class="badge bg-secondary"><i class="fas fa-circle-notch fa-spin me-1"></i>Načítání stavu...</span>';
+    }
     
     fetch(`/api/analysis/status/${encodeURIComponent(websiteUrl)}`, {
       credentials: 'include'
     })
-    .then(response => response.json())
+    .then(response => {
+      if (!response.ok) {
+        if (response.status === 404) {
+          // Není problém, web jen ještě nemá analýzu
+          return { success: true, analysis: null };
+        }
+        throw new Error(`Chyba serveru: ${response.status}`);
+      }
+      return response.json();
+    })
     .then(data => {
-      const statusCell = document.getElementById(statusCellId);
-      if (!statusCell) return;
-      
       if (data.success && data.analysis) {
+        // Máme data analýzy
         const analysis = data.analysis;
         let statusHtml = '';
         
+        // Generování správného statusu
         switch (analysis.status) {
           case 'scanning':
             statusHtml = '<span class="badge bg-info"><i class="fas fa-spinner fa-spin me-1"></i>Skenování</span>';
@@ -269,7 +350,7 @@ function initWebsiteManager() {
             statusHtml = '<span class="badge bg-primary"><i class="fas fa-spinner fa-spin me-1"></i>Publikace</span>';
             break;
           case 'completed':
-            const lastScan = new Date(analysis.lastScan).toLocaleDateString('cs-CZ');
+            const lastScan = analysis.lastScan ? new Date(analysis.lastScan).toLocaleDateString('cs-CZ') : 'N/A';
             statusHtml = `<span class="text-success">Dokončeno ${lastScan}</span>`;
             break;
           case 'failed':
@@ -279,16 +360,59 @@ function initWebsiteManager() {
             statusHtml = '<span class="text-muted">Zatím žádná</span>';
         }
         
-        statusCell.innerHTML = statusHtml;
+        // Přidat tlačítko pro opakování analýzy pro dokončené nebo chybové stavy
+        let actionButton = '';
+        if (analysis.status === 'completed' || analysis.status === 'failed') {
+          actionButton = `<button class="btn btn-sm btn-outline-primary restart-analysis-btn ms-2" data-url="${websiteUrl}">
+            <i class="fas fa-redo"></i>
+          </button>`;
+        }
+        
+        statusCell.innerHTML = statusHtml + actionButton;
+        
+        // Přidat event listenery pro tlačítka
+        if (actionButton) {
+          const restartBtn = statusCell.querySelector('.restart-analysis-btn');
+          if (restartBtn) {
+            restartBtn.addEventListener('click', function() {
+              restartAnalysis(websiteUrl);
+            });
+          }
+        }
+        
+        // Pro běžící analýzy naplánovat další kontrolu
+        if (['scanning', 'extracting', 'generating', 'publishing'].includes(analysis.status)) {
+          setTimeout(() => loadAnalysisStatus(websiteUrl), 5000);
+        }
       } else {
-        statusCell.innerHTML = '<span class="text-muted">Zatím žádná</span>';
+        // Nemáme data analýzy - zobrazit tlačítko pro spuštění
+        statusCell.innerHTML = `<button class="btn btn-sm btn-primary start-analysis-btn" data-url="${websiteUrl}">
+          <i class="fas fa-play me-1"></i> Spustit analýzu
+        </button>`;
+        
+        // Přidat event listener
+        const startBtn = statusCell.querySelector('.start-analysis-btn');
+        if (startBtn) {
+          startBtn.addEventListener('click', function() {
+            startAnalysis(websiteUrl);
+          });
+        }
       }
     })
     .catch(error => {
       console.error('[WEBSITES] Chyba při načítání stavu analýzy:', error);
-      const statusCell = document.getElementById(statusCellId);
-      if (statusCell) {
-        statusCell.innerHTML = '<span class="text-muted">Chyba načítání</span>';
+      
+      // Zobrazit tlačítko pro spuštění analýzy v případě chyby
+      statusCell.innerHTML = `<button class="btn btn-sm btn-primary start-analysis-btn" data-url="${websiteUrl}">
+        <i class="fas fa-play me-1"></i> Spustit analýzu
+      </button>`;
+      
+      // Přidat event listener
+      const startBtn = statusCell.querySelector('.start-analysis-btn');
+      if (startBtn) {
+        startBtn.addEventListener('click', function() {
+          startAnalysis(websiteUrl);
+        });
       }
     });
   }
@@ -620,6 +744,15 @@ function initWebsiteManager() {
   }
   
   console.log('[WEBSITES] Inicializace dokončena');
+}
+
+// Funkce pro spuštění analýzy webu (globální pro onclick)
+function startWebsiteAnalysis(websiteUrl) {
+  if (typeof startAnalysis === 'function') {
+    startAnalysis(websiteUrl);
+  } else {
+    console.error('[WEBSITES] Funkce startAnalysis není definována');
+  }
 }
 
 // Volání inicializace

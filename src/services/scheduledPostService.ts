@@ -284,17 +284,37 @@ export class ScheduledPostService {
       if (post.metadata?.useAi && post.metadata.aiPrompt) {
         try {
           const contentGenerator = ContentGeneratorService.getInstance(this.contentApiKey);
+          
           // Vygenerování obsahu na základě promptu
           const systemMessage = `You are a professional social media content writer that creates engaging posts specifically for ${post.platform}. Use appropriate tone and style for this platform.`;
           
-          // Zde bychom zavolali OpenAI API, ale pro zjednodušení pouze logujeme
           webLog(`Generování AI obsahu pro příspěvek ${postId}`, {
             platform: post.platform,
             aiPrompt: post.metadata.aiPrompt
           });
           
-          // Simulujeme generování (v reálné implementaci by zde byl call na OpenAI)
-          // finalContent = await contentGenerator.callOpenAI(systemMessage, post.metadata.aiPrompt);
+          // Získáme informace o webu pro kontext
+          const websiteTitle = post.title || '';
+          const websiteDescription = post.content || '';
+          const websiteUrl = post.websiteUrl || '';
+          
+          // Volání ContentGeneratorService pro generování finálního příspěvku
+          if (post.platform === 'facebook' || post.platform === 'twitter' || post.platform === 'linkedin') {
+            finalContent = await contentGenerator.generateSocialPost(
+              websiteTitle,
+              websiteDescription,
+              post.platform as any,
+              websiteUrl
+            );
+            
+            webLog(`AI obsah vygenerován pro ${post.platform}`, { 
+              postId,
+              contentLength: finalContent.length
+            });
+          } else {
+            // Pro jiné platformy použijeme obecný OpenAI call
+            finalContent = await contentGenerator.callOpenAI(systemMessage, post.metadata.aiPrompt);
+          }
         } catch (error) {
           webLog('Chyba při generování AI obsahu', { error, postId });
           // Pokračujeme s původním obsahem
@@ -313,12 +333,19 @@ export class ScheduledPostService {
             );
             break;
           case 'twitter':
-            // Simulace publikace na Twitter
-            publishResult = { success: true, id: `tw_${Date.now()}` };
+            publishResult = await SocialApiService.publishTwitterPost(
+              post.userId.toString(),
+              finalContent,
+              post.imageUrl
+            );
             break;
           case 'linkedin':
-            // Simulace publikace na LinkedIn
-            publishResult = { success: true, id: `li_${Date.now()}` };
+            publishResult = await SocialApiService.publishLinkedInPost(
+              post.userId.toString(),
+              finalContent,
+              post.imageUrl,
+              post.websiteUrl
+            );
             break;
           default:
             throw new Error(`Publikace na platformu ${post.platform} není podporována`);

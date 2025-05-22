@@ -1,0 +1,282 @@
+<!-- Content Generation Page -->
+<div class="container-fluid px-4">
+  <h1 class="mt-4">Generování obsahu pro sociální sítě</h1>
+  <div class="alert alert-info">
+    <strong>DEBUG:</strong> Stránka byla načtena. CSRF Token: <%= csrfToken || 'undefined' %>
+    <button id="testButton" class="btn btn-sm btn-warning">Test Button</button>
+    <button id="testGenerateButton" class="btn btn-sm btn-success">Test Generate</button>
+    <button id="reloadHistoryButton" class="btn btn-sm btn-info">Reload History</button>
+  </div>
+  
+  <ol class="breadcrumb mb-4">
+    <li class="breadcrumb-item"><a href="/dashboard">Dashboard</a></li>
+    <li class="breadcrumb-item active">Generování obsahu</li>
+  </ol>
+
+  <div class="row">
+    <div class="col-xl-12">
+      <div class="card mb-4">
+        <div class="card-header">
+          <i class="fas fa-robot me-1"></i>
+          Vytvoření nového obsahu
+        </div>
+        <div class="card-body">
+          <form id="generateContentForm">
+            <div class="mb-3">
+              <label for="websiteUrl" class="form-label">URL webové stránky</label>
+              <select class="form-select" id="websiteUrl" required>
+                <option value="" selected disabled>Vyberte webovou stránku</option>
+                <% if (user && user.websites && user.websites.length > 0) { %>
+                  <% user.websites.forEach(website => { %>
+                    <option value="<%= website %>"><%= website %></option>
+                  <% }); %>
+                <% } %>
+              </select>
+              <div class="form-text">Z této URL budou čerpány informace pro generování obsahu.</div>
+            </div>
+
+            <div class="mb-3">
+              <label for="platform" class="form-label">Sociální síť</label>
+              <select class="form-select" id="platform" required>
+                <option value="" selected disabled>Vyberte sociální síť</option>
+                <option value="facebook">Facebook</option>
+                <option value="twitter">Twitter</option>
+                <option value="instagram">Instagram</option>
+                <option value="linkedin">LinkedIn</option>
+              </select>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="tone" class="form-label">Tón obsahu</label>
+                  <select class="form-select" id="tone" required>
+                    <option value="" selected disabled>Vyberte tón</option>
+                    <option value="professional">Profesionální</option>
+                    <option value="casual">Neformální</option>
+                    <option value="humorous">Humorný</option>
+                    <option value="informative">Informativní</option>
+                  </select>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="contentType" class="form-label">Typ obsahu</label>
+                  <select class="form-select" id="contentType" required>
+                    <option value="" selected disabled>Vyberte typ obsahu</option>
+                    <option value="post">Příspěvek</option>
+                    <option value="ad">Reklama</option>
+                    <option value="story">Story</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="d-flex justify-content-between">
+              <button type="button" id="generateButton" class="btn btn-primary">Vygenerovat</button>
+              <button type="button" id="generateVariations" class="btn btn-secondary">Vygenerovat více variant</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-xl-12">
+      <div class="card mb-4">
+        <div class="card-header">
+          <i class="fas fa-list me-1"></i>
+          Vygenerovaný obsah
+        </div>
+        <div class="card-body">
+          <div id="contentResults">
+            <p class="text-center text-muted">Zde se zobrazí vygenerovaný obsah.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-xl-12">
+      <div class="card mb-4">
+        <div class="card-header">
+          <i class="fas fa-history me-1"></i>
+          Historie vygenerovaného obsahu
+        </div>
+        <div class="card-body">
+          <div id="contentHistory" class="table-responsive">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>Datum</th>
+                  <th>Webová stránka</th>
+                  <th>Sociální síť</th>
+                  <th>Text obsahu</th>
+                  <th>Akce</th>
+                </tr>
+              </thead>
+              <tbody id="contentHistoryBody">
+                <!-- Content will be loaded dynamically -->
+                <tr>
+                  <td colspan="5" class="text-center">Žádný vygenerovaný obsah nenalezen.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal for content preview -->
+<div class="modal fade" id="contentPreviewModal" tabindex="-1" aria-labelledby="contentPreviewModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="contentPreviewModalLabel">Náhled obsahu</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="contentPreviewBody">
+        <!-- Content will be loaded dynamically -->
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Zavřít</button>
+        <button type="button" class="btn btn-primary" id="scheduleContentBtn">Naplánovat</button>
+        <button type="button" class="btn btn-success" id="publishContentBtn">Publikovat nyní</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  console.log("[CONTENT] DOM loaded, setting up content generation");
+  
+  // Helper function to generate content
+  function generateContent(websiteUrl, platform, tone, contentType) {
+    const results = document.getElementById('contentResults');
+    results.innerHTML = '<div class="alert alert-info">Generuji obsah...</div>';
+    
+    fetch('/api/content/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ websiteUrl, platform, tone, contentType })
+    })
+    .then(r => r.json())
+    .then(data => {
+      console.log('[CONTENT] Response:', data);
+      if (data.success) {
+        results.innerHTML = '<div class="alert alert-success">✅ Obsah vygenerován!<br><strong>Text:</strong> ' + (data.content.textContent || 'N/A') + '</div>';
+        loadHistory(); // Reload history after generating
+      } else {
+        results.innerHTML = '<div class="alert alert-danger">❌ Chyba: ' + (data.error || 'Unknown') + '</div>';
+      }
+    })
+    .catch(error => {
+      console.error('[CONTENT] Error:', error);
+      results.innerHTML = '<div class="alert alert-danger">❌ Error: ' + error.message + '</div>';
+    });
+  }
+  
+  // Helper function to load history
+  function loadHistory() {
+    console.log('[HISTORY] Loading content history...');
+    const historyBody = document.getElementById('contentHistoryBody');
+    
+    if (!historyBody) {
+      console.error('[HISTORY] History table body not found');
+      return;
+    }
+    
+    historyBody.innerHTML = '<tr><td colspan="5" class="text-center">Načítám historii...</td></tr>';
+    
+    fetch('/api/content/history', {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include'
+    })
+    .then(r => r.json())
+    .then(data => {
+      console.log('[HISTORY] History response:', data);
+      
+      if (data.success && data.content && data.content.length > 0) {
+        historyBody.innerHTML = '';
+        
+        data.content.forEach(item => {
+          const date = new Date(item.createdAt).toLocaleString();
+          const platform = item.socialPlatforms[0]?.platform || 'N/A';
+          const textPreview = (item.textContent || '').substring(0, 50) + '...';
+          
+          const row = document.createElement('tr');
+          row.innerHTML = 
+            '<td>' + date + '</td>' +
+            '<td>' + item.websiteUrl + '</td>' +
+            '<td>' + platform + '</td>' +
+            '<td>' + textPreview + '</td>' +
+            '<td><button class="btn btn-sm btn-primary preview-btn" data-content="' + encodeURIComponent(JSON.stringify(item)) + '">Náhled</button></td>';
+          
+          historyBody.appendChild(row);
+        });
+      } else {
+        historyBody.innerHTML = '<tr><td colspan="5" class="text-center">Žádný vygenerovaný obsah nenalezen.</td></tr>';
+      }
+    })
+    .catch(error => {
+      console.error('[HISTORY] Error:', error);
+      historyBody.innerHTML = '<tr><td colspan="5" class="text-center">Chyba při načítání historie.</td></tr>';
+    });
+  }
+  
+  // Test button
+  document.getElementById('testButton').addEventListener('click', function() {
+    alert('Button test works');
+    console.log('Button clicked');
+  });
+  
+  // Test generate button  
+  document.getElementById('testGenerateButton').addEventListener('click', function() {
+    console.log('[TEST] Testing...');
+    generateContent('https://bekpagames.com/', 'facebook', 'professional', 'post');
+  });
+  
+  // Reload history button
+  document.getElementById('reloadHistoryButton').addEventListener('click', function() {
+    loadHistory();
+  });
+  
+  // Main generate button
+  document.getElementById('generateButton').addEventListener('click', function(e) {
+    e.preventDefault();
+    console.log('[FORM] Generate clicked');
+    
+    const websiteUrl = document.getElementById('websiteUrl').value;
+    const platform = document.getElementById('platform').value;
+    const tone = document.getElementById('tone').value;
+    const contentType = document.getElementById('contentType').value;
+    
+    console.log('[FORM] Data:', {websiteUrl, platform, tone, contentType});
+    
+    if (!websiteUrl || !platform || !tone || !contentType) {
+      alert('Vyplňte prosím všechna pole');
+      return;
+    }
+    
+    generateContent(websiteUrl, platform, tone, contentType);
+  });
+  
+  // Event delegation for preview buttons
+  document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('preview-btn')) {
+      const contentData = JSON.parse(decodeURIComponent(e.target.dataset.content));
+      alert('Content: ' + JSON.stringify(contentData, null, 2));
+    }
+  });
+  
+  // Load history on page load
+  setTimeout(loadHistory, 1000);
+});
+</script>

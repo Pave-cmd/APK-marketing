@@ -6,6 +6,8 @@ import { PullOperator } from 'mongodb';
 import { validateUrl, normalizeUrl, isUrlInList, findMatchingUrl } from '../utils/urlUtils';
 // Import loggeru
 import { logger, webLog } from '../utils/logger';
+// Import error handler utility
+import { handleApiError, sendSuccess } from '../utils/errorHandler';
 
 // TEST LOGGERU - uvidíme, zda se zapíše při startu serveru
 logger.info('WebsiteController načten - test loggeru');
@@ -167,10 +169,14 @@ export const addWebsite = async (req: Request, res: Response) => {
 
         console.log('[DEBUG addWebsite] Pokus o uložení uživatele, weby před uložením:', user.websites);
 
-        // Zkusíme přímo aktualizovat pomocí MongoDB
+        // Zkusíme přímo aktualizovat pomocí MongoDB - bezpečný způsob
+        // Zajistíme, že _id je validním ObjectId a že url bylo dříve validováno
+        const userId = new mongoose.Types.ObjectId(String(user._id));
+        const sanitizedUrl = normalizeUrl(url); // používáme již validované a normalizované URL
+        
         const result = await User.updateOne(
-          { _id: user._id },
-          { $addToSet: { websites: url } }
+          { _id: userId },
+          { $addToSet: { websites: sanitizedUrl } }
         );
 
         console.log('[DEBUG addWebsite] Výsledek přímé aktualizace MongoDB:', result);
@@ -199,29 +205,37 @@ export const addWebsite = async (req: Request, res: Response) => {
 
       // Vracíme úspěšnou odpověď s formatovanou zprávou
       console.log('[DEBUG addWebsite] Odesílám úspěšnou odpověď s weby:', user.websites);
-      return res.status(201).json({
-        success: true,
-        message: 'Webová stránka byla úspěšně přidána!',
-        websites: user.websites
-      });
+      
+      // Using new success response utility
+      return sendSuccess(
+        res, 
+        'Webová stránka byla úspěšně přidána!', 
+        { websites: user.websites },
+        201
+      );
     } catch (dbError) {
       console.log('[DEBUG addWebsite] CHYBA při práci s databází:', dbError);
-
-      return res.status(500).json({
-        success: false,
-        message: 'Při přidávání webové stránky došlo k chybě databáze',
-        error: dbError instanceof Error ? dbError.message : 'Unknown error'
-      });
+      
+      // Using new error handler utility
+      return handleApiError(
+        res, 
+        500, 
+        'Při přidávání webové stránky došlo k chybě databáze', 
+        dbError, 
+        '[WEBSITE]'
+      );
     }
   } catch (error) {
-    logger.error('Chyba při přidávání webové stránky', { error: error instanceof Error ? error.message : String(error) });
     console.log('[DEBUG addWebsite] KRITICKÁ CHYBA:', error);
-
-    return res.status(500).json({
-      success: false,
-      message: 'Při přidávání webové stránky došlo k chybě',
-      error: error instanceof Error ? error.message : 'Unknown error'
-    });
+    
+    // Using new error handler utility
+    return handleApiError(
+      res, 
+      500, 
+      'Při přidávání webové stránky došlo k chybě', 
+      error, 
+      '[WEBSITE]'
+    );
   }
 };
 

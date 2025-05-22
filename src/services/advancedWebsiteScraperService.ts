@@ -130,7 +130,7 @@ export class AdvancedWebsiteScraperService {
         blogPosts: [],
         products: [],
         lastScrapedAt: new Date(),
-        language: this.detectLanguage(basicContent),
+        language: await this.detectLanguage(basicContent),
         contactInfo: await this.extractContactInfo(normalizedUrl),
         pageLinks: [],
         internalLinks: []
@@ -277,7 +277,7 @@ export class AdvancedWebsiteScraperService {
   /**
    * Detekuje jazyk stránky
    */
-  private detectLanguage(content: ScrapedContent): string {
+  private async detectLanguage(content: ScrapedContent): Promise<string> {
     // Analýza textu pro detekci jazyka
     const text = content.mainText + ' ' + content.title + ' ' + content.description;
     
@@ -296,8 +296,8 @@ export class AdvancedWebsiteScraperService {
     
     // Pro jednodušší detekci využijeme i html lang atribut pokud je dostupný
     try {
-      const response = axios.get(this.baseUrl);
-      const html = (async () => await response).data;
+      const response = await axios.get(this.baseUrl);
+      const html = response.data;
       const $ = cheerio.load(html);
       const htmlLang = $('html').attr('lang');
       
@@ -627,7 +627,7 @@ export class AdvancedWebsiteScraperService {
   /**
    * Extrahuje produkt z HTML elementu
    */
-  private extractProductFromElement($: cheerio.CheerioAPI, element: cheerio.Element, baseUrl: string): Product | null {
+  private extractProductFromElement($: cheerio.CheerioAPI, element: any, baseUrl: string): Product | null {
     const $product = $(element);
     
     const nameElement = $product.find('.product-name, .product-title, h2, h3, [itemprop="name"]').first();
@@ -639,7 +639,7 @@ export class AdvancedWebsiteScraperService {
     const price = priceElement.text().trim();
     
     const imageElement = $product.find('img').first();
-    const image = imageElement.attr('src') || imageElement.attr('data-src');
+    const image = imageElement.attr('src') || imageElement.attr('data-src') || undefined;
     
     const linkElement = $product.find('a').first();
     const url = linkElement.attr('href') || baseUrl;
@@ -815,7 +815,7 @@ export class AdvancedWebsiteScraperService {
           const author = authorElement.text().trim();
           
           const imageElement = $('meta[property="og:image"]');
-          const image = imageElement.attr('content') || $('img').first().attr('src');
+          const image = imageElement.attr('content') || $('img').first().attr('src') || undefined;
           
           const post: BlogPost = {
             title,
@@ -847,7 +847,7 @@ export class AdvancedWebsiteScraperService {
   /**
    * Extrahuje blogový příspěvek z HTML elementu
    */
-  private extractBlogPostFromElement($: cheerio.CheerioAPI, element: cheerio.Element, baseUrl: string): BlogPost | null {
+  private extractBlogPostFromElement($: cheerio.CheerioAPI, element: any, baseUrl: string): BlogPost | null {
     const $article = $(element);
     
     const titleElement = $article.find('h1, h2, h3, .title, .entry-title, [itemprop="headline"]').first();
@@ -879,7 +879,7 @@ export class AdvancedWebsiteScraperService {
     const author = authorElement.text().trim();
     
     const imageElement = $article.find('img').first();
-    const image = imageElement.attr('src') || imageElement.attr('data-src');
+    const image = imageElement.attr('src') || imageElement.attr('data-src') || undefined;
     
     return {
       title,
@@ -1208,8 +1208,9 @@ export class AdvancedWebsiteScraperService {
           if (images.length > 0) importance += 1;
           
           // Sekce v horní části stránky jsou důležitější
-          const parentOffset = $(element).parent().offset();
-          if (parentOffset && parentOffset.top < 1000) importance += 1;
+          // We don't have direct access to offset in cheerio, so skip this importance check
+          // const parentOffset = $(element).parent().offset();
+          // if (parentOffset && parentOffset.top < 1000) importance += 1;
           
           // Přidáme sekci do výsledku
           sections.push({

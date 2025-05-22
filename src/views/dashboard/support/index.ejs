@@ -1,0 +1,248 @@
+<%- contentFor('styles') %>
+<style>
+  .faq-item {
+    margin-bottom: 1.5rem;
+  }
+  .faq-question {
+    font-weight: bold;
+    color: #3366cc;
+    cursor: pointer;
+    margin-bottom: 0.5rem;
+  }
+  .faq-answer {
+    padding-left: 1rem;
+    border-left: 3px solid #eaeaea;
+  }
+  .contact-card {
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+  .contact-icon {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    color: #3366cc;
+  }
+  .support-resource {
+    border: 1px solid #eaeaea;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    transition: all 0.3s ease;
+  }
+  .support-resource:hover {
+    border-color: #3366cc;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  }
+  .video-container {
+    position: relative;
+    padding-bottom: 56.25%;
+    height: 0;
+    overflow: hidden;
+    max-width: 100%;
+    margin-bottom: 1.5rem;
+  }
+  .video-container iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+</style>
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-12">
+      <div class="card mb-4">
+        <div class="card-header">
+          <h5 class="mb-0">Podpora a nápověda</h5>
+        </div>
+        <div class="card-body">
+          <p>Vítejte v sekci podpory APK-marketing. Zde najdete odpovědi na často kladené otázky, návody a možnosti kontaktu s naším týmem podpory.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-8">
+      <div class="card mb-4">
+        <div class="card-header">
+          <h5 class="mb-0">Často kladené otázky</h5>
+        </div>
+        <div class="card-body">
+          <div class="faq-item">
+            <div class="faq-question">
+              <i class="fas fa-chevron-right me-2"></i>Jak přidat novou webovou stránku?
+            </div>
+            <div class="faq-answer">
+              <p>Pro přidání nové webové stránky přejděte do sekce "Weby" v menu na levé straně. Klikněte na tlačítko "Přidat web" a zadejte URL vaší webové stránky. Systém automaticky analyzuje váš web a připraví návrhy obsahu pro vaše sociální sítě.</p>
+            </div>
+          </div>
+          
+          <div class="faq-item">
+            <div class="faq-question">
+              <i class="fas fa-chevron-right me-2"></i>Jak propojit sociální síť s aplikací?
+            </div>
+            <div class="faq-answer">
+              <p>Propojení sociálních sítí provedete v sekci "Sociální sítě". Klikněte na tlačítko "Připojit" u příslušné platformy (Facebook, Twitter, LinkedIn) a postupujte podle pokynů pro autorizaci. Po úspěšném propojení budete moci automaticky publikovat obsah na své účty.</p>
+            </div>
+          </div>
+          
+          <div class="faq-item">
+            <div class="faq-question">
+              <i class="fas fa-chevron-right me-2"></i>Jak naplánovat příspěvek na sociální sítě?
+            </div>
+            <div class="faq-answer">
+              <p>V sekci "Příspěvky" klikněte na tlačítko "Vytvořit příspěvek". Můžete napsat vlastní obsah nebo použít AI generování obsahu, nastavit čas publikace, vybrat cílové sociální sítě a přidat obrázky. Příspěvek bude automaticky publikován v určený čas.</p>
+            </div>
+          </div>
+          
+          <div class="faq-item">
+            <div class="faq-question">
+              <i class="fas fa-chevron-right me-2"></i>Jak funguje AI generování obsahu?
+            </div>
+            <div class="faq-answer">
+              <p>AI analyzuje vaši webovou stránku a na základě jejího obsahu vytváří relevantní příspěvky pro sociální sítě. Obsah je automaticky optimalizován pro každou platformu (délka, styl, hashtagy). Můžete také nastavit tón příspěvků (formální, neformální, profesionální) a další parametry v nastavení.</p>
+            </div>
+          </div>
+          
+          <div class="faq-item">
+            <div class="faq-question">
+              <i class="fas fa-chevron-right me-2"></i>Jak změnit plán předplatného?
+            </div>
+            <div class="faq-answer">
+              <p>V sekci "Předplatné" najdete informace o vašem aktuálním plánu a možnosti jeho změny. Klikněte na tlačítko "Změnit plán" a vyberte si z dostupných možností. Změna se projeví okamžitě nebo při příštím fakturačním období, podle typu změny.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="card mb-4">
+        <div class="card-header">
+          <h5 class="mb-0">Video návody</h5>
+        </div>
+        <div class="card-body">
+          <div class="video-container">
+            <img src="/images/ai-marketing-hero.svg" alt="Video tutorial placeholder" class="img-fluid" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;">
+            <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; color: #fff; background: rgba(0,0,0,0.5); padding: 1rem; border-radius: 8px;">
+              <i class="fas fa-film fa-3x mb-3"></i>
+              <p>Video návody budou dostupné brzy</p>
+            </div>
+          </div>
+          
+          <h6>Seznam dostupných návodů:</h6>
+          <ul class="list-group">
+            <li class="list-group-item">
+              <i class="fas fa-play-circle me-2 text-primary"></i>Úvod do APK-marketing (již brzy)
+            </li>
+            <li class="list-group-item">
+              <i class="fas fa-play-circle me-2 text-primary"></i>Propojení sociálních sítí (již brzy)
+            </li>
+            <li class="list-group-item">
+              <i class="fas fa-play-circle me-2 text-primary"></i>AI generování obsahu (již brzy)
+            </li>
+            <li class="list-group-item">
+              <i class="fas fa-play-circle me-2 text-primary"></i>Analýza úspěšnosti kampaní (již brzy)
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-md-4">
+      <div class="card mb-4">
+        <div class="card-header">
+          <h5 class="mb-0">Kontaktujte nás</h5>
+        </div>
+        <div class="card-body">
+          <div class="contact-card mb-3">
+            <div class="contact-icon">
+              <i class="fas fa-envelope"></i>
+            </div>
+            <h5>E-mail</h5>
+            <p>Odpovídáme do 24 hodin:</p>
+            <a href="mailto:podpora@apk-marketing.com" class="btn btn-primary">podpora@apk-marketing.com</a>
+          </div>
+          
+          <div class="contact-card mb-3">
+            <div class="contact-icon">
+              <i class="fas fa-comments"></i>
+            </div>
+            <h5>Live chat</h5>
+            <p>Dostupný v pracovních dnech 9:00 - 17:00:</p>
+            <button class="btn btn-outline-primary" id="startChatBtn">Zahájit chat</button>
+          </div>
+          
+          <div class="contact-card">
+            <div class="contact-icon">
+              <i class="fas fa-phone-alt"></i>
+            </div>
+            <h5>Telefonní podpora</h5>
+            <p>Pracovní dny 9:00 - 16:00:</p>
+            <a href="tel:+420123456789" class="btn btn-outline-primary">+420 123 456 789</a>
+          </div>
+        </div>
+      </div>
+      
+      <div class="card mb-4">
+        <div class="card-header">
+          <h5 class="mb-0">Užitečné zdroje</h5>
+        </div>
+        <div class="card-body">
+          <div class="support-resource">
+            <h6><i class="fas fa-book me-2"></i>Kompletní dokumentace</h6>
+            <p>Podrobný popis všech funkcí aplikace</p>
+            <a href="#" class="btn btn-sm btn-outline-primary">Zobrazit dokumentaci</a>
+          </div>
+          
+          <div class="support-resource">
+            <h6><i class="fas fa-graduation-cap me-2"></i>Online kurz</h6>
+            <p>Naučte se efektivně využívat APK-marketing</p>
+            <a href="#" class="btn btn-sm btn-outline-primary">Přejít na kurz</a>
+          </div>
+          
+          <div class="support-resource">
+            <h6><i class="fas fa-download me-2"></i>Soubory ke stažení</h6>
+            <p>Šablony, průvodce a další materiály</p>
+            <a href="#" class="btn btn-sm btn-outline-primary">Procházet soubory</a>
+          </div>
+          
+          <div class="support-resource">
+            <h6><i class="fas fa-users me-2"></i>Komunita</h6>
+            <p>Diskuzní fórum pro uživatele APK-marketing</p>
+            <a href="#" class="btn btn-sm btn-outline-primary">Zapojit se do komunity</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- contentFor('scripts') %>
+<script>
+  // Toggle FAQ answers
+  document.querySelectorAll('.faq-question').forEach(question => {
+    question.addEventListener('click', function() {
+      const answer = this.nextElementSibling;
+      const icon = this.querySelector('i');
+      
+      if (answer.style.display === 'none' || !answer.style.display) {
+        answer.style.display = 'block';
+        icon.classList.remove('fa-chevron-right');
+        icon.classList.add('fa-chevron-down');
+      } else {
+        answer.style.display = 'none';
+        icon.classList.remove('fa-chevron-down');
+        icon.classList.add('fa-chevron-right');
+      }
+    });
+  });
+  
+  // Start chat button
+  document.getElementById('startChatBtn').addEventListener('click', function() {
+    alert('Chat bude k dispozici již brzy!');
+  });
+</script>

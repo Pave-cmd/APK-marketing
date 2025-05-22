@@ -13,17 +13,26 @@ export const SERVER_CONFIG = {
 export const DB_CONFIG = {
   // Heroku sets MONGODB_URI for MongoDB addons
   uri: process.env.MONGODB_URI || process.env.MONGODB_URI_HEROKU || process.env.MONGODB_URL || 'mongodb://localhost:27017/apk-marketing',
-  // Add a larger timeout for Heroku
+  // Add a larger timeout for Heroku and MongoDB Atlas
   options: {
     serverSelectionTimeoutMS: 30000,
     connectTimeoutMS: 30000,
+    socketTimeoutMS: 45000, // Socket timeout
+    maxPoolSize: 10, // Maximum number of connections
   }
 };
 
 // Konfigurace zabezpečení
 export const SECURITY_CONFIG = {
-  jwtSecret: process.env.JWT_SECRET || 'your-default-secret-key-change-in-production',
+  jwtSecret: process.env.JWT_SECRET || (() => {
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error('JWT_SECRET must be set in production environment');
+    }
+    console.warn('WARNING: Using default JWT secret for development. DO NOT use in production!');
+    return `dev-jwt-secret-${Date.now()}-${Math.random()}`;
+  })(),
   jwtExpiresIn: process.env.JWT_EXPIRES_IN || '7d',
+  jwtAlgorithm: 'HS256', // Explicitně nastavený algoritmus pro JWT
 };
 
 // Konfigurace API klíčů pro sociální sítě a AI služby

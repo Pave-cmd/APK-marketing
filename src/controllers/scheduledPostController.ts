@@ -22,7 +22,7 @@ export const createScheduledPost = async (req: Request, res: Response) => {
       recurrence,
       metadata
     } = req.body;
-    const userId = req.user._id;
+    const userId = req.user?._id;
 
     // Validace vstupu
     if (!socialNetworkId || !websiteUrl || !title || !content || !platform || !scheduledFor) {
@@ -74,7 +74,7 @@ export const createScheduledPost = async (req: Request, res: Response) => {
  */
 export const getUserScheduledPosts = async (req: Request, res: Response) => {
   try {
-    const userId = req.user._id;
+    const userId = req.user?._id;
     const { status, platform, limit, offset, fromDate, toDate } = req.query;
 
     // Připravíme filtry
@@ -105,10 +105,10 @@ export const getUserScheduledPosts = async (req: Request, res: Response) => {
     }
 
     // Získání naplánovaných příspěvků
-    const scheduledPosts = await scheduledPostService.getUserScheduledPosts(userId, filters);
+    const scheduledPosts = await scheduledPostService.getUserScheduledPosts(userId as string, filters);
 
     // Získání statistik
-    const stats = await scheduledPostService.getScheduledPostStats(userId);
+    const stats = await scheduledPostService.getScheduledPostStats(userId as string);
 
     return res.json({
       success: true,
@@ -131,11 +131,11 @@ export const getUserScheduledPosts = async (req: Request, res: Response) => {
 export const updateScheduledPost = async (req: Request, res: Response) => {
   try {
     const { postId } = req.params;
-    const userId = req.user._id;
+    const userId = req.user?._id;
     const updates = req.body;
 
     // Provést aktualizaci
-    const updatedPost = await scheduledPostService.updateScheduledPost(postId, userId, updates);
+    const updatedPost = await scheduledPostService.updateScheduledPost(postId as string, userId as string, updates);
 
     if (!updatedPost) {
       return res.status(404).json({
@@ -165,10 +165,10 @@ export const updateScheduledPost = async (req: Request, res: Response) => {
 export const deleteScheduledPost = async (req: Request, res: Response) => {
   try {
     const { postId } = req.params;
-    const userId = req.user._id;
+    const userId = req.user?._id;
 
     // Smazat příspěvek
-    const deleted = await scheduledPostService.deleteScheduledPost(postId, userId);
+    const deleted = await scheduledPostService.deleteScheduledPost(postId as string, userId as string);
 
     if (!deleted) {
       return res.status(404).json({
@@ -197,10 +197,10 @@ export const deleteScheduledPost = async (req: Request, res: Response) => {
 export const cancelScheduledPost = async (req: Request, res: Response) => {
   try {
     const { postId } = req.params;
-    const userId = req.user._id;
+    const userId = req.user?._id;
 
     // Zrušit příspěvek
-    const cancelledPost = await scheduledPostService.cancelScheduledPost(postId, userId);
+    const cancelledPost = await scheduledPostService.cancelScheduledPost(postId as string, userId as string);
 
     if (!cancelledPost) {
       return res.status(404).json({
@@ -230,10 +230,10 @@ export const cancelScheduledPost = async (req: Request, res: Response) => {
 export const publishScheduledPostNow = async (req: Request, res: Response) => {
   try {
     const { postId } = req.params;
-    const userId = req.user._id;
+    const userId = req.user?._id;
 
     // Nejprve ověříme, že příspěvek patří uživateli
-    const posts = await scheduledPostService.getUserScheduledPosts(userId, {
+    const posts = await scheduledPostService.getUserScheduledPosts(userId as string, {
       limit: 1,
       offset: 0
     });
@@ -247,7 +247,7 @@ export const publishScheduledPostNow = async (req: Request, res: Response) => {
     }
 
     // Publikovat příspěvek
-    const publishedPost = await scheduledPostService.publishScheduledPost(postId);
+    const publishedPost = await scheduledPostService.publishScheduledPost(postId as string);
 
     return res.json({
       success: true,

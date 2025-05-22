@@ -768,6 +768,71 @@ export class ContentGeneratorService {
   }
 
   /**
+   * Generuje jednoduchý příspěvek pro sociální sítě na základě názvu a popisu
+   * Tato metoda slouží jako jednodušší verze pro použití v základní analýze
+   * @param title Název webu nebo stránky
+   * @param description Popis webu nebo stránky
+   * @param platform Sociální síť, pro kterou je příspěvek určen
+   * @returns Vygenerovaný text příspěvku
+   */
+  public async generateSocialPost(
+    title: string,
+    description: string,
+    platform: 'facebook' | 'twitter' | 'instagram' | 'linkedin',
+    websiteUrl?: string
+  ): Promise<string> {
+    const maxLength = platform === 'twitter' ? 280 : 2000;
+    const language = /[ěščřžýáíéůúň]/i.test(description) ? 'cs' : 'en';
+    
+    try {
+      const prompt = `
+        Vytvoř příspěvek pro ${platform} o webové stránce s následujícími informacemi:
+        
+        Název: ${title}
+        Popis: ${description}
+        ${websiteUrl ? `URL: ${websiteUrl}` : ''}
+        
+        Požadavky:
+        - Maximální délka: ${maxLength} znaků
+        - Jazyk: ${language === 'cs' ? 'Čeština' : 'Angličtina'}
+        - Tón: profesionální a poutavý
+        - Zapoj čtenáře a přiměj je navštívit web
+        ${websiteUrl ? '- Zahrň URL stránky do příspěvku' : ''}
+        ${platform === 'instagram' ? '- Vhodný pro Instagram - kreativní a vizuálně popisný' : ''}
+        ${platform === 'twitter' ? '- Stručný a výstižný, vhodný pro Twitter' : ''}
+        ${platform === 'linkedin' ? '- Profesionální tón vhodný pro LinkedIn' : ''}
+        ${platform === 'facebook' ? '- Konverzační styl vhodný pro Facebook' : ''}
+        
+        Vrať pouze text příspěvku bez dalších komentářů.
+      `;
+      
+      // Generování příspěvku s vhodným systémovým promptem
+      const systemMessage = `You are a professional social media content creator who specializes in creating engaging ${platform} posts. Your posts always include the website URL when provided and encourage users to click it.`;
+      const post = await this.callOpenAI(systemMessage, prompt);
+      
+      // Pokud URL není v příspěvku a byl poskytnut, přidáme ho na konec
+      const finalPost = post.trim();
+      if (websiteUrl && !finalPost.includes(websiteUrl)) {
+        // Respektujeme maximální délku platformy
+        if (finalPost.length + websiteUrl.length + 2 <= maxLength) {
+          return `${finalPost}\n\n${websiteUrl}`;
+        }
+      }
+      
+      return finalPost;
+    } catch (error) {
+      console.error(`Chyba při generování příspěvku pro ${platform}:`, error);
+      
+      // V případě chyby vrátíme základní template, který zahrnuje URL
+      if (websiteUrl) {
+        return `Podívejte se na ${title}! ${description.slice(0, 70)}${description.length > 70 ? '...' : ''}\n\n${websiteUrl}`;
+      } else {
+        return `Podívejte se na ${title}! ${description.slice(0, 100)}${description.length > 100 ? '...' : ''}`;
+      }
+    }
+  }
+
+  /**
    * Vytvoří systémovou zprávu podle nastavení tónu
    */
   private getSystemMessageForTone(

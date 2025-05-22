@@ -5,7 +5,7 @@ import { webLog } from '../utils/logger';
 export const getApiConfigs = async (req: Request, res: Response) => {
   console.log('[getApiConfigs] Starting - user:', req.user?.email);
   try {
-    webLog('Getting API configs for user', { email: req.user.email });
+    webLog('Getting API configs for user', { email: req.user?.email });
     
     // For now, allow all authenticated users to access their own API configs
     // You can add more sophisticated role-based access control later
@@ -45,7 +45,7 @@ export const updateApiConfig = async (req: Request, res: Response) => {
     webLog('Updating API config', { 
       platform: req.params.platform,
       body: req.body,
-      userEmail: req.user.email 
+      userEmail: req.user?.email 
     });
     
     // For now, allow all authenticated users to update their own API configs

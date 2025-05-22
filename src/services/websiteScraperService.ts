@@ -1,28 +1,21 @@
 import axios from 'axios';
 import * as cheerio from 'cheerio';
 import { logger } from '../utils/logger';
-import { normalizeUrl } from '../utils/urlUtils';
+import { normalizeUrl, makeAbsoluteUrl } from '../utils/urlUtils';
+import { Singleton } from '../utils/singleton';
 
 export interface ScrapedContent {
   title: string;
   description: string;
   images: string[];
+  content?: string;  // Added for compatibility with existing code
   mainText: string;
   keywords: string[];
   products: any[];
 }
 
-export class WebsiteScraperService {
-  private static instance: WebsiteScraperService;
-
-  private constructor() {}
-
-  public static getInstance(): WebsiteScraperService {
-    if (!WebsiteScraperService.instance) {
-      WebsiteScraperService.instance = new WebsiteScraperService();
-    }
-    return WebsiteScraperService.instance;
-  }
+export class WebsiteScraperService extends Singleton {
+  // Using Singleton base class for consistent implementation
 
   /**
    * Skenuje webovou stránku a extrahuje obsah
@@ -56,6 +49,7 @@ export class WebsiteScraperService {
 
       return {
         title,
+        content: mainText, // Added for backward compatibility
         description,
         images,
         mainText,
@@ -118,14 +112,14 @@ export class WebsiteScraperService {
     // OG image
     const ogImage = $('meta[property="og:image"]').attr('content');
     if (ogImage) {
-      images.push(this.makeAbsoluteUrl(ogImage, baseUrl));
+      images.push(makeAbsoluteUrl(ogImage, baseUrl));
     }
 
     // Všechny img tagy
     $('img').each((_, element) => {
       const src = $(element).attr('src');
       if (src && !src.includes('data:image')) {
-        const absoluteUrl = this.makeAbsoluteUrl(src, baseUrl);
+        const absoluteUrl = makeAbsoluteUrl(src, baseUrl);
         if (!images.includes(absoluteUrl)) {
           images.push(absoluteUrl);
         }
@@ -225,17 +219,10 @@ export class WebsiteScraperService {
 
   /**
    * Převede relativní URL na absolutní
+   * @deprecated Use the centralized makeAbsoluteUrl from urlUtils.ts instead
    */
-  private makeAbsoluteUrl(url: string, baseUrl: string): string {
-    if (url.startsWith('http')) {
-      return url;
-    }
-    
-    try {
-      const base = new URL(baseUrl);
-      return new URL(url, base).href;
-    } catch (e) {
-      return url;
-    }
+  private makeRelativeUrlAbsolute(url: string, baseUrl: string): string {
+    // Using the centralized utility function
+    return makeAbsoluteUrl(url, baseUrl);
   }
 }

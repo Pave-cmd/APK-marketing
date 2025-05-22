@@ -60,11 +60,23 @@ export const directAdd = async (req: Request, res: Response): Promise<void> => {
     }
 
     try {
+      // Validace userId je validním MongoDB ObjectId
+      if (!mongoose.Types.ObjectId.isValid(userId)) {
+        console.log('🚨 [EMERGENCY] Neplatné ID uživatele:', userId);
+        res.status(400).json({
+          success: false,
+          message: 'Neplatné ID uživatele'
+        });
+        return;
+      }
+      
+      const userObjectId = new mongoose.Types.ObjectId(userId);
+      
       // Přímý update MongoDB dokumentu (obejití Mongoose)
       console.log('🚨 [EMERGENCY] Přidávání do MongoDB, uživatel:', userId);
       
       // Nejprve zkontrolujeme, zda uživatel existuje
-      const user = await User.findById(userId);
+      const user = await User.findById(userObjectId);
       if (!user) {
         console.log('🚨 [EMERGENCY] Uživatel nenalezen:', userId);
         res.status(404).json({
@@ -113,10 +125,10 @@ export const directAdd = async (req: Request, res: Response): Promise<void> => {
       // Přidání webu pomocí MongoDB přímého přístupu
       console.log('🚨 [EMERGENCY] Přidávám web pomocí updateOne');
 
-      // Nejprve zkontrolujeme, zda web již existuje
+      // Nejprve zkontrolujeme, zda web již existuje - používáme validovaný ObjectId
       const existingWebsiteCheck = await User.findOne(
         {
-          _id: new mongoose.Types.ObjectId(userId),
+          _id: userObjectId,
           websites: normalizedUrl
         }
       );
@@ -132,8 +144,9 @@ export const directAdd = async (req: Request, res: Response): Promise<void> => {
 
       // URL není v seznamu, přidáme ji
       // Použijeme $addToSet místo $push, aby nedošlo k duplikaci
+      // Používáme validovaný ObjectId a sanitizovaný URL string
       const result = await User.updateOne(
-        { _id: new mongoose.Types.ObjectId(userId) },
+        { _id: userObjectId },
         { $addToSet: { websites: normalizedUrl } }
       );
 

@@ -1,6 +1,19 @@
 import mongoose, { Document, Schema } from 'mongoose';
 import { normalizeUrl } from '../utils/urlUtils';
 
+// Interface for AI-generated social media content
+export interface SocialContent {
+  websiteUrl: string;
+  platform: 'facebook' | 'twitter' | 'instagram' | 'linkedin';
+  tone: 'professional' | 'casual' | 'humorous' | 'informative';
+  contentType: 'post' | 'ad' | 'story';
+  text: string;
+  hashtags: string[];
+  images: string[];
+  createdAt: Date;
+  userId: string;
+}
+
 // Rozhraní pro obsahový příspěvek
 export interface IContent extends Document {
   userId: mongoose.Types.ObjectId;

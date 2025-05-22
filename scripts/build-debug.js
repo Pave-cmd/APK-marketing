@@ -1,4 +1,5 @@
 const fs = require('fs');
+// path is actually used on line 89 to require package.json
 const path = require('path');
 const { execSync } = require('child_process');
 

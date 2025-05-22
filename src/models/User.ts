@@ -13,30 +13,47 @@ export interface IUser extends Document {
   isActive: boolean;
   createdAt: Date;
   lastLogin?: Date;
+  role?: string;
   websites: string[];
   socialNetworks: {
     _id?: any;
     platform: string;
-    accountId: string;
-    accessToken: string;
-    refreshToken?: string;
-    isConnected: boolean;
-    connectedAt?: Date;
+    username?: string;       // Uživatelské jméno na platformě
+    accountId?: string;      // ID účtu na platformě (pro zpětnou kompatibilitu)
+    lastChecked?: Date;      // Kdy byla naposled ověřena platnost propojení
+    
     // Facebook specifické pole
-    pageId?: string;       // ID stránky pro publikování
-    pageName?: string;     // Název stránky
-    // Metadata pro všechny sítě
-    lastTokenRefresh?: Date; // Kdy byl token naposledy obnoven
-    tokenExpiry?: Date;      // Kdy vyprší token
-    status?: string;         // Status připojení (active, error, expired)
+    pageId?: string;         // ID stránky pro publikování
+    pageName?: string;       // Název stránky
+    
+    // Twitter specifické pole
+    screenName?: string;     // Twitter přezdívka (@...)
+    
+    // LinkedIn specifické pole
+    linkedinCompanyId?: string; // ID firmy na LinkedIn, pokud se používá
+    
+    // Obecná metadata
+    status?: string;         // Status připojení (active, error, expired, pending)
     lastPostAt?: Date;       // Kdy byl naposledy publikován příspěvek
     errorMessage?: string;   // Poslední chybová zpráva
-    publishSettings?: {      // Nastavení publikování
-      autoPublish: boolean;  // Automatické publikování
-      frequency: string;     // Jak často publikovat (daily, weekly, monthly)
-      contentType: string;   // Jaký typ obsahu publikovat (blog, products, news)
+    connectedAt?: Date;      // Kdy bylo připojení vytvořeno
+    
+    // Nastavení publikování
+    publishSettings?: {
+      autoPublish: boolean;   // Automatické publikování
+      frequency: string;      // Jak často publikovat (daily, weekly, monthly)
+      contentType: string;    // Jaký typ obsahu publikovat (blog, products, news)
       bestTimeToPost: boolean; // Publikovat v optimální čas
+      
+      // Pokročilejší nastavení
+      tone?: string;          // Tón příspěvků (casual, professional, friendly, formal)
+      hashtags?: string;      // Množství hashtagů (none, few, many)
+      emoji?: string;         // Množství emoji (none, few, many)
+      includeImage?: boolean; // Přidat obrázek k příspěvku
     };
+    
+    // Flexibilní objekt pro různá metadata specifická pro platformu
+    metadata?: Record<string, any>;
   }[];
   comparePassword(password: string): Promise<boolean>;
 }
@@ -85,6 +102,11 @@ const UserSchema: Schema = new Schema({
   lastLogin: {
     type: Date,
   },
+  role: {
+    type: String,
+    enum: ['user', 'admin'],
+    default: 'user',
+  },
   websites: [{
     type: String,
     trim: true,
@@ -97,23 +119,15 @@ const UserSchema: Schema = new Schema({
       enum: ['facebook', 'instagram', 'twitter', 'linkedin', 'pinterest', 'tiktok', 'youtube'],
       required: true,
     },
-    accountId: {
-      type: String,
-      required: true,
-    },
-    accessToken: {
-      type: String,
-      required: true,
-    },
-    refreshToken: {
+    username: {
       type: String,
       required: false,
     },
-    isConnected: {
-      type: Boolean,
-      default: true,
+    accountId: {
+      type: String,
+      required: false,
     },
-    connectedAt: {
+    lastChecked: {
       type: Date,
       required: false,
     },
@@ -126,15 +140,17 @@ const UserSchema: Schema = new Schema({
       type: String,
       required: false,
     },
+    // Twitter specifická pole
+    screenName: {
+      type: String,
+      required: false,
+    },
+    // LinkedIn specifická pole
+    linkedinCompanyId: {
+      type: String,
+      required: false,
+    },
     // Obecná metadata
-    lastTokenRefresh: {
-      type: Date,
-      required: false,
-    },
-    tokenExpiry: {
-      type: Date,
-      required: false,
-    },
     status: {
       type: String,
       enum: ['active', 'error', 'expired', 'pending'],
@@ -146,6 +162,10 @@ const UserSchema: Schema = new Schema({
     },
     errorMessage: {
       type: String,
+      required: false,
+    },
+    connectedAt: {
+      type: Date,
       required: false,
     },
     publishSettings: {
@@ -167,6 +187,29 @@ const UserSchema: Schema = new Schema({
         type: Boolean,
         default: true,
       },
+      tone: {
+        type: String,
+        enum: ['casual', 'professional', 'friendly', 'formal'],
+        default: 'professional',
+      },
+      hashtags: {
+        type: String,
+        enum: ['none', 'few', 'many'],
+        default: 'few',
+      },
+      emoji: {
+        type: String,
+        enum: ['none', 'few', 'many'],
+        default: 'few',
+      },
+      includeImage: {
+        type: Boolean,
+        default: true,
+      },
+    },
+    metadata: {
+      type: Schema.Types.Mixed,
+      default: {},
     },
   }],
 });

@@ -12,8 +12,12 @@ import socialNetworkRoutes from './routes/socialNetworkRoutes';
 import apiConfigRoutes from './routes/apiConfigRoutes';
 import webAnalysisRoutes from './routes/webAnalysisRoutes';
 import scheduledPostRoutes from './routes/scheduledPostRoutes';
+import contentGeneratorRoutes from './routes/contentGeneratorRoutes';
 import jwt from 'jsonwebtoken';
 import { setAuthCookies } from './utils/cookieUtils';
+import { rateLimit } from './middleware/rateLimitMiddleware';
+import { setCsrfToken, validateCsrfToken } from './middleware/csrfMiddleware';
+import helmet from 'helmet';
 
 // Inicializace Express aplikace
 const app: Express = express();
@@ -23,15 +27,47 @@ const port = SERVER_CONFIG.port;
 connectDB();
 console.log('Připojování k MongoDB Atlas...');
 
-// Middleware
+// Základní bezpečnostní middleware s vlastním CSP nastavením
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "cdn.jsdelivr.net", "cdnjs.cloudflare.com", "*.bootstrapcdn.com"],
+        scriptSrcAttr: ["'self'", "'unsafe-inline'"], // Povolit inline event handlery
+        styleSrc: ["'self'", "'unsafe-inline'", "cdn.jsdelivr.net", "cdnjs.cloudflare.com", "*.bootstrapcdn.com", "*.googleapis.com"],
+        imgSrc: ["'self'", "data:", "blob:", "*.imgur.com", "*.cloudfront.net", "via.placeholder.com", "*.google.com", "*.googleapis.com"],
+        fontSrc: ["'self'", "*.googleapis.com", "*.gstatic.com", "cdnjs.cloudflare.com"],
+        connectSrc: ["'self'", "api.example.com", "*"], // povolit API volání
+        frameSrc: ["'self'", "*.google.com", "www.google.com"], // Povolit iframe pro mapy
+        objectSrc: ["'none'"],
+        upgradeInsecureRequests: [],
+      },
+    },
+  })
+);
+
+// Standardní middleware
 app.use((req, res, next) => {
   console.log(`[HTTP] ${req.method} ${req.originalUrl}`);
   next();
 });
-app.use(cors());
+
+// CORS a parsery
+app.use(cors({
+  origin: process.env.NODE_ENV === 'production' ? 
+    ['https://apk-marketing.com', 'https://www.apk-marketing.com'] : 
+    true,
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-CSRF-Token', 'CSRF-Token']
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+
+// Rate limiting pro základní ochranu proti DoS útokům
+app.use(rateLimit());
 
 // Statické soubory
 const staticPath = SERVER_CONFIG.environment === 'production'
@@ -41,17 +77,24 @@ const staticPath = SERVER_CONFIG.environment === 'production'
 console.log('[SERVER] Cesta ke statickým souborům:', staticPath);
 app.use(express.static(staticPath));
 
-// API Routes
+// CSRF ochrana - nejprve nastavení tokenu, pak validace
+// Nutno přidat před API routy, ale po parseování cookies
+app.use(setCsrfToken);
+app.use(validateCsrfToken);
+
+// API Routes s různým rate limitingem pro různé typy API
 console.log('[SERVER] Registering API routes');
-app.use('/api/auth', authRoutes);
-app.use('/api/websites', websiteRoutes);
-app.use('/api/social-networks', socialNetworkRoutes);
-app.use('/api/config', (req, res, next) => {
+app.use('/api/auth', rateLimit('auth'), authRoutes);
+app.use('/api/websites', rateLimit('website'), websiteRoutes);
+app.use('/api/social-networks', rateLimit('social'), socialNetworkRoutes);
+app.use('/api/config', rateLimit('default'), (req, res, next) => {
   console.log('[SERVER] API config route hit:', req.method, req.path);
   next();
 }, apiConfigRoutes);
-app.use('/api/analysis', webAnalysisRoutes);
-app.use('/api/scheduled-posts', scheduledPostRoutes);
+app.use('/api/analysis', rateLimit('default'), webAnalysisRoutes);
+app.use('/api/scheduled-posts', rateLimit('default'), scheduledPostRoutes);
+import contentRoutes from './routes/contentRoutes';
+app.use('/api/content', rateLimit('default'), setCsrfToken, validateCsrfToken, contentRoutes);
 
 // EJS šablony a layout
 app.use(expressLayouts);
@@ -70,13 +113,14 @@ app.set('layout extractStyles', true);
  * Authentication middleware
  * Zkontroluje, zda je uživatel přihlášen
  */
-const authenticate = async (req: Request, res: Response, next: NextFunction) => {
+const authenticate = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   console.log('[AUTH] Kontroluji přihlášení na cestě:', req.path);
   
   // Speciální případ - přihlašovací stránka
   if (req.path === '/prihlaseni') {
     console.log('[AUTH] Stránka pro přihlášení, neověřuji');
-    return next();
+    next();
+    return;
   }
   
   try {
@@ -102,11 +146,13 @@ const authenticate = async (req: Request, res: Response, next: NextFunction) => 
         // Přesměrování bez URL parametrů
         const cleanUrl = req.originalUrl.replace(/[?&]token=[^&]+(&|$)/, '$1');
         console.log('[AUTH] Přesměrování na:', cleanUrl || '/dashboard');
-        return res.redirect(cleanUrl || '/dashboard');
+        res.redirect(cleanUrl || '/dashboard');
+        return;
       }
       
       console.log('[AUTH] Token nenalezen vůbec, přesměrování na login');
-      return res.redirect(`/prihlaseni?from=${encodeURIComponent(req.path)}`);
+      res.redirect(`/prihlaseni?from=${encodeURIComponent(req.path)}`);
+      return;
     }
     
     // Ověření JWT tokenu
@@ -129,7 +175,8 @@ const authenticate = async (req: Request, res: Response, next: NextFunction) => 
         
         res.clearCookie('authToken');
         res.clearCookie('loggedIn');
-        return res.redirect('/prihlaseni');
+        res.redirect('/prihlaseni');
+        return;
       }
       
       // Kontrola, zda již nebyla odeslána odpověď
@@ -141,7 +188,8 @@ const authenticate = async (req: Request, res: Response, next: NextFunction) => 
       // Uživatel nalezen, přidáme ho do requestu
       req.user = user;
       console.log('[AUTH] Uživatel nalezen a ověřen:', user.email);
-      next(); // Voláme next() bez return, abychom zabránili dvojitému volání response
+      next();
+      return;
       
     } catch (error) {
       console.error('[AUTH] Chyba při ověření tokenu:', error);
@@ -154,7 +202,8 @@ const authenticate = async (req: Request, res: Response, next: NextFunction) => 
       
       res.clearCookie('authToken');
       res.clearCookie('loggedIn');
-      return res.redirect('/prihlaseni');
+      res.redirect('/prihlaseni');
+      return;
     }
     
   } catch (error) {
@@ -166,7 +215,8 @@ const authenticate = async (req: Request, res: Response, next: NextFunction) => 
       return;
     }
     
-    return res.redirect('/prihlaseni');
+    res.redirect('/prihlaseni');
+    return;
   }
 };
 
@@ -350,6 +400,19 @@ app.get('/dashboard/prispevky', authenticate, (req: Request, res: Response): voi
   });
 });
 
+// Stránka generování obsahu
+app.get('/dashboard/generovani-obsahu', authenticate, setCsrfToken, (req: Request, res: Response): void => {
+  console.log('[SERVER] Vykreslení generování obsahu pro uživatele:', req.user.email);
+  
+  res.render('dashboard/content/index', {
+    title: 'Generování obsahu | APK-marketing',
+    description: 'AI generování obsahu pro sociální sítě',
+    layout: 'layouts/dashboard',
+    user: req.user,
+    csrfToken: res.locals.csrfToken || ''
+  });
+});
+
 // Stránka analýzy
 app.get('/dashboard/analyza', authenticate, (req: Request, res: Response): void => {
   console.log('[SERVER] Vykreslení analýzy pro uživatele:', req.user.email);
@@ -381,6 +444,18 @@ app.get('/dashboard/predplatne', authenticate, (req: Request, res: Response): vo
   res.render('dashboard/subscription/index', {
     title: 'Předplatné | APK-marketing',
     description: 'Správa vašeho předplatného',
+    layout: 'layouts/dashboard',
+    user: req.user
+  });
+});
+
+// Stránka podpory
+app.get('/dashboard/podpora', authenticate, (req: Request, res: Response): void => {
+  console.log('[SERVER] Vykreslení stránky podpory pro uživatele:', req.user.email);
+  
+  res.render('dashboard/support/index', {
+    title: 'Podpora | APK-marketing',
+    description: 'Podpora a nápověda k používání aplikace',
     layout: 'layouts/dashboard',
     user: req.user
   });

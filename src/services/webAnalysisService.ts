@@ -9,14 +9,14 @@ import mongoose from 'mongoose';
 
 export class WebAnalysisService {
   private scraperService: WebsiteScraperService;
-  private advancedScraperService: AdvancedWebsiteScraperService;
+  private advancedScraperService: AdvancedWebsiteScraperService | null;
   private generatorService: ContentGeneratorService;
   private publisherService: SocialPublisherService;
 
   constructor() {
     // Předpokládáme, že instančně již existují
     this.scraperService = new WebsiteScraperService();
-    this.advancedScraperService = new AdvancedWebsiteScraperService();
+    this.advancedScraperService = null; // Disabled due to issues
     
     // Pro generování obsahu potřebujeme API klíč
     const apiKey = process.env.OPENAI_API_KEY || '';
@@ -39,7 +39,8 @@ export class WebAnalysisService {
         userId: new mongoose.Types.ObjectId(userId),
         websiteUrl,
         status: 'pending',
-        createdAt: new Date()
+        createdAt: new Date(),
+        lastScan: new Date()
       });
       await analysis.save();
       
@@ -66,57 +67,195 @@ export class WebAnalysisService {
       analysis.status = 'scanning';
       await analysis.save();
 
-      // Nejprve zkusíme pokročilý scraper pro dynamické weby
+      // Základní scraper pro statické weby
       let scrapedContent;
       try {
-        // @ts-ignore - Property 'scrapeWebsite' exists dynamically
-        scrapedContent = await this.advancedScraperService.scrapeWebsite(websiteUrl);
-        logger.info(`Použit pokročilý scraper pro: ${websiteUrl}`);
-      } catch (error) {
-        logger.warn(`Pokročilý scraper selhal, používám základní scraper pro: ${websiteUrl}`);
-        // Pokud pokročilý scraper selže, použijeme základní
         scrapedContent = await this.scraperService.scrapeWebsite(websiteUrl);
+        logger.info(`Použit základní scraper pro: ${websiteUrl}`);
+      } catch (error) {
+        logger.error(`Základní scraper selhal pro: ${websiteUrl}`, error);
+        throw new Error(`Nepodařilo se stáhnout obsah webu: ${error instanceof Error ? error.message : String(error)}`);
       }
 
       // 2. Uložení výsledků
       analysis.scannedContent = {
         title: scrapedContent.title || websiteUrl,
         description: scrapedContent.description || '',
+        mainText: scrapedContent.content || '',
         keywords: scrapedContent.keywords || [],
-        headers: scrapedContent.headers || [],
-        images: scrapedContent.images || [],
-        links: scrapedContent.links || []
+        images: scrapedContent.images || []
       };
+      analysis.lastScan = new Date();
       await analysis.save();
 
       // 3. AI generování
       analysis.status = 'generating';
       await analysis.save();
 
-      // @ts-ignore - Property 'generateSocialContent' exists dynamically
-      const generatedContent = await this.generatorService.generateSocialContent(scrapedContent, websiteUrl);
-      analysis.generatedContent = generatedContent;
-      await analysis.save();
+      try {
+        // Nastavíme timeout pro případné zaseknutí generování (5 minut)
+        const generationTimeout = setTimeout(async () => {
+          logger.warn(`Timeout při generování obsahu pro ${websiteUrl} - dokončuji analýzu`);          
+          try {
+            // Nastavíme základní výchozí obsah
+            analysis.generatedContent = {
+              facebook: {
+                text: `Podívejte se na ${websiteUrl}!`,
+                image: scrapedContent.images && scrapedContent.images.length > 0 ? scrapedContent.images[0] : undefined
+              },
+              twitter: {
+                text: `Zajímavý obsah na ${websiteUrl}`,
+                image: scrapedContent.images && scrapedContent.images.length > 0 ? scrapedContent.images[0] : undefined
+              },
+              linkedin: {
+                text: `Doporučujeme obsah na ${websiteUrl}`,
+                image: scrapedContent.images && scrapedContent.images.length > 0 ? scrapedContent.images[0] : undefined
+              }
+            };
+            
+            // Dokončíme analýzu
+            analysis.status = 'completed';
+            analysis.updatedAt = new Date();
+            await analysis.save();
+            logger.info(`Analýza webu ${websiteUrl} dokončena po timeoutu generování`);  
+          } catch (timeoutError) {
+            logger.error(`Chyba při dokončování analýzy po timeoutu pro ${websiteUrl}:`, timeoutError);
+          }
+        }, 300000); // 5 minut  
+        
+        // Generování obsahu pro Facebook
+        const facebookContent = await this.generatorService.generateSocialPost(
+          scrapedContent.title,
+          scrapedContent.description,
+          'facebook'
+        );
+        
+        // Generování obsahu pro Twitter
+        const twitterContent = await this.generatorService.generateSocialPost(
+          scrapedContent.title,
+          scrapedContent.description,
+          'twitter'
+        );
+        
+        // Generování obsahu pro LinkedIn
+        const linkedinContent = await this.generatorService.generateSocialPost(
+          scrapedContent.title,
+          scrapedContent.description,
+          'linkedin'
+        );
+        
+        // Zrušíme timeout, protože generování proběhlo úspěšně
+        clearTimeout(generationTimeout);
+        
+        // Uložení vygenerovaného obsahu
+        analysis.generatedContent = {
+          facebook: {
+            text: facebookContent || `Podívejte se na ${websiteUrl}!`,
+            image: scrapedContent.images && scrapedContent.images.length > 0 ? scrapedContent.images[0] : undefined
+          },
+          twitter: {
+            text: twitterContent || `Zajímavý obsah na ${websiteUrl}`,
+            image: scrapedContent.images && scrapedContent.images.length > 0 ? scrapedContent.images[0] : undefined
+          },
+          linkedin: {
+            text: linkedinContent || `Doporučujeme obsah na ${websiteUrl}`,
+            image: scrapedContent.images && scrapedContent.images.length > 0 ? scrapedContent.images[0] : undefined
+          }
+        };
+        
+        await analysis.save();
+      } catch (error) {
+        logger.error(`Chyba při generování obsahu pro ${websiteUrl}:`, error);
+        // Pokračujeme i přes chybu v generování obsahu
+        
+        // Nastavíme základní výchozí obsah abychom mohli dokončit analýzu
+        try {
+          analysis.generatedContent = {
+            facebook: {
+              text: `Podívejte se na ${websiteUrl}!`,
+              image: scrapedContent.images && scrapedContent.images.length > 0 ? scrapedContent.images[0] : undefined
+            },
+            twitter: {
+              text: `Zajímavý obsah na ${websiteUrl}`,
+              image: scrapedContent.images && scrapedContent.images.length > 0 ? scrapedContent.images[0] : undefined
+            },
+            linkedin: {
+              text: `Doporučujeme obsah na ${websiteUrl}`,
+              image: scrapedContent.images && scrapedContent.images.length > 0 ? scrapedContent.images[0] : undefined
+            }
+          };
+          await analysis.save();
+        } catch (fallbackError) {
+          logger.error(`Chyba při ukládání náhradního obsahu pro ${websiteUrl}:`, fallbackError);
+        }
+      }
 
-      // 4. Publikace
-      analysis.status = 'publishing';
-      await analysis.save();
-
-      // Automatická publikace obsahu
-      const publishResult = await this.publisherService.publishToAllNetworks(analysis);
-      analysis.publishResult = publishResult;
-      
-      // 5. Dokončení
+      // 4. Dokončení
       analysis.status = 'completed';
-      analysis.completedAt = new Date();
+      analysis.updatedAt = new Date();
       await analysis.save();
       
       logger.info(`Analýza webu ${websiteUrl} úspěšně dokončena`);
     } catch (error) {
       logger.error(`Chyba při analýze webu ${websiteUrl}:`, error);
-      analysis.status = 'error';
-      analysis.errorMessage = error instanceof Error ? error.message : 'Neznámá chyba';
+      analysis.status = 'failed';
+      analysis.error = error instanceof Error ? error.message : 'Neznámá chyba';
       await analysis.save();
+    }
+  }
+
+  /**
+   * Iniciuje novou analýzu pro web (určeno pro API)
+   */
+  public async analyzeWebsite(userId: string, websiteUrl: string): Promise<IWebAnalysis> {
+    try {
+      // Nejprve zkontrolujeme, zda již neběží analýza pro tento web
+      const existingAnalysis = await WebAnalysis.findOne({
+        userId: new mongoose.Types.ObjectId(userId),
+        websiteUrl,
+        status: { $in: ['pending', 'scanning', 'extracting', 'generating', 'publishing'] }
+      });
+      
+      if (existingAnalysis) {
+        logger.info(`Pro web ${websiteUrl} již běží analýza, vracím existující`);
+        return existingAnalysis;
+      }
+      
+      // Vytvoříme novou analýzu
+      return await this.createAnalysis(userId, websiteUrl);
+    } catch (error) {
+      logger.error(`Chyba při spouštění analýzy webu:`, error);
+      throw new Error(`Nepodařilo se spustit analýzu: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  }
+
+  /**
+   * Získá stav analýzy pro web
+   */
+  public async getAnalysisStatus(userId: string, websiteUrl: string): Promise<IWebAnalysis | null> {
+    try {
+      // Nejprve hledáme aktuálně běžící analýzu
+      let analysis = await WebAnalysis.findOne({
+        userId: new mongoose.Types.ObjectId(userId),
+        websiteUrl,
+        status: { $in: ['pending', 'scanning', 'extracting', 'generating', 'publishing'] }
+      });
+      
+      if (analysis) {
+        logger.info(`Nalezena běžící analýza pro ${websiteUrl}`);
+        return analysis;
+      }
+      
+      // Pokud neběží žádná analýza, najdeme nejnovější dokončenou
+      analysis = await WebAnalysis.findOne({
+        userId: new mongoose.Types.ObjectId(userId),
+        websiteUrl
+      }).sort({ createdAt: -1 });
+      
+      return analysis;
+    } catch (error) {
+      logger.error(`Chyba při získávání stavu analýzy:`, error);
+      throw new Error('Nepodařilo se získat stav analýzy');
     }
   }
 
@@ -196,8 +335,11 @@ export class WebAnalysisService {
             }
           }
 
-          logger.info(`Vytvářím naplánovanou analýzu pro web ${website} uživatele ${user._id}`);
-          analysisPromises.push(this.createAnalysis(user._id.toString(), website));
+          const userId = user._id ? user._id.toString() : '';
+          if (userId) {
+            logger.info(`Vytvářím naplánovanou analýzu pro web ${website} uživatele ${userId}`);
+            analysisPromises.push(this.createAnalysis(userId, website));
+          }
         }
       }
 

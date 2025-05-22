@@ -30,4 +30,4 @@ function trackConversions() {
 }
 
 // Nastavení oznámení o úspěšném načtení
-console.log('chrome run time success');
+console.log('Content.js loaded and initialized successfully');

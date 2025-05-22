@@ -5,11 +5,14 @@ import { SECURITY_CONFIG } from '../config/config';
 import User from '../models/User';
 import { setAuthCookies } from '../utils/cookieUtils';
 
-// Rozšíření typů Express Request
+// Import typu uživatele
+import { IUser } from '../models/User';
+
+// Použijeme typ IUser namísto any
 declare global {
   namespace Express {
     interface Request {
-      user?: any;
+      user?: IUser;
       token?: string;
     }
   }
@@ -139,9 +142,9 @@ export const auth = async (req: Request, res: Response, next: NextFunction): Pro
       req.token = token;
 
       console.log('[DEBUG AUTH] Uživatel úspěšně ověřen:', {
-        id: req.user.id,
-        email: req.user.email,
-        websites: req.user.websites || []
+        id: req.user?.id,
+        email: req.user?.email,
+        websites: req.user?.websites || []
       });
 
       // Kontrola, zda již nebyla odeslána odpověď
@@ -203,6 +206,62 @@ export const isAdmin = (req: Request, res: Response, next: NextFunction) => {
     res.status(403).render('errors/403', { 
       title: 'Přístup odepřen | APK-marketing',
       description: 'Nemáte dostatečná oprávnění pro přístup k této stránce'
+    });
+  }
+};
+
+// Middleware pro API autentizaci
+export const requireAuth = async (req: Request, res: Response, next: NextFunction): Promise<void | Response> => {
+  try {
+    // Získání tokenu z cookies nebo hlavičky
+    let token = '';
+    const authHeader = req.headers.authorization;
+    
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      token = authHeader.substring(7);
+    } else if (req.cookies && req.cookies.authToken) {
+      token = req.cookies.authToken;
+    }
+    
+    // Pokud token neexistuje
+    if (!token) {
+      return res.status(401).json({
+        success: false,
+        message: 'Unauthorized - no token provided'
+      });
+    }
+    
+    // Ověření tokenu
+    const secretKey = Buffer.from(SECURITY_CONFIG.jwtSecret || 'default-secret-key', 'utf8');
+    
+    try {
+      const decoded = jwt.verify(token, secretKey) as { id: string };
+      
+      // Vyhledání uživatele podle ID
+      const user = await User.findById(decoded.id);
+      
+      if (!user) {
+        return res.status(401).json({
+          success: false,
+          message: 'Unauthorized - user not found'
+        });
+      }
+      
+      // Přidání informací o uživateli do požadavku
+      req.user = user;
+      req.token = token;
+      
+      next();
+    } catch (error) {
+      return res.status(401).json({
+        success: false,
+        message: 'Unauthorized - invalid token'
+      });
+    }
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: 'Server error during authentication'
     });
   }
 };

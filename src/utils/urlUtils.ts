@@ -144,11 +144,17 @@ export function areUrlsEquivalent(url1: string, url2: string): boolean {
 export function isUrlInList(urlToCheck: string, urlList: string[]): boolean {
   if (!urlToCheck || !urlList || !Array.isArray(urlList)) return false;
   
-  // Normalize the URL we're checking for
+  // Normalize the URL we're checking for (jen jednou!)
   const normalizedUrlToCheck = normalizeUrl(urlToCheck, { keepTrailingSlash: false });
   
-  // Check if any URL in the list is equivalent to our URL
-  return urlList.some(url => areUrlsEquivalent(url, urlToCheck));
+  // Pro výkon: normalizujeme seznam URL jen jednou a pak porovnáváme 
+  // normalizované URL přímo
+  const normalizedUrlList = urlList.map(url => 
+    normalizeUrl(url, { keepTrailingSlash: false })
+  );
+  
+  // Jednoduché porovnání normalizovaných URL
+  return normalizedUrlList.includes(normalizedUrlToCheck);
 }
 
 /**
@@ -160,5 +166,48 @@ export function isUrlInList(urlToCheck: string, urlList: string[]): boolean {
 export function findMatchingUrl(urlToFind: string, urlList: string[]): string | null {
   if (!urlToFind || !urlList || !Array.isArray(urlList)) return null;
   
-  return urlList.find(url => areUrlsEquivalent(url, urlToFind)) || null;
+  // Normalize the URL we're checking for (jen jednou!)
+  const normalizedUrlToFind = normalizeUrl(urlToFind, { keepTrailingSlash: false });
+  
+  // Procházíme seznam a hledáme první vyhovující URL
+  for (const url of urlList) {
+    if (normalizeUrl(url, { keepTrailingSlash: false }) === normalizedUrlToFind) {
+      return url; // Vracíme původní, nenormalizovanou URL z původního seznamu
+    }
+  }
+  
+  return null;
+}
+
+/**
+ * Converts a relative URL to an absolute URL based on the base URL
+ * @param relativeUrl The relative URL to convert
+ * @param baseUrl The base URL to use for conversion
+ * @returns Absolute URL
+ */
+export function makeAbsoluteUrl(relativeUrl: string, baseUrl: string): string {
+  if (!relativeUrl) return '';
+  
+  // If already absolute, return as is
+  if (relativeUrl.startsWith('http://') || relativeUrl.startsWith('https://')) {
+    return relativeUrl;
+  }
+  
+  try {
+    // Remove query parameters from base URL
+    const baseUrlObj = new URL(baseUrl);
+    const baseUrlWithoutQuery = `${baseUrlObj.protocol}//${baseUrlObj.host}${baseUrlObj.pathname}`;
+    
+    // Handle root-relative URLs
+    if (relativeUrl.startsWith('/')) {
+      const baseOrigin = `${baseUrlObj.protocol}//${baseUrlObj.host}`;
+      return `${baseOrigin}${relativeUrl}`;
+    }
+    
+    // Handle simple relative URLs
+    return new URL(relativeUrl, baseUrlWithoutQuery).toString();
+  } catch (error) {
+    console.error('Error creating absolute URL:', error);
+    return relativeUrl;
+  }
 }
