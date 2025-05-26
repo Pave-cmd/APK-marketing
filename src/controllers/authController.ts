@@ -293,3 +293,162 @@ export const logout = asyncHandler(async (req: Request, res: Response) => {
   // Přesměrování na hlavní stránku po odhlášení
   return res.redirect('/');
 });
+
+// Aktualizace GDPR souhlasu
+export const updateConsent = asyncHandler(async (req: Request, res: Response) => {
+  console.log('[GDPR] Aktualizace souhlasu cookies');
+  
+  const { necessary, functional, analytics, marketing } = req.body;
+  const clientIP = req.ip || req.connection.remoteAddress || 'unknown';
+  const userAgent = req.get('User-Agent') || 'unknown';
+  
+  // Pokud je uživatel přihlášen, uložíme do jeho profilu
+  const token = req.cookies?.authToken;
+  if (token) {
+    try {
+      const secretKey = Buffer.from(SECURITY_CONFIG.jwtSecret, 'utf8');
+      const decoded = jwt.verify(token, secretKey) as any;
+      
+      const user = await User.findById(decoded.id);
+      if (user) {
+        user.gdprConsent = {
+          analytics: !!analytics,
+          marketing: !!marketing,
+          functional: !!functional,
+          consentDate: new Date(),
+          ipAddress: clientIP,
+          userAgent: userAgent
+        };
+        await user.save();
+        console.log('[GDPR] Souhlas uložen pro uživatele:', user.email);
+      }
+    } catch (error) {
+      console.log('[GDPR] Chyba při ukládání souhlasu pro přihlášeného uživatele:', error);
+    }
+  }
+  
+  return sendSuccess(res, 'Souhlas byl úspěšně uložen', { 
+    consent: { necessary, functional, analytics, marketing } 
+  });
+});
+
+// Export uživatelských dat (GDPR Článek 20)
+export const exportUserData = asyncHandler(async (req: Request, res: Response) => {
+  console.log('[GDPR] Export dat - začátek, cookies:', req.cookies);
+  
+  // Ručně ověřit autentizaci
+  const token = req.cookies?.authToken;
+  if (!token) {
+    console.log('[GDPR] Chybí auth token');
+    return handleApiError(res, 401, 'Nejste přihlášeni', null, '[GDPR]');
+  }
+  
+  try {
+    const secretKey = Buffer.from(SECURITY_CONFIG.jwtSecret, 'utf8');
+    const decoded = jwt.verify(token, secretKey) as any;
+    
+    const user = await User.findById(decoded.id);
+    if (!user) {
+      console.log('[GDPR] Uživatel nebyl nalezen');
+      return handleApiError(res, 401, 'Uživatel nebyl nalezen', null, '[GDPR]');
+    }
+    
+    console.log('[GDPR] Uživatel ověřen:', user.email);
+    
+    // Sestavení kompletních dat uživatele
+    const userData = {
+      personalInfo: {
+        id: user._id,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        company: user.company,
+        plan: user.plan,
+        createdAt: user.createdAt,
+        lastLogin: user.lastLogin,
+        isActive: user.isActive
+      },
+      websites: user.websites,
+      gdprConsent: user.gdprConsent,
+      dataProcessingConsent: user.dataProcessingConsent,
+      socialNetworks: user.socialNetworks?.map(sn => ({
+        platform: sn.platform,
+        username: sn.username,
+        status: sn.status,
+        connectedAt: sn.connectedAt,
+        lastPostAt: sn.lastPostAt,
+        publishSettings: sn.publishSettings
+        // Nezahrnujeme tokeny z bezpečnostních důvodů
+      })),
+      exportInfo: {
+        exportDate: new Date().toISOString(),
+        version: '1.0',
+        format: 'JSON'
+      }
+    };
+    
+    // Nastavení hlaviček pro stažení
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Content-Disposition', `attachment; filename="user-data-${user._id}-${Date.now()}.json"`);
+    
+    console.log('[GDPR] Data exportována pro uživatele:', user.email);
+    return res.json(userData);
+    
+  } catch (error) {
+    console.log('[GDPR] Chyba ověření tokenu:', error);
+    return handleApiError(res, 401, 'Neplatný token', null, '[GDPR]');
+  }
+});
+
+// Smazání účtu (GDPR Článek 17 - Právo na výmaz)
+export const deleteAccount = asyncHandler(async (req: Request, res: Response) => {
+  const user = req.user as IUser;
+  
+  if (!user) {
+    return handleApiError(res, 401, 'Uživatel není přihlášen', null, '[GDPR]');
+  }
+  
+  console.log('[GDPR] Žádost o smazání účtu od uživatele:', user.email);
+  
+  const { confirmPassword } = req.body;
+  
+  // Ověření hesla pro bezpečnost
+  if (!confirmPassword) {
+    return handleApiError(res, 400, 'Pro smazání účtu je nutné zadat heslo', null, '[GDPR]');
+  }
+  
+  const isPasswordValid = await user.comparePassword(confirmPassword);
+  if (!isPasswordValid) {
+    return handleApiError(res, 401, 'Neplatné heslo', null, '[GDPR]');
+  }
+  
+  // Smazání všech souvisejících dat
+  try {
+    // Smazání naplánovaných příspěvků
+    const ScheduledPost = require('../models/ScheduledPost').default;
+    await ScheduledPost.deleteMany({ userId: user._id });
+    
+    // Smazání analýz webů
+    const WebAnalysis = require('../models/WebAnalysis').default;
+    await WebAnalysis.deleteMany({ userId: user._id });
+    
+    // Smazání API konfigurací
+    const ApiConfig = require('../models/ApiConfig').default;
+    await ApiConfig.deleteMany({ userId: user._id });
+    
+    // Smazání uživatelského účtu
+    await User.findByIdAndDelete(user._id);
+    
+    console.log('[GDPR] Účet a všechna související data byla smazána pro uživatele:', user.email);
+    
+    // Vymazání cookies
+    res.clearCookie('authToken');
+    res.clearCookie('loggedIn');
+    
+    return sendSuccess(res, 'Váš účet a všechna data byla trvale smazána', null);
+    
+  } catch (error) {
+    console.error('[GDPR] Chyba při mazání účtu:', error);
+    return handleApiError(res, 500, 'Chyba při mazání účtu', error, '[GDPR]');
+  }
+});

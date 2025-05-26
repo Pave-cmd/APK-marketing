@@ -15,6 +15,20 @@ export interface IUser extends Document {
   lastLogin?: Date;
   role?: string;
   websites: string[];
+  gdprConsent: {
+    analytics: boolean;
+    marketing: boolean;
+    functional: boolean;
+    consentDate: Date;
+    ipAddress?: string;
+    userAgent?: string;
+  };
+  dataProcessingConsent: {
+    contentGeneration: boolean;
+    socialMediaPosting: boolean;
+    websiteAnalysis: boolean;
+    consentDate: Date;
+  };
   socialNetworks: {
     _id?: any;
     platform: string;
@@ -113,6 +127,53 @@ const UserSchema: Schema = new Schema({
     set: (url: string) => normalizeUrl(url, { keepTrailingSlash: false }),
     get: (url: string) => url
   }],
+  gdprConsent: {
+    analytics: {
+      type: Boolean,
+      default: false,
+    },
+    marketing: {
+      type: Boolean,
+      default: false,
+    },
+    functional: {
+      type: Boolean,
+      default: false,
+    },
+    consentDate: {
+      type: Date,
+      required: true,
+      default: Date.now,
+    },
+    ipAddress: {
+      type: String,
+      required: false,
+    },
+    userAgent: {
+      type: String,
+      required: false,
+    },
+  },
+  dataProcessingConsent: {
+    contentGeneration: {
+      type: Boolean,
+      default: true,
+      required: true,
+    },
+    socialMediaPosting: {
+      type: Boolean,
+      default: false,
+    },
+    websiteAnalysis: {
+      type: Boolean,
+      default: false,
+    },
+    consentDate: {
+      type: Date,
+      required: true,
+      default: Date.now,
+    },
+  },
   socialNetworks: [{
     platform: {
       type: String,

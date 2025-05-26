@@ -13,6 +13,7 @@ import apiConfigRoutes from './routes/apiConfigRoutes';
 import webAnalysisRoutes from './routes/webAnalysisRoutes';
 import scheduledPostRoutes from './routes/scheduledPostRoutes';
 import contentGeneratorRoutes from './routes/contentGeneratorRoutes';
+import legalRoutes from './routes/legalRoutes';
 import jwt from 'jsonwebtoken';
 import { setAuthCookies } from './utils/cookieUtils';
 import { rateLimit } from './middleware/rateLimitMiddleware';
@@ -95,6 +96,9 @@ app.use('/api/analysis', rateLimit('default'), webAnalysisRoutes);
 app.use('/api/scheduled-posts', rateLimit('default'), scheduledPostRoutes);
 import contentRoutes from './routes/contentRoutes';
 app.use('/api/content', rateLimit('default'), setCsrfToken, validateCsrfToken, contentRoutes);
+
+// Legal pages
+app.use('/legal', legalRoutes);
 
 // EJS šablony a layout
 app.use(expressLayouts);
@@ -456,6 +460,18 @@ app.get('/dashboard/podpora', authenticate, (req: Request, res: Response): void 
   res.render('dashboard/support/index', {
     title: 'Podpora | APK-marketing',
     description: 'Podpora a nápověda k používání aplikace',
+    layout: 'layouts/dashboard',
+    user: req.user
+  });
+});
+
+// GDPR nastavení stránka
+app.get('/dashboard/settings/gdpr', authenticate, (req: Request, res: Response): void => {
+  console.log('[SERVER] Vykreslení GDPR nastavení pro uživatele:', req.user.email);
+  
+  res.render('dashboard/settings/gdpr', {
+    title: 'GDPR & Ochrana dat | APK-marketing',
+    description: 'Správa souhlasů a ochrany osobních údajů',
     layout: 'layouts/dashboard',
     user: req.user
   });

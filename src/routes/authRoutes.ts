@@ -13,6 +13,16 @@ router.post('/login', (authController.login as unknown) as RequestHandler);
 // Odhlášení uživatele
 router.get('/logout', (authController.logout as unknown) as RequestHandler);
 
+// GDPR endpoints
+router.post('/consent', (authController.updateConsent as unknown) as RequestHandler);
+router.get('/export-data', (authController.exportUserData as unknown) as RequestHandler);
+router.delete('/delete-account',
+  (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    auth(req, res, next).catch(next);
+  },
+  (authController.deleteAccount as unknown) as RequestHandler
+);
+
 // Testovací endpoint pro ověření autentizace
 router.get('/test-auth',
   (req: express.Request, res: express.Response, next: express.NextFunction) => {
