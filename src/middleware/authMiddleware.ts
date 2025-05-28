@@ -139,6 +139,7 @@ export const auth = async (req: Request, res: Response, next: NextFunction): Pro
         ...userObj,
         id: user._id.toString()
       };
+      req.userId = user._id.toString(); // Pro kompatibilitu s AuthRequest interface
       req.token = token;
 
       console.log('[DEBUG AUTH] Uživatel úspěšně ověřen:', {

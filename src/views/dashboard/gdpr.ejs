@@ -1,0 +1,501 @@
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-12">
+      <h1 class="h3 mb-4">
+        <i class="fas fa-shield-alt me-2"></i>GDPR a ochrana osobních údajů
+      </h1>
+    </div>
+  </div>
+
+  <!-- Stav souhlasů -->
+  <div class="row">
+    <div class="col-lg-6">
+      <div class="card gdpr-card">
+        <div class="card-header">
+          <h5 class="mb-0">Stav souhlasů</h5>
+        </div>
+        <div class="card-body">
+          <div class="consent-status <%= gdprStatus.generalConsent.given ? 'active' : 'inactive' %>">
+            <i class="fas fa-<%= gdprStatus.generalConsent.given ? 'check-circle text-success' : 'times-circle text-danger' %> fa-2x"></i>
+            <div>
+              <strong>Obecný souhlas se zpracováním dat</strong>
+              <div class="text-muted small">
+                <%= gdprStatus.generalConsent.given ? 
+                  `Udělen: ${new Date(gdprStatus.generalConsent.date).toLocaleDateString('cs-CZ')}` : 
+                  'Souhlas nebyl udělen' %>
+              </div>
+            </div>
+          </div>
+
+          <h6 class="mt-3 mb-2">Specifické souhlasy:</h6>
+          <ul class="list-unstyled">
+            <li>
+              <i class="fas fa-<%= gdprStatus.dataProcessingConsent.contentGeneration ? 'check text-success' : 'times text-danger' %> me-2"></i>
+              Generování obsahu pomocí AI
+            </li>
+            <li>
+              <i class="fas fa-<%= gdprStatus.dataProcessingConsent.socialMediaPosting ? 'check text-success' : 'times text-danger' %> me-2"></i>
+              Publikování na sociálních sítích
+            </li>
+            <li>
+              <i class="fas fa-<%= gdprStatus.dataProcessingConsent.websiteAnalysis ? 'check text-success' : 'times text-danger' %> me-2"></i>
+              Analýza webových stránek
+            </li>
+          </ul>
+
+          <% if (!gdprStatus.generalConsent.given) { %>
+            <button class="btn btn-primary" id="consentBtn">
+              <i class="fas fa-check me-2"></i>Udělit souhlas
+            </button>
+          <% } else { %>
+            <button class="btn btn-outline-secondary btn-sm" id="revokeBtn">
+              <i class="fas fa-times me-2"></i>Odvolat souhlas
+            </button>
+          <% } %>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-6">
+      <div class="card gdpr-card">
+        <div class="card-header">
+          <h5 class="mb-0">Vaše práva</h5>
+        </div>
+        <div class="card-body">
+          <p>V souladu s GDPR máte následující práva:</p>
+          <ul>
+            <li>Právo na přístup k vašim údajům</li>
+            <li>Právo na opravu nepřesných údajů</li>
+            <li>Právo na výmaz údajů</li>
+            <li>Právo na omezení zpracování</li>
+            <li>Právo na přenositelnost údajů</li>
+            <li>Právo vznést námitku</li>
+          </ul>
+          
+          <div class="mt-3">
+            <button class="btn btn-outline-primary me-2" id="exportDataBtn">
+              <i class="fas fa-download me-2"></i>Exportovat moje data
+            </button>
+            <button class="btn btn-outline-danger" id="deleteAccountBtn">
+              <i class="fas fa-trash me-2"></i>Smazat účet
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Žádosti o data -->
+  <% if (gdprStatus.dataRequests.lastExportRequest || gdprStatus.dataRequests.deletionRequest) { %>
+    <div class="row mt-3">
+      <div class="col-12">
+        <div class="card gdpr-card">
+          <div class="card-header">
+            <h5 class="mb-0">Historie žádostí</h5>
+          </div>
+          <div class="card-body">
+            <% if (gdprStatus.dataRequests.lastExportRequest) { %>
+              <div class="data-request-info">
+                <i class="fas fa-info-circle me-2"></i>
+                Poslední export dat: <%= new Date(gdprStatus.dataRequests.lastExportRequest).toLocaleDateString('cs-CZ') %>
+              </div>
+            <% } %>
+            
+            <% if (gdprStatus.dataRequests.deletionRequest) { %>
+              <div class="data-request-info">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                <strong>Žádost o smazání účtu</strong><br>
+                Váš účet bude smazán: <%= new Date(gdprStatus.dataRequests.deletionScheduledFor).toLocaleDateString('cs-CZ') %>
+                <br>
+                <button class="btn btn-sm btn-warning mt-2" id="cancelDeletionBtn">
+                  Zrušit žádost o smazání
+                </button>
+              </div>
+            <% } %>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% } %>
+
+  <!-- Právní dokumenty -->
+  <div class="row mt-3">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0">Právní dokumenty</h5>
+        </div>
+        <div class="card-body">
+          <div class="list-group">
+            <a href="/legal/privacy" target="_blank" class="list-group-item list-group-item-action">
+              <i class="fas fa-file-alt me-2"></i>Zásady ochrany osobních údajů
+            </a>
+            <a href="/legal/terms" target="_blank" class="list-group-item list-group-item-action">
+              <i class="fas fa-file-contract me-2"></i>Obchodní podmínky
+            </a>
+            <a href="/legal/cookies" target="_blank" class="list-group-item list-group-item-action">
+              <i class="fas fa-cookie me-2"></i>Zásady používání cookies
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal pro smazání účtu -->
+<div class="modal fade" id="deleteAccountModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title">
+          <i class="fas fa-exclamation-triangle me-2"></i>Smazání účtu
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="alert alert-danger">
+          <strong>Varování!</strong> Tato akce je nevratná. Všechna vaše data budou trvale smazána.
+        </div>
+        
+        <form id="deleteAccountForm">
+          <div class="mb-3">
+            <label class="form-label">Email:</label>
+            <input type="email" class="form-control" name="username" value="<%= user.email %>" autocomplete="username" disabled readonly>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Zadejte vaše heslo pro potvrzení:</label>
+            <input type="password" class="form-control" id="deletePassword" name="password" autocomplete="current-password" required>
+          </div>
+          
+          <div class="form-check mb-3">
+            <input type="checkbox" class="form-check-input" id="confirmDeletion" required>
+            <label class="form-check-label" for="confirmDeletion">
+              Rozumím, že tato akce je nevratná a všechna má data budou smazána
+            </label>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Zrušit</button>
+        <button type="button" class="btn btn-danger" id="confirmDeleteBtn">
+          <i class="fas fa-trash me-2"></i>Smazat účet
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .gdpr-card {
+    border-left: 4px solid #007bff;
+    margin-bottom: 1.5rem;
+  }
+  .gdpr-card.danger {
+    border-left-color: #dc3545;
+  }
+  .consent-status {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+  }
+  .consent-status.active {
+    background: #d4edda;
+    border: 1px solid #c3e6cb;
+  }
+  .consent-status.inactive {
+    background: #f8d7da;
+    border: 1px solid #f5c6cb;
+  }
+  .data-request-info {
+    background: #fff3cd;
+    border: 1px solid #ffeaa7;
+    color: #856404;
+    padding: 1rem;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+  }
+</style>
+
+<!-- Force browser refresh - cache buster: 1748431475 -->
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+
+<!-- GDPR Script v3.0 - FIXED FILE - No onclick handlers, only event listeners -->
+<script>
+// GDPR funkce pro správu souhlasů a dat - VERSION 3.0 - FIXED FILE - Updated: 2025-05-28
+console.log('GDPR script se spouští - START');
+alert('GDPR script se načítá!');
+
+// Získání CSRF tokenu
+function getCsrfToken() {
+  return '<%= csrfToken %>';
+}
+
+// Získání GDPR statusu
+async function loadGdprStatus() {
+  try {
+    const response = await fetch('/api/gdpr/status', {
+      method: 'GET',
+      credentials: 'include',
+      headers: {
+        'X-CSRF-Token': getCsrfToken(),
+        'Accept': 'application/json'
+      }
+    });
+    
+    if (response.ok) {
+      const data = await response.json();
+      console.log('GDPR status načten:', data);
+    } else if (response.status === 401) {
+      console.log('Uživatel není přihlášen pro GDPR status');
+    } else {
+      console.error('Chyba při načítání GDPR statusu:', response.status);
+    }
+  } catch (error) {
+    console.error('Chyba při načítání GDPR statusu:', error);
+  }
+}
+
+// Export dat
+async function exportData() {
+  try {
+    showAlert('info', 'Připravuji export dat...');
+    
+    const response = await fetch('/api/gdpr/export', {
+      method: 'GET',
+      credentials: 'include',
+      headers: {
+        'X-CSRF-Token': getCsrfToken()
+      }
+    });
+    
+    if (response.ok) {
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `apk-marketing-data-export-${new Date().toISOString().split('T')[0]}.zip`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+      
+      showAlert('success', 'Data byla úspěšně exportována');
+    } else {
+      const error = await response.json();
+      showAlert('danger', error.error || 'Chyba při exportu dat');
+    }
+  } catch (error) {
+    console.error('Chyba při exportu dat:', error);
+    showAlert('danger', 'Nastala chyba při exportu dat');
+  }
+}
+
+// Zobrazení dialogu pro smazání účtu
+function showDeleteDialog() {
+  const modal = new bootstrap.Modal(document.getElementById('deleteAccountModal'));
+  modal.show();
+}
+
+// Smazání účtu
+async function deleteAccount() {
+  const password = document.getElementById('deletePassword').value;
+  const confirmDeletion = document.getElementById('confirmDeletion').checked;
+  
+  if (!password || !confirmDeletion) {
+    showAlert('danger', 'Vyplňte všechna pole');
+    return;
+  }
+  
+  try {
+    const response = await fetch('/api/gdpr/delete-request', {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-Token': getCsrfToken()
+      },
+      body: JSON.stringify({ password, confirmDeletion })
+    });
+    
+    const data = await response.json();
+    
+    if (response.ok) {
+      showAlert('warning', data.message);
+      bootstrap.Modal.getInstance(document.getElementById('deleteAccountModal')).hide();
+      setTimeout(() => location.reload(), 3000);
+    } else {
+      showAlert('danger', data.error || 'Chyba při žádosti o smazání');
+    }
+  } catch (error) {
+    console.error('Chyba při žádosti o smazání:', error);
+    showAlert('danger', 'Nastala chyba při zpracování žádosti');
+  }
+}
+
+// Helper funkce pro zobrazení alertů
+function showAlert(type, message) {
+  // Odstraníme existující alerty
+  document.querySelectorAll('.alert.position-fixed').forEach(alert => alert.remove());
+  
+  const alertDiv = document.createElement('div');
+  alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3`;
+  alertDiv.style.zIndex = '9999';
+  alertDiv.innerHTML = `
+    ${message}
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+  `;
+  document.body.appendChild(alertDiv);
+  
+  setTimeout(() => {
+    alertDiv.remove();
+  }, 5000);
+}
+
+// Zobrazení dialogu pro udělení souhlasu
+function showConsentDialog() {
+  window.location.href = '/dashboard/consent?platform=general&returnUrl=' + encodeURIComponent(window.location.pathname);
+}
+
+// Odvolání souhlasu
+async function revokeConsent() {
+  if (!confirm('Opravdu chcete odvolat souhlas se zpracováním dat? Některé funkce aplikace nebudou dostupné.')) {
+    return;
+  }
+  
+  try {
+    const response = await fetch('/api/gdpr/consent', {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-Token': getCsrfToken()
+      },
+      body: JSON.stringify({ consentGiven: false })
+    });
+    
+    const data = await response.json();
+    
+    if (response.ok) {
+      showAlert('warning', 'Souhlas byl odvolán');
+      setTimeout(() => location.reload(), 2000);
+    } else {
+      showAlert('danger', data.error || 'Chyba při odvolání souhlasu');
+    }
+  } catch (error) {
+    console.error('Chyba při odvolání souhlasu:', error);
+    showAlert('danger', 'Nastala chyba při odvolání souhlasu');
+  }
+}
+
+// Zrušení žádosti o smazání
+async function cancelDeletion() {
+  if (!confirm('Opravdu chcete zrušit žádost o smazání účtu?')) {
+    return;
+  }
+  
+  try {
+    const response = await fetch('/api/gdpr/cancel-deletion', {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-Token': getCsrfToken()
+      }
+    });
+    
+    const data = await response.json();
+    
+    if (response.ok) {
+      showAlert('success', 'Žádost o smazání byla zrušena');
+      setTimeout(() => location.reload(), 2000);
+    } else {
+      showAlert('danger', data.error || 'Chyba při rušení žádosti');
+    }
+  } catch (error) {
+    console.error('Chyba při rušení žádosti:', error);
+    showAlert('danger', 'Nastala chyba při rušení žádosti');
+  }
+}
+
+// Načtení dat při načtení stránky
+document.addEventListener('DOMContentLoaded', function() {
+  console.log('GDPR skripty načteny - verze 3.0 - OPRAVENÝ SOUBOR');
+  console.log('Kontroluji dostupnost funkcí:');
+  console.log('exportData:', typeof exportData);
+  console.log('showDeleteDialog:', typeof showDeleteDialog);
+  console.log('showConsentDialog:', typeof showConsentDialog);
+  
+  loadGdprStatus();
+  
+  // Přidání event listenerů
+  const consentBtn = document.getElementById('consentBtn');
+  console.log('consentBtn nalezeno:', !!consentBtn);
+  if (consentBtn) {
+    consentBtn.addEventListener('click', showConsentDialog);
+    console.log('Event listener pro consentBtn přidán');
+  }
+  
+  const revokeBtn = document.getElementById('revokeBtn');
+  console.log('revokeBtn nalezeno:', !!revokeBtn);
+  if (revokeBtn) {
+    revokeBtn.addEventListener('click', revokeConsent);
+    console.log('Event listener pro revokeBtn přidán');
+  }
+  
+  const exportDataBtn = document.getElementById('exportDataBtn');
+  console.log('exportDataBtn nalezeno:', !!exportDataBtn);
+  if (exportDataBtn) {
+    exportDataBtn.addEventListener('click', exportData);
+    console.log('Event listener pro exportDataBtn přidán');
+  }
+  
+  const deleteAccountBtn = document.getElementById('deleteAccountBtn');
+  console.log('deleteAccountBtn nalezeno:', !!deleteAccountBtn);
+  if (deleteAccountBtn) {
+    deleteAccountBtn.addEventListener('click', showDeleteDialog);
+    console.log('Event listener pro deleteAccountBtn přidán');
+  }
+  
+  const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+  console.log('confirmDeleteBtn nalezeno:', !!confirmDeleteBtn);
+  if (confirmDeleteBtn) {
+    confirmDeleteBtn.addEventListener('click', deleteAccount);
+    console.log('Event listener pro confirmDeleteBtn přidán');
+  }
+  
+  const cancelDeletionBtn = document.getElementById('cancelDeletionBtn');
+  console.log('cancelDeletionBtn nalezeno:', !!cancelDeletionBtn);
+  if (cancelDeletionBtn) {
+    cancelDeletionBtn.addEventListener('click', cancelDeletion);
+    console.log('Event listener pro cancelDeletionBtn přidán');
+  }
+  
+  // Testovací funkce dostupná globálně
+  window.testGdprFunctions = function() {
+    console.log('=== Test GDPR funkcí ===');
+    console.log('exportData:', typeof window.exportData);
+    console.log('showDeleteDialog:', typeof window.showDeleteDialog);
+    console.log('showConsentDialog:', typeof window.showConsentDialog);
+    console.log('deleteAccount:', typeof window.deleteAccount);
+    console.log('cancelDeletion:', typeof window.cancelDeletion);
+  };
+  
+  console.log('GDPR inicializace dokončena. Pro test spusťte: testGdprFunctions()');
+});
+
+// Ujistíme se, že funkce jsou dostupné globálně (pro zpětnou kompatibilitu)
+window.exportData = exportData;
+window.showDeleteDialog = showDeleteDialog;
+window.showConsentDialog = showConsentDialog;
+window.revokeConsent = revokeConsent;
+window.deleteAccount = deleteAccount;
+window.cancelDeletion = cancelDeletion;
+window.showAlert = showAlert;
+</script>

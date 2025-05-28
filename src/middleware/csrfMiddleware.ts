@@ -45,7 +45,7 @@ export const generateCsrfToken = (userId: string): string => {
 /**
  * Middleware pro nastavení CSRF tokenu do cookies a response
  */
-export const setCsrfToken = (req: Request, res: Response, next: NextFunction) => {
+export const setCsrfToken = (req: Request, res: Response, next: NextFunction): void => {
   // Pokud uživatel není přihlášený, pokračujeme bez CSRF tokenu
   if (!req.user || !req.user._id) {
     return next();
@@ -71,7 +71,7 @@ export const setCsrfToken = (req: Request, res: Response, next: NextFunction) =>
 /**
  * Middleware pro validaci CSRF tokenu
  */
-export const validateCsrfToken = (req: Request, res: Response, next: NextFunction) => {
+export const validateCsrfToken = (req: Request, res: Response, next: NextFunction): void => {
   // DEVELOPMENT ONLY: V development módu můžeme CSRF ochranu úplně přeskočit pro jednodušší testování
   const isDevelopment = process.env.NODE_ENV === 'development';
   const disableCsrfInDev = true; // Změňte na false pokud chcete testovat CSRF ochranu i v development módu
@@ -100,10 +100,11 @@ export const validateCsrfToken = (req: Request, res: Response, next: NextFunctio
   
   if (!token || typeof token !== 'string') {
     logger.warn(`CSRF token chybí: ${req.method} ${req.path}`);
-    return res.status(403).json({
+    res.status(403).json({
       success: false,
       message: 'CSRF token chybí'
     });
+    return;
   }
   
   // Validace tokenu
@@ -111,29 +112,32 @@ export const validateCsrfToken = (req: Request, res: Response, next: NextFunctio
   
   if (!tokenEntry) {
     logger.warn(`Neplatný CSRF token: ${req.method} ${req.path}`);
-    return res.status(403).json({
+    res.status(403).json({
       success: false,
       message: 'Neplatný CSRF token'
     });
+    return;
   }
   
   // Kontrola expirace
   if (Date.now() > tokenEntry.expires) {
     csrfTokens.delete(token);
     logger.warn(`Expirovaný CSRF token: ${req.method} ${req.path}`);
-    return res.status(403).json({
+    res.status(403).json({
       success: false,
       message: 'CSRF token expiroval, načtěte stránku znovu'
     });
+    return;
   }
   
   // Kontrola, zda token patří přihlášenému uživateli
   if (req.user && req.user._id && req.user._id.toString() !== tokenEntry.userId) {
     logger.warn(`CSRF token patří jinému uživateli: ${req.method} ${req.path}`);
-    return res.status(403).json({
+    res.status(403).json({
       success: false,
       message: 'Neplatný CSRF token'
     });
+    return;
   }
   
   next();

@@ -8,6 +8,7 @@ import {
   publishToSocialNetwork
 } from '../controllers/socialNetworkController';
 import { auth } from '../middleware/authMiddleware';
+import { consentMiddleware } from '../middleware/consentMiddleware';
 
 const router = express.Router();
 
@@ -21,7 +22,8 @@ router.use(auth as RequestHandler);
 router.get('/', getSocialNetworks as RequestHandler);
 router.post('/add', addSocialNetwork as RequestHandler);
 router.delete('/remove/:networkId', removeSocialNetwork as RequestHandler);
-router.get('/authenticate/:networkId', authenticateSocialNetwork as RequestHandler);
+// OAuth authentication vyžaduje consent
+router.get('/authenticate/:networkId', consentMiddleware as unknown as RequestHandler, authenticateSocialNetwork as RequestHandler);
 router.post('/publish/:networkId', publishToSocialNetwork as RequestHandler);
 
 export default router;

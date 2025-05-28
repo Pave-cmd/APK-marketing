@@ -1,0 +1,229 @@
+<%- contentFor('styles') %>
+<style>
+  .consent-card {
+    max-width: 800px;
+    margin: 2rem auto;
+  }
+  .consent-section {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+  .consent-item {
+    margin-bottom: 1rem;
+    padding: 1rem;
+    background: white;
+    border-radius: 4px;
+    border: 1px solid #dee2e6;
+  }
+  .consent-item label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+  }
+  .consent-item input[type="checkbox"] {
+    margin-right: 1rem;
+    width: 20px;
+    height: 20px;
+  }
+  .consent-description {
+    color: #6c757d;
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+  }
+  .btn-consent {
+    min-width: 200px;
+  }
+  .warning-box {
+    background: #fff3cd;
+    border: 1px solid #ffeaa7;
+    color: #856404;
+    padding: 1rem;
+    border-radius: 4px;
+    margin-bottom: 1.5rem;
+  }
+</style>
+
+<div class="container py-4">
+  <div class="consent-card card shadow">
+    <div class="card-header bg-primary text-white">
+      <h4 class="mb-0">
+        <i class="fas fa-shield-alt me-2"></i>
+        Souhlas se zpracováním dat
+      </h4>
+    </div>
+    
+    <div class="card-body">
+      <% if (typeof renew !== 'undefined' && renew) { %>
+        <div class="warning-box">
+          <i class="fas fa-exclamation-triangle me-2"></i>
+          <strong>Váš souhlas je starší než rok.</strong> Pro pokračování je nutné obnovit souhlas se zpracováním dat.
+        </div>
+      <% } %>
+
+      <p class="lead mb-4">
+        Pro využívání služeb APK-marketing a propojení s platformou <%= platform %> potřebujeme váš souhlas se zpracováním dat.
+      </p>
+
+      <form id="consentForm" action="/api/gdpr/consent" method="POST">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <input type="hidden" name="platform" value="<%= platform %>">
+        <input type="hidden" name="returnUrl" value="<%= returnUrl %>">
+
+        <!-- Obecný souhlas -->
+        <div class="consent-section">
+          <h5 class="mb-3">Základní souhlas</h5>
+          
+          <div class="consent-item">
+            <label>
+              <input type="checkbox" id="generalConsent" name="consentGiven" value="true" required>
+              <div>
+                <strong>Souhlasím se zpracováním osobních údajů</strong>
+                <div class="consent-description">
+                  Souhlasím se zpracováním mých osobních údajů v souladu s 
+                  <a href="/legal/privacy" target="_blank">Zásadami ochrany osobních údajů</a> a
+                  <a href="/legal/terms" target="_blank">Obchodními podmínkami</a>.
+                </div>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Specifické souhlasy pro <%= platform %> -->
+        <div class="consent-section">
+          <h5 class="mb-3">Souhlas s funkcemi pro <%= platform %></h5>
+          
+          <% if (platform === 'facebook') { %>
+            <div class="consent-item">
+              <label>
+                <input type="checkbox" name="dataProcessing[socialMediaPosting]" value="true" checked>
+                <div>
+                  <strong>Publikování příspěvků</strong>
+                  <div class="consent-description">
+                    Povolte APK-marketing publikovat příspěvky na vaší Facebook stránce na základě analýzy vašeho webu.
+                  </div>
+                </div>
+              </label>
+            </div>
+            
+            <div class="consent-item">
+              <label>
+                <input type="checkbox" name="dataProcessing[analytics]" value="true" checked>
+                <div>
+                  <strong>Čtení statistik a analýz</strong>
+                  <div class="consent-description">
+                    Povolte čtení statistik vašich příspěvků pro optimalizaci budoucího obsahu.
+                  </div>
+                </div>
+              </label>
+            </div>
+          <% } %>
+
+          <div class="consent-item">
+            <label>
+              <input type="checkbox" name="dataProcessing[contentGeneration]" value="true" checked>
+              <div>
+                <strong>AI generování obsahu</strong>
+                <div class="consent-description">
+                  Použití umělé inteligence pro vytváření personalizovaného marketingového obsahu.
+                </div>
+              </div>
+            </label>
+          </div>
+
+          <div class="consent-item">
+            <label>
+              <input type="checkbox" name="dataProcessing[websiteAnalysis]" value="true" checked>
+              <div>
+                <strong>Analýza webových stránek</strong>
+                <div class="consent-description">
+                  Pravidelná analýza vašich webových stránek pro vytváření relevantního obsahu.
+                </div>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- GDPR práva -->
+        <div class="consent-section">
+          <h5 class="mb-3">Vaše práva</h5>
+          <ul class="list-unstyled">
+            <li><i class="fas fa-check text-success me-2"></i>Právo na přístup k vašim údajům</li>
+            <li><i class="fas fa-check text-success me-2"></i>Právo na opravu nepřesných údajů</li>
+            <li><i class="fas fa-check text-success me-2"></i>Právo na výmaz údajů ("právo být zapomenut")</li>
+            <li><i class="fas fa-check text-success me-2"></i>Právo na export vašich dat</li>
+            <li><i class="fas fa-check text-success me-2"></i>Právo odvolat souhlas kdykoliv</li>
+          </ul>
+          <p class="text-muted small mb-0">
+            Více informací najdete v našich <a href="/legal/privacy" target="_blank">Zásadách ochrany osobních údajů</a>.
+          </p>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center">
+          <a href="/dashboard" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-2"></i>Zpět
+          </a>
+          <button type="submit" class="btn btn-primary btn-consent" disabled>
+            <i class="fas fa-check me-2"></i>Udělit souhlas a pokračovat
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<%- contentFor('scripts') %>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const form = document.getElementById('consentForm');
+  const generalConsent = document.getElementById('generalConsent');
+  const submitBtn = form.querySelector('button[type="submit"]');
+  
+  // Aktivace tlačítka pouze když je zaškrtnutý základní souhlas
+  generalConsent.addEventListener('change', function() {
+    submitBtn.disabled = !this.checked;
+  });
+  
+  // Odeslání formuláře
+  form.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(form);
+    const data = {
+      consentGiven: formData.get('consentGiven') === 'true',
+      platform: formData.get('platform'),
+      returnUrl: formData.get('returnUrl'),
+      dataProcessing: {
+        socialMediaPosting: formData.get('dataProcessing[socialMediaPosting]') === 'true',
+        analytics: formData.get('dataProcessing[analytics]') === 'true',
+        contentGeneration: formData.get('dataProcessing[contentGeneration]') === 'true',
+        websiteAnalysis: formData.get('dataProcessing[websiteAnalysis]') === 'true'
+      }
+    };
+    
+    try {
+      const response = await fetch('/api/gdpr/consent', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-Token': formData.get('_csrf')
+        },
+        body: JSON.stringify(data)
+      });
+      
+      const result = await response.json();
+      
+      if (result.success) {
+        // Přesměrování zpět na původní URL
+        window.location.href = data.returnUrl || '/dashboard';
+      } else {
+        alert('Chyba: ' + result.error);
+      }
+    } catch (error) {
+      console.error('Chyba při ukládání souhlasu:', error);
+      alert('Nastala chyba při ukládání souhlasu. Zkuste to prosím znovu.');
+    }
+  });
+});
+</script>

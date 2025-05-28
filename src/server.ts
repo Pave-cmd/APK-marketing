@@ -14,10 +14,12 @@ import webAnalysisRoutes from './routes/webAnalysisRoutes';
 import scheduledPostRoutes from './routes/scheduledPostRoutes';
 import contentGeneratorRoutes from './routes/contentGeneratorRoutes';
 import legalRoutes from './routes/legalRoutes';
+import gdprRoutes from './routes/gdprRoutes';
 import jwt from 'jsonwebtoken';
 import { setAuthCookies } from './utils/cookieUtils';
 import { rateLimit } from './middleware/rateLimitMiddleware';
 import { setCsrfToken, validateCsrfToken } from './middleware/csrfMiddleware';
+import { httpsRedirect } from './middleware/httpsRedirect';
 import helmet from 'helmet';
 
 // Inicializace Express aplikace
@@ -27,6 +29,9 @@ const port = SERVER_CONFIG.port;
 // Připojení k databázi
 connectDB();
 console.log('Připojování k MongoDB Atlas...');
+
+// HTTPS redirect musí být jako první middleware
+app.use(httpsRedirect);
 
 // Základní bezpečnostní middleware s vlastním CSP nastavením
 app.use(
@@ -100,7 +105,7 @@ app.use('/api/content', rateLimit('default'), setCsrfToken, validateCsrfToken, c
 // Legal pages
 app.use('/legal', legalRoutes);
 
-// EJS šablony a layout
+// EJS šablony a layout - MUSÍ BÝT PŘED ROUTES!
 app.use(expressLayouts);
 const viewsPath = SERVER_CONFIG.environment === 'production'
   ? path.join(__dirname, 'views')
@@ -112,6 +117,13 @@ app.set('view engine', 'ejs');
 app.set('layout', 'layouts/main');
 app.set('layout extractScripts', true);
 app.set('layout extractStyles', true);
+
+// GDPR routes
+app.use('/api/gdpr', rateLimit('default'), gdprRoutes);
+
+// Dashboard routes
+import dashboardRoutes from './routes/dashboardRoutes';
+app.use('/dashboard', dashboardRoutes);
 
 /**
  * Authentication middleware
@@ -331,7 +343,7 @@ app.get('/registrace', (req: Request, res: Response): void => {
 
 // Dashboard po přihlášení - použití auth middleware
 app.get('/dashboard', authenticate, (req: Request, res: Response): void => {
-  console.log('[SERVER] Vykreslení dashboardu pro uživatele:', req.user.email);
+  console.log('[SERVER] Vykreslení dashboardu pro uživatele:', req.user?.email);
   
   res.render('dashboard/index', {
     title: 'Dashboard | APK-marketing',
@@ -343,7 +355,7 @@ app.get('/dashboard', authenticate, (req: Request, res: Response): void => {
 
 // Správa webů
 app.get('/dashboard/weby', authenticate, (req: Request, res: Response): void => {
-  console.log('[SERVER] Vykreslení webs pro uživatele:', req.user.email);
+  console.log('[SERVER] Vykreslení webs pro uživatele:', req.user?.email);
   
   res.render('dashboard/websites/index', {
     title: 'Moje weby | APK-marketing',
@@ -355,10 +367,10 @@ app.get('/dashboard/weby', authenticate, (req: Request, res: Response): void => 
 
 // Správa sociálních sítí
 app.get('/dashboard/socialni-site', authenticate, (req: Request, res: Response): void => {
-  console.log('[SERVER] Vykreslení sociálních sítí pro uživatele:', req.user.email);
+  console.log('[SERVER] Vykreslení sociálních sítí pro uživatele:', req.user?.email);
   
   // Vytvoření dummy dat pro sociální sítě, pokud uživatel nemá žádné
-  if (!req.user.socialNetworks) {
+  if (req.user && !req.user.socialNetworks) {
     req.user.socialNetworks = [];
   }
   
@@ -372,10 +384,10 @@ app.get('/dashboard/socialni-site', authenticate, (req: Request, res: Response):
 
 // API konfigurace
 app.get('/dashboard/api-config', authenticate, (req: Request, res: Response): void => {
-  console.log('[SERVER] Vykreslení API konfigurace pro uživatele:', req.user.email);
+  console.log('[SERVER] Vykreslení API konfigurace pro uživatele:', req.user?.email);
   
   // Pouze admin může přistupovat k této stránce
-  if (req.user.email !== 'fa@fa.com') { // Změňte na správný admin email
+  if (req.user?.email !== 'fa@fa.com') { // Změňte na správný admin email
     return res.status(403).render('errors/403', {
       title: 'Přístup odepřen | APK-marketing',
       description: 'Nemáte oprávnění k této stránce',
@@ -394,7 +406,7 @@ app.get('/dashboard/api-config', authenticate, (req: Request, res: Response): vo
 
 // Stránka příspěvků
 app.get('/dashboard/prispevky', authenticate, (req: Request, res: Response): void => {
-  console.log('[SERVER] Vykreslení příspěvků pro uživatele:', req.user.email);
+  console.log('[SERVER] Vykreslení příspěvků pro uživatele:', req.user?.email);
   
   res.render('dashboard/posts/index', {
     title: 'Příspěvky | APK-marketing',
@@ -406,7 +418,7 @@ app.get('/dashboard/prispevky', authenticate, (req: Request, res: Response): voi
 
 // Stránka generování obsahu
 app.get('/dashboard/generovani-obsahu', authenticate, setCsrfToken, (req: Request, res: Response): void => {
-  console.log('[SERVER] Vykreslení generování obsahu pro uživatele:', req.user.email);
+  console.log('[SERVER] Vykreslení generování obsahu pro uživatele:', req.user?.email);
   
   res.render('dashboard/content/index', {
     title: 'Generování obsahu | APK-marketing',
@@ -419,7 +431,7 @@ app.get('/dashboard/generovani-obsahu', authenticate, setCsrfToken, (req: Reques
 
 // Stránka analýzy
 app.get('/dashboard/analyza', authenticate, (req: Request, res: Response): void => {
-  console.log('[SERVER] Vykreslení analýzy pro uživatele:', req.user.email);
+  console.log('[SERVER] Vykreslení analýzy pro uživatele:', req.user?.email);
   
   res.render('dashboard/analytics/index', {
     title: 'Analýza | APK-marketing',
@@ -431,7 +443,7 @@ app.get('/dashboard/analyza', authenticate, (req: Request, res: Response): void 
 
 // Stránka nastavení
 app.get('/dashboard/nastaveni', authenticate, (req: Request, res: Response): void => {
-  console.log('[SERVER] Vykreslení nastavení pro uživatele:', req.user.email);
+  console.log('[SERVER] Vykreslení nastavení pro uživatele:', req.user?.email);
   
   res.render('dashboard/settings/index', {
     title: 'Nastavení | APK-marketing',
@@ -443,7 +455,7 @@ app.get('/dashboard/nastaveni', authenticate, (req: Request, res: Response): voi
 
 // Stránka předplatného
 app.get('/dashboard/predplatne', authenticate, (req: Request, res: Response): void => {
-  console.log('[SERVER] Vykreslení předplatného pro uživatele:', req.user.email);
+  console.log('[SERVER] Vykreslení předplatného pro uživatele:', req.user?.email);
   
   res.render('dashboard/subscription/index', {
     title: 'Předplatné | APK-marketing',
@@ -455,7 +467,7 @@ app.get('/dashboard/predplatne', authenticate, (req: Request, res: Response): vo
 
 // Stránka podpory
 app.get('/dashboard/podpora', authenticate, (req: Request, res: Response): void => {
-  console.log('[SERVER] Vykreslení stránky podpory pro uživatele:', req.user.email);
+  console.log('[SERVER] Vykreslení stránky podpory pro uživatele:', req.user?.email);
   
   res.render('dashboard/support/index', {
     title: 'Podpora | APK-marketing',
@@ -465,17 +477,7 @@ app.get('/dashboard/podpora', authenticate, (req: Request, res: Response): void 
   });
 });
 
-// GDPR nastavení stránka
-app.get('/dashboard/settings/gdpr', authenticate, (req: Request, res: Response): void => {
-  console.log('[SERVER] Vykreslení GDPR nastavení pro uživatele:', req.user.email);
-  
-  res.render('dashboard/settings/gdpr', {
-    title: 'GDPR & Ochrana dat | APK-marketing',
-    description: 'Správa souhlasů a ochrany osobních údajů',
-    layout: 'layouts/dashboard',
-    user: req.user
-  });
-});
+// GDPR nastavení stránka je nyní v dashboardRoutes
 
 // Alternativní cesty
 app.get('/Dashboard', (req, res) => res.redirect('/dashboard'));

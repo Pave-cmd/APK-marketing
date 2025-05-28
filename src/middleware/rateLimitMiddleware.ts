@@ -56,7 +56,7 @@ export const cleanupRateLimiters = () => {
 export const rateLimit = (type: keyof typeof rateLimitConfig = 'default') => {
   const { windowMs, maxRequests } = rateLimitConfig[type];
   
-  return (req: Request, res: Response, next: NextFunction) => {
+  return (req: Request, res: Response, next: NextFunction): void => {
     // Získáme IP adresu nebo uživatelské ID
     const clientIp = req.ip || (req.headers['x-forwarded-for'] as string) || 'unknown';
     const userId = req.user?._id?.toString();
@@ -104,10 +104,11 @@ export const rateLimit = (type: keyof typeof rateLimitConfig = 'default') => {
     // Pokud bylo překročeno omezení, odpovíme s chybou 429
     if (limitExceeded) {
       logger.warn(`Rate limit překročen: ${clientIp}, userId: ${userId || 'nepřihlášen'}, path: ${req.path}`);
-      return res.status(429).json({
+      res.status(429).json({
         success: false,
         message: 'Příliš mnoho požadavků. Zkuste to prosím znovu později.'
       });
+      return;
     }
     
     next();

@@ -29,6 +29,11 @@ export interface IUser extends Document {
     websiteAnalysis: boolean;
     consentDate: Date;
   };
+  // GDPR compliance fields
+  dataExportRequest?: Date;
+  dataDeletionRequest?: Date;
+  consentGiven: boolean;
+  consentDate: Date;
   socialNetworks: {
     _id?: any;
     platform: string;
@@ -173,6 +178,24 @@ const UserSchema: Schema = new Schema({
       required: true,
       default: Date.now,
     },
+  },
+  // GDPR compliance fields
+  dataExportRequest: {
+    type: Date,
+    required: false,
+  },
+  dataDeletionRequest: {
+    type: Date,
+    required: false,
+  },
+  consentGiven: {
+    type: Boolean,
+    default: false,
+    required: true,
+  },
+  consentDate: {
+    type: Date,
+    required: false,
   },
   socialNetworks: [{
     platform: {
