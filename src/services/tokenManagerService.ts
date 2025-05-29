@@ -357,8 +357,8 @@ export class TokenManagerService {
         apiSecret: process.env.TWITTER_API_SECRET,
         accessToken: twitterConfig.getDecryptedAccessToken(),
         accessTokenSecret: twitterConfig.getDecryptedAccessTokenSecret(),
-        twitterUserId: twitterConfig.configDetails.twitterUserId,
-        twitterUsername: twitterConfig.configDetails.twitterUsername
+        twitterUserId: twitterConfig.configDetails?.twitterUserId,
+        twitterUsername: twitterConfig.configDetails?.twitterUsername
       };
     } catch (error) {
       webLog('Chyba při získávání Twitter tokenů', { error, userId });
@@ -563,8 +563,8 @@ export class TokenManagerService {
         accessToken: linkedinConfig.getDecryptedAccessToken(),
         refreshToken: linkedinConfig.getDecryptedRefreshToken(),
         tokenExpiry: linkedinConfig.tokenExpiry,
-        linkedinUserId: linkedinConfig.configDetails.linkedinUserId,
-        linkedinName: linkedinConfig.configDetails.linkedinName
+        linkedinUserId: linkedinConfig.configDetails?.linkedinUserId,
+        linkedinName: linkedinConfig.configDetails?.linkedinName
       };
     } catch (error) {
       webLog('Chyba při získávání LinkedIn tokenu', { error, userId });

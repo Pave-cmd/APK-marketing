@@ -154,7 +154,7 @@ export class ContentGeneratorService {
             break;
 
           case 'general':
-          default:
+          default: {
             const generalPosts = await this.generateGeneralPosts(
               websiteData, 
               typeCount, 
@@ -163,6 +163,7 @@ export class ContentGeneratorService {
             );
             posts.push(...generalPosts);
             break;
+          }
         }
       }
 
@@ -569,7 +570,7 @@ export class ContentGeneratorService {
           const post = await this.generateSectionPost(
             section, 
             websiteData.title,
-            websiteData.url,
+            websiteData.url || '',
             websiteData.language, 
             platform, 
             tone
@@ -904,7 +905,7 @@ export class ContentGeneratorService {
   /**
    * Volá OpenAI API pro generování obsahu
    */
-  private async callOpenAI(systemMessage: string, userMessage: string): Promise<string> {
+  public async callOpenAI(systemMessage: string, userMessage: string): Promise<string> {
     try {
       const response = await axios.post(
         'https://api.openai.com/v1/chat/completions',

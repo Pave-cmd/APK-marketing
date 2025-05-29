@@ -2,8 +2,6 @@ import { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import User, { IUser } from '../models/User';
 import { SECURITY_CONFIG } from '../config/config';
-import { setAuthCookies } from '../utils/cookieUtils';
-import { logger } from '../utils/logger';
 import { handleApiError, sendSuccess, asyncHandler } from '../utils/errorHandler';
 
 // Typ pro odpověď uživatele
@@ -24,17 +22,13 @@ interface UserResponse {
 const createToken = (userId: string): string | null => {
   try {
     console.log('[AUTH] Vytváření tokenu pro uživatele s ID:', userId);
-    const secretKey = Buffer.from(SECURITY_CONFIG.jwtSecret, 'utf8');
     
-    // Přidáváme expiraci a explicitně definujeme algoritmus
-    const token = jwt.sign(
-      { id: userId, iat: Math.floor(Date.now() / 1000) }, 
-      secretKey,
-      { 
-        expiresIn: SECURITY_CONFIG.jwtExpiresIn,
-        algorithm: SECURITY_CONFIG.jwtAlgorithm as jwt.Algorithm
-      }
-    );
+    // Přidáváme expiraci a explicitně definujeme algoritmus  
+    const payload = { id: userId };
+    const secret = SECURITY_CONFIG.jwtSecret;
+    const options: any = { expiresIn: SECURITY_CONFIG.jwtExpiresIn };
+    
+    const token = jwt.sign(payload, secret, options);
     
     console.log('[AUTH] Token byl úspěšně vytvořen');
     return token;

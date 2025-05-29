@@ -57,6 +57,13 @@ export interface IUser extends Document {
     errorMessage?: string;   // Poslední chybová zpráva
     connectedAt?: Date;      // Kdy bylo připojení vytvořeno
     
+    // OAuth tokens
+    accessToken?: string;    // Access token pro API
+    refreshToken?: string;   // Refresh token pro obnovení
+    tokenExpiry?: Date;      // Vypršení tokenu
+    lastTokenRefresh?: Date; // Kdy byl token naposledy obnoven
+    isConnected?: boolean;   // Zda je účet připojen
+    
     // Nastavení publikování
     publishSettings?: {
       autoPublish: boolean;   // Automatické publikování

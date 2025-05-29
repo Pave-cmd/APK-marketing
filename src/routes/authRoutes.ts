@@ -28,7 +28,8 @@ router.get('/test-auth',
   (req: express.Request, res: express.Response, next: express.NextFunction) => {
     auth(req, res, next).catch(next);
   },
-  ((req: express.Request, res: express.Response, next: express.NextFunction) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  ((req: express.Request, res: express.Response, _next: express.NextFunction) => {
     res.status(200).json({
       success: true,
       message: 'Autentizace úspěšná',

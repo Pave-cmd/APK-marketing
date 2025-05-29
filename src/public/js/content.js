@@ -22,7 +22,7 @@ function trackConversions() {
     
     if (ctaButtons.length > 0) {
         ctaButtons.forEach(button => {
-            button.addEventListener('click', function(e) {
+            button.addEventListener('click', function() {
                 console.log('Conversion tracked:', this.dataset.campaign || 'unknown campaign');
             });
         });

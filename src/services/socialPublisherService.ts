@@ -95,7 +95,8 @@ export class SocialPublisherService {
    */
   private async publishToFacebook(
     content: { text: string; image?: string },
-    apiConfig: any
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    _apiConfig: any
   ): Promise<PublishResult> {
     try {
       // Zde by byla implementace Facebook Graph API
@@ -133,7 +134,8 @@ export class SocialPublisherService {
    */
   private async publishToTwitter(
     content: { text: string; image?: string },
-    apiConfig: any
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    _apiConfig: any
   ): Promise<PublishResult> {
     try {
       logger.info(`Simuluji publikaci na Twitter: ${content.text.substring(0, 50)}...`);
@@ -161,7 +163,8 @@ export class SocialPublisherService {
    */
   private async publishToLinkedIn(
     content: { text: string; image?: string },
-    apiConfig: any
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    _apiConfig: any
   ): Promise<PublishResult> {
     try {
       logger.info(`Simuluji publikaci na LinkedIn: ${content.text.substring(0, 50)}...`);

@@ -1,7 +1,6 @@
 import { Request, Response } from 'express';
 import { ScheduledPostService } from '../services/scheduledPostService';
 import { webLog } from '../utils/logger';
-import { IScheduledPost } from '../models/ScheduledPost';
 
 // Inicializace služby
 const scheduledPostService = ScheduledPostService.getInstance();
@@ -42,7 +41,7 @@ export const createScheduledPost = async (req: Request, res: Response) => {
     }
 
     // Vytvoření naplánovaného příspěvku
-    const scheduledPost = await scheduledPostService.createScheduledPost(userId, {
+    const scheduledPost = await scheduledPostService.createScheduledPost(userId as string, {
       socialNetworkId,
       websiteUrl,
       title,

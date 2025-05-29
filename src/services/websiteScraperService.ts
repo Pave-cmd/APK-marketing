@@ -12,6 +12,7 @@ export interface ScrapedContent {
   mainText: string;
   keywords: string[];
   products: any[];
+  url?: string;      // URL of the scraped content
 }
 
 export class WebsiteScraperService extends Singleton {
@@ -183,7 +184,7 @@ export class WebsiteScraperService extends Singleton {
         if (jsonLd['@type'] === 'Product' || jsonLd['@type'] === 'ItemList') {
           products.push(jsonLd);
         }
-      } catch (e) {
+      } catch {
         // Ignorovat chyby parsování
       }
     });

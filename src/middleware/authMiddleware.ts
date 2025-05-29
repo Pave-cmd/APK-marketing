@@ -19,7 +19,7 @@ declare global {
 }
 
 // Middleware pro ověření, že uživatel je přihlášen pomocí JWT tokenu
-export const auth = async (req: Request, res: Response, next: NextFunction): Promise<void | Response> => {
+export const auth = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     console.log('[DEBUG AUTH] Auth middleware - začátek ověření');
     console.log('[DEBUG AUTH] Method:', req.method, 'Original URL:', req.originalUrl, 'Path:', req.path);
@@ -87,15 +87,17 @@ export const auth = async (req: Request, res: Response, next: NextFunction): Pro
       }
       
       if (isApiRequest) {
-        return res.status(401).json({
+        res.status(401).json({
           success: false,
           message: 'Nejste přihlášeni. Přihlaste se a zkuste to znovu.'
         });
+        return;
       } else {
         // Přidání parametru from pro zabránění nekonečných přesměrování
         const redirectUrl = '/prihlaseni?from=' + encodeURIComponent(req.path);
         console.log('[DEBUG AUTH] Přesměrování na:', redirectUrl);
-        return res.redirect(redirectUrl);
+        res.redirect(redirectUrl);
+        return;
       }
     }
 
@@ -121,14 +123,16 @@ export const auth = async (req: Request, res: Response, next: NextFunction): Pro
         }
         
         if (isApiRequest) {
-          return res.status(401).json({
+          res.status(401).json({
             success: false,
             message: 'Uživatel nebyl nalezen. Přihlaste se znovu.'
           });
+          return;
         } else {
           const redirectUrl = '/prihlaseni';
           console.log('[DEBUG AUTH] Přesměrování na:', redirectUrl);
-          return res.redirect(redirectUrl);
+          res.redirect(redirectUrl);
+          return;
         }
       }
 
@@ -167,15 +171,17 @@ export const auth = async (req: Request, res: Response, next: NextFunction): Pro
       }
       
       if (isApiRequest) {
-        return res.status(401).json({
+        res.status(401).json({
           success: false,
           message: 'Platnost vašeho přihlášení vypršela. Přihlaste se znovu.'
         });
+        return;
       } else {
         // Přidání parametru from pro zabránění nekonečných přesměrování
         const redirectUrl = '/prihlaseni?from=' + encodeURIComponent(req.path);
         console.log('[DEBUG AUTH] Přesměrování na:', redirectUrl);
-        return res.redirect(redirectUrl);
+        res.redirect(redirectUrl);
+        return;
       }
     }
   } catch (error) {
@@ -187,14 +193,16 @@ export const auth = async (req: Request, res: Response, next: NextFunction): Pro
     }
     
     if (req.originalUrl.startsWith('/api/')) {
-      return res.status(500).json({
+      res.status(500).json({
         success: false,
         message: 'Chyba při ověřování přihlášení.'
       });
+      return;
     } else {
       const redirectUrl = '/prihlaseni';
       console.log('[DEBUG AUTH] Přesměrování na:', redirectUrl);
-      return res.redirect(redirectUrl);
+      res.redirect(redirectUrl);
+      return;
     }
   }
 };
@@ -212,7 +220,7 @@ export const isAdmin = (req: Request, res: Response, next: NextFunction) => {
 };
 
 // Middleware pro API autentizaci
-export const requireAuth = async (req: Request, res: Response, next: NextFunction): Promise<void | Response> => {
+export const requireAuth = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     // Získání tokenu z cookies nebo hlavičky
     let token = '';
@@ -226,10 +234,11 @@ export const requireAuth = async (req: Request, res: Response, next: NextFunctio
     
     // Pokud token neexistuje
     if (!token) {
-      return res.status(401).json({
+      res.status(401).json({
         success: false,
         message: 'Unauthorized - no token provided'
       });
+      return;
     }
     
     // Ověření tokenu
@@ -242,10 +251,11 @@ export const requireAuth = async (req: Request, res: Response, next: NextFunctio
       const user = await User.findById(decoded.id);
       
       if (!user) {
-        return res.status(401).json({
+        res.status(401).json({
           success: false,
           message: 'Unauthorized - user not found'
         });
+        return;
       }
       
       // Přidání informací o uživateli do požadavku
@@ -253,16 +263,20 @@ export const requireAuth = async (req: Request, res: Response, next: NextFunctio
       req.token = token;
       
       next();
-    } catch (error) {
-      return res.status(401).json({
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars, unused-imports/no-unused-vars
+    } catch (_error) {
+      res.status(401).json({
         success: false,
         message: 'Unauthorized - invalid token'
       });
+      return;
     }
-  } catch (error) {
-    return res.status(500).json({
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars, unused-imports/no-unused-vars
+  } catch (_error) {
+    res.status(500).json({
       success: false,
       message: 'Server error during authentication'
     });
+    return;
   }
 };

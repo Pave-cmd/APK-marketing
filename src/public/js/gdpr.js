@@ -160,3 +160,10 @@ async function revokeConsent() {
 
 // Načtení dat při načtení stránky
 document.addEventListener('DOMContentLoaded', loadGdprStatus);
+
+// Expose functions globally for HTML onclick handlers
+window.exportData = exportData;
+window.showDeleteDialog = showDeleteDialog;
+window.deleteAccount = deleteAccount;
+window.showConsentDialog = showConsentDialog;
+window.revokeConsent = revokeConsent;

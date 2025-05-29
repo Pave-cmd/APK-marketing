@@ -61,9 +61,9 @@ export function normalizeUrl(url: string, options: {
     }
     
     return parsedUrl.toString();
-  } catch (error) {
+  } catch (_error) {
     // If URL parsing fails, return the original with basic normalization
-    console.error('Error normalizing URL:', error);
+    console.error('Error normalizing URL:', _error);
     return normalized;
   }
 }
@@ -109,7 +109,7 @@ export function validateUrl(url: string): { isValid: boolean; message?: string }
     }
     
     return { isValid: true };
-  } catch (error) {
+  } catch {
     return { isValid: false, message: 'Neplatný formát URL' };
   }
 }
@@ -129,7 +129,7 @@ export function areUrlsEquivalent(url1: string, url2: string): boolean {
     const normalizedUrl2 = normalizeUrl(url2, { keepTrailingSlash: false, lowercaseDomain: true });
     
     return normalizedUrl1 === normalizedUrl2;
-  } catch (error) {
+  } catch {
     // If normalization fails, fall back to simple comparison
     return url1.trim().toLowerCase() === url2.trim().toLowerCase();
   }
@@ -206,8 +206,8 @@ export function makeAbsoluteUrl(relativeUrl: string, baseUrl: string): string {
     
     // Handle simple relative URLs
     return new URL(relativeUrl, baseUrlWithoutQuery).toString();
-  } catch (error) {
-    console.error('Error creating absolute URL:', error);
+  } catch (_error) {
+    console.error('Error creating absolute URL:', _error);
     return relativeUrl;
   }
 }

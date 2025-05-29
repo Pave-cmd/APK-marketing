@@ -1,11 +1,10 @@
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import { AuthRequest } from '../types/express';
 import User from '../models/User';
 import ApiConfig from '../models/ApiConfig';
 import Content from '../models/Content';
 import ScheduledPost from '../models/ScheduledPost';
 import WebAnalysis from '../models/WebAnalysis';
-import bcrypt from 'bcryptjs';
 import { promises as fs } from 'fs';
 import path from 'path';
 import archiver from 'archiver';
@@ -16,12 +15,14 @@ export const updateConsent = async (req: AuthRequest, res: Response) => {
     const { consentGiven } = req.body as { consentGiven: boolean };
     
     if (!req.userId) {
-      return res.status(401).json({ success: false, error: 'Neautorizovaný přístup' });
+      res.status(401).json({ success: false, error: 'Neautorizovaný přístup' });
+      return;
     }
 
     const user = await User.findById(req.userId);
     if (!user) {
-      return res.status(404).json({ success: false, error: 'Uživatel nenalezen' });
+      res.status(404).json({ success: false, error: 'Uživatel nenalezen' });
+      return;
     }
 
     // Aktualizace souhlasu
@@ -41,6 +42,7 @@ export const updateConsent = async (req: AuthRequest, res: Response) => {
   } catch (error) {
     console.error('Chyba při aktualizaci souhlasu:', error);
     res.status(500).json({ success: false, error: 'Chyba při aktualizaci souhlasu' });
+      return;
   }
 };
 
@@ -48,12 +50,14 @@ export const updateConsent = async (req: AuthRequest, res: Response) => {
 export const exportUserData = async (req: AuthRequest, res: Response) => {
   try {
     if (!req.userId) {
-      return res.status(401).json({ success: false, error: 'Neautorizovaný přístup' });
+      res.status(401).json({ success: false, error: 'Neautorizovaný přístup' });
+      return;
     }
 
     const user = await User.findById(req.userId).select('-password');
     if (!user) {
-      return res.status(404).json({ success: false, error: 'Uživatel nenalezen' });
+      res.status(404).json({ success: false, error: 'Uživatel nenalezen' });
+      return;
     }
 
     // Zaznamenání žádosti o export
@@ -117,7 +121,8 @@ export const exportUserData = async (req: AuthRequest, res: Response) => {
     await archive.finalize();
 
     // Odeslání ZIP souboru
-    res.download(zipPath, `apk-marketing-data-export-${new Date().toISOString().split('T')[0]}.zip`, async (err) => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    res.download(zipPath, `apk-marketing-data-export-${new Date().toISOString().split('T')[0]}.zip`, async (_err) => {
       // Vyčištění dočasných souborů
       try {
         await fs.rm(exportDir, { recursive: true, force: true });
@@ -129,6 +134,7 @@ export const exportUserData = async (req: AuthRequest, res: Response) => {
   } catch (error) {
     console.error('Chyba při exportu dat:', error);
     res.status(500).json({ success: false, error: 'Chyba při exportu dat' });
+      return;
   }
 };
 
@@ -138,22 +144,26 @@ export const requestDataDeletion = async (req: AuthRequest, res: Response) => {
     const { password, confirmDeletion } = req.body as { password: string; confirmDeletion: boolean };
 
     if (!req.userId) {
-      return res.status(401).json({ success: false, error: 'Neautorizovaný přístup' });
+      res.status(401).json({ success: false, error: 'Neautorizovaný přístup' });
+      return;
     }
 
     if (!confirmDeletion) {
-      return res.status(400).json({ success: false, error: 'Musíte potvrdit smazání účtu' });
+      res.status(400).json({ success: false, error: 'Musíte potvrdit smazání účtu' });
+      return;
     }
 
     const user = await User.findById(req.userId);
     if (!user) {
-      return res.status(404).json({ success: false, error: 'Uživatel nenalezen' });
+      res.status(404).json({ success: false, error: 'Uživatel nenalezen' });
+      return;
     }
 
     // Ověření hesla
     const isPasswordValid = await user.comparePassword(password);
     if (!isPasswordValid) {
-      return res.status(401).json({ success: false, error: 'Nesprávné heslo' });
+      res.status(401).json({ success: false, error: 'Nesprávné heslo' });
+      return;
     }
 
     // Zaznamenání žádosti o smazání
@@ -169,6 +179,7 @@ export const requestDataDeletion = async (req: AuthRequest, res: Response) => {
   } catch (error) {
     console.error('Chyba při žádosti o smazání dat:', error);
     res.status(500).json({ success: false, error: 'Chyba při zpracování žádosti' });
+      return;
   }
 };
 
@@ -178,22 +189,26 @@ export const deleteUserDataImmediately = async (req: AuthRequest, res: Response)
     const { password, confirmPhrase } = req.body as { password: string; confirmPhrase: string };
 
     if (!req.userId) {
-      return res.status(401).json({ success: false, error: 'Neautorizovaný přístup' });
+      res.status(401).json({ success: false, error: 'Neautorizovaný přístup' });
+      return;
     }
 
     if (confirmPhrase !== 'DELETE MY ACCOUNT PERMANENTLY') {
-      return res.status(400).json({ success: false, error: 'Nesprávná potvrzovací fráze' });
+      res.status(400).json({ success: false, error: 'Nesprávná potvrzovací fráze' });
+      return;
     }
 
     const user = await User.findById(req.userId);
     if (!user) {
-      return res.status(404).json({ success: false, error: 'Uživatel nenalezen' });
+      res.status(404).json({ success: false, error: 'Uživatel nenalezen' });
+      return;
     }
 
     // Ověření hesla
     const isPasswordValid = await user.comparePassword(password);
     if (!isPasswordValid) {
-      return res.status(401).json({ success: false, error: 'Nesprávné heslo' });
+      res.status(401).json({ success: false, error: 'Nesprávné heslo' });
+      return;
     }
 
     // Smazání všech souvisejících dat
@@ -215,6 +230,7 @@ export const deleteUserDataImmediately = async (req: AuthRequest, res: Response)
   } catch (error) {
     console.error('Chyba při mazání dat:', error);
     res.status(500).json({ success: false, error: 'Chyba při mazání dat' });
+      return;
   }
 };
 
@@ -222,12 +238,14 @@ export const deleteUserDataImmediately = async (req: AuthRequest, res: Response)
 export const getGdprStatus = async (req: AuthRequest, res: Response) => {
   try {
     if (!req.userId) {
-      return res.status(401).json({ success: false, error: 'Neautorizovaný přístup' });
+      res.status(401).json({ success: false, error: 'Neautorizovaný přístup' });
+      return;
     }
 
     const user = await User.findById(req.userId).select('gdprConsent dataProcessingConsent consentGiven consentDate dataExportRequest dataDeletionRequest');
     if (!user) {
-      return res.status(404).json({ success: false, error: 'Uživatel nenalezen' });
+      res.status(404).json({ success: false, error: 'Uživatel nenalezen' });
+      return;
     }
 
     res.json({
@@ -249,5 +267,6 @@ export const getGdprStatus = async (req: AuthRequest, res: Response) => {
   } catch (error) {
     console.error('Chyba při získávání GDPR statusu:', error);
     res.status(500).json({ success: false, error: 'Chyba při získávání GDPR statusu' });
+      return;
   }
 };

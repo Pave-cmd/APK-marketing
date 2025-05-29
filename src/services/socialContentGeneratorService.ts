@@ -10,10 +10,11 @@ export class SocialContentGeneratorService {
   private apiKey: string;
   private openai: OpenAI;
 
-  constructor(apiKey: string, apiEndpoint: string) {
+  constructor(apiKey: string, apiEndpoint?: string) {
     this.apiKey = apiKey;
     this.openai = new OpenAI({
-      apiKey: this.apiKey
+      apiKey: this.apiKey,
+      baseURL: apiEndpoint
     });
   }
 
@@ -239,7 +240,7 @@ export class SocialContentGeneratorService {
       
       if (contentMatches) {
         content = contentMatches
-          .map(p => p.replace(/<\/?p\b[^>]*>/gi, ''))
+          .map((p: string) => p.replace(/<\/?p\b[^>]*>/gi, ''))
           .join(' ')
           .substring(0, 1000);
       }

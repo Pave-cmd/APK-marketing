@@ -1,12 +1,12 @@
 {
   "statistics": {
-    "detectionDate": "2025-05-21T06:15:09.592Z",
+    "detectionDate": "2025-05-28T14:38:24.906Z",
     "formats": {
       "typescript": {
         "sources": {
           "src/utils/duplicateDetection/unusedCodeDetector.ts": {
             "lines": 625,
-            "tokens": 4683,
+            "tokens": 4679,
             "sources": 1,
             "clones": 0,
             "duplicatedLines": 0,
@@ -42,7 +42,7 @@
           },
           "src/utils/duplicateDetection/fileDetector.ts": {
             "lines": 161,
-            "tokens": 1268,
+            "tokens": 1266,
             "sources": 1,
             "clones": 0,
             "duplicatedLines": 0,
@@ -65,8 +65,20 @@
             "newClones": 0
           },
           "src/utils/urlUtils.ts": {
-            "lines": 163,
-            "tokens": 1228,
+            "lines": 212,
+            "tokens": 2002,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/utils/singleton.ts": {
+            "lines": 28,
+            "tokens": 156,
             "sources": 1,
             "clones": 0,
             "duplicatedLines": 0,
@@ -100,9 +112,33 @@
             "newDuplicatedLines": 0,
             "newClones": 0
           },
+          "src/utils/errorHandler.ts": {
+            "lines": 64,
+            "tokens": 427,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
           "src/utils/cookieUtils.ts": {
-            "lines": 28,
-            "tokens": 197,
+            "lines": 33,
+            "tokens": 225,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/types/express.d.ts": {
+            "lines": 15,
+            "tokens": 104,
             "sources": 1,
             "clones": 0,
             "duplicatedLines": 0,
@@ -113,8 +149,8 @@
             "newClones": 0
           },
           "src/services/websiteScraperService.ts": {
-            "lines": 240,
-            "tokens": 1860,
+            "lines": 228,
+            "tokens": 1761,
             "sources": 1,
             "clones": 0,
             "duplicatedLines": 0,
@@ -125,20 +161,32 @@
             "newClones": 0
           },
           "src/services/webAnalysisService.ts": {
-            "lines": 227,
-            "tokens": 1880,
+            "lines": 369,
+            "tokens": 3201,
             "sources": 1,
-            "clones": 0,
-            "duplicatedLines": 0,
-            "duplicatedTokens": 0,
-            "percentage": 0,
-            "percentageTokens": 0,
+            "clones": 2,
+            "duplicatedLines": 28,
+            "duplicatedTokens": 348,
+            "percentage": 7.59,
+            "percentageTokens": 10.87,
             "newDuplicatedLines": 0,
             "newClones": 0
           },
           "src/services/tokenManagerService.ts": {
-            "lines": 256,
-            "tokens": 1900,
+            "lines": 710,
+            "tokens": 5079,
+            "sources": 1,
+            "clones": 2,
+            "duplicatedLines": 24,
+            "duplicatedTokens": 196,
+            "percentage": 3.38,
+            "percentageTokens": 3.86,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/services/socialPublisherService.ts": {
+            "lines": 188,
+            "tokens": 1427,
             "sources": 1,
             "clones": 0,
             "duplicatedLines": 0,
@@ -148,9 +196,9 @@
             "newDuplicatedLines": 0,
             "newClones": 0
           },
-          "src/services/socialPublisherService.ts": {
-            "lines": 185,
-            "tokens": 1418,
+          "src/services/socialContentGeneratorService.ts": {
+            "lines": 261,
+            "tokens": 2066,
             "sources": 1,
             "clones": 0,
             "duplicatedLines": 0,
@@ -161,26 +209,26 @@
             "newClones": 0
           },
           "src/services/socialApiService.ts": {
-            "lines": 226,
-            "tokens": 1506,
+            "lines": 786,
+            "tokens": 5296,
             "sources": 1,
-            "clones": 0,
-            "duplicatedLines": 0,
-            "duplicatedTokens": 0,
-            "percentage": 0,
-            "percentageTokens": 0,
+            "clones": 6,
+            "duplicatedLines": 100,
+            "duplicatedTokens": 690,
+            "percentage": 12.72,
+            "percentageTokens": 13.03,
             "newDuplicatedLines": 0,
             "newClones": 0
           },
           "src/services/scheduledPostService.ts": {
-            "lines": 632,
-            "tokens": 5039,
+            "lines": 660,
+            "tokens": 5240,
             "sources": 1,
             "clones": 1,
             "duplicatedLines": 9,
             "duplicatedTokens": 83,
-            "percentage": 1.42,
-            "percentageTokens": 1.65,
+            "percentage": 1.36,
+            "percentageTokens": 1.58,
             "newDuplicatedLines": 0,
             "newClones": 0
           },
@@ -209,14 +257,14 @@
             "newClones": 0
           },
           "src/services/contentGeneratorService.ts": {
-            "lines": 868,
-            "tokens": 6211,
+            "lines": 934,
+            "tokens": 6725,
             "sources": 1,
             "clones": 16,
             "duplicatedLines": 250,
             "duplicatedTokens": 2134,
-            "percentage": 28.8,
-            "percentageTokens": 34.36,
+            "percentage": 26.77,
+            "percentageTokens": 31.73,
             "newDuplicatedLines": 0,
             "newClones": 0
           },
@@ -245,8 +293,8 @@
             "newClones": 0
           },
           "src/routes/socialNetworkRoutes.ts": {
-            "lines": 26,
-            "tokens": 198,
+            "lines": 28,
+            "tokens": 224,
             "sources": 1,
             "clones": 0,
             "duplicatedLines": 0,
@@ -268,9 +316,69 @@
             "newDuplicatedLines": 0,
             "newClones": 0
           },
+          "src/routes/legalRoutes.ts": {
+            "lines": 31,
+            "tokens": 235,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/routes/gdprRoutes.ts": {
+            "lines": 30,
+            "tokens": 153,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/routes/dashboardRoutes.ts": {
+            "lines": 83,
+            "tokens": 731,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/routes/contentRoutes.ts": {
+            "lines": 75,
+            "tokens": 426,
+            "sources": 1,
+            "clones": 1,
+            "duplicatedLines": 27,
+            "duplicatedTokens": 86,
+            "percentage": 36,
+            "percentageTokens": 20.19,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/routes/contentGeneratorRoutes.ts": {
+            "lines": 29,
+            "tokens": 128,
+            "sources": 1,
+            "clones": 1,
+            "duplicatedLines": 27,
+            "duplicatedTokens": 86,
+            "percentage": 93.1,
+            "percentageTokens": 67.19,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
           "src/routes/authRoutes.ts": {
-            "lines": 32,
-            "tokens": 311,
+            "lines": 43,
+            "tokens": 440,
             "sources": 1,
             "clones": 0,
             "duplicatedLines": 0,
@@ -305,8 +413,8 @@
             "newClones": 0
           },
           "src/models/User.ts": {
-            "lines": 209,
-            "tokens": 1510,
+            "lines": 343,
+            "tokens": 2364,
             "sources": 1,
             "clones": 0,
             "duplicatedLines": 0,
@@ -329,8 +437,8 @@
             "newClones": 0
           },
           "src/models/Content.ts": {
-            "lines": 131,
-            "tokens": 983,
+            "lines": 144,
+            "tokens": 1095,
             "sources": 1,
             "clones": 0,
             "duplicatedLines": 0,
@@ -341,8 +449,8 @@
             "newClones": 0
           },
           "src/models/ApiConfig.ts": {
-            "lines": 227,
-            "tokens": 1948,
+            "lines": 327,
+            "tokens": 2951,
             "sources": 1,
             "clones": 0,
             "duplicatedLines": 0,
@@ -352,21 +460,57 @@
             "newDuplicatedLines": 0,
             "newClones": 0
           },
-          "src/middleware/protectedRouteMiddleware.ts": {
-            "lines": 159,
-            "tokens": 1100,
+          "src/middleware/rateLimitMiddleware.ts": {
+            "lines": 115,
+            "tokens": 1049,
             "sources": 1,
             "clones": 0,
             "duplicatedLines": 0,
             "duplicatedTokens": 0,
             "percentage": 0,
             "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/middleware/httpsRedirect.ts": {
+            "lines": 54,
+            "tokens": 369,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/middleware/csrfMiddleware.ts": {
+            "lines": 160,
+            "tokens": 1189,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/middleware/consentMiddleware.ts": {
+            "lines": 85,
+            "tokens": 876,
+            "sources": 1,
+            "clones": 2,
+            "duplicatedLines": 22,
+            "duplicatedTokens": 280,
+            "percentage": 25.88,
+            "percentageTokens": 31.96,
             "newDuplicatedLines": 0,
             "newClones": 0
           },
           "src/middleware/authMiddleware.ts": {
-            "lines": 207,
-            "tokens": 1753,
+            "lines": 281,
+            "tokens": 2275,
             "sources": 1,
             "clones": 0,
             "duplicatedLines": 0,
@@ -377,8 +521,8 @@
             "newClones": 0
           },
           "src/controllers/websiteController.ts": {
-            "lines": 505,
-            "tokens": 4250,
+            "lines": 519,
+            "tokens": 4242,
             "sources": 1,
             "clones": 0,
             "duplicatedLines": 0,
@@ -401,20 +545,20 @@
             "newClones": 0
           },
           "src/controllers/socialNetworkController.ts": {
-            "lines": 632,
-            "tokens": 4990,
+            "lines": 667,
+            "tokens": 5225,
             "sources": 1,
-            "clones": 2,
-            "duplicatedLines": 44,
-            "duplicatedTokens": 344,
-            "percentage": 6.96,
-            "percentageTokens": 6.89,
+            "clones": 6,
+            "duplicatedLines": 116,
+            "duplicatedTokens": 898,
+            "percentage": 17.39,
+            "percentageTokens": 17.19,
             "newDuplicatedLines": 0,
             "newClones": 0
           },
           "src/controllers/scheduledPostController.ts": {
-            "lines": 298,
-            "tokens": 2291,
+            "lines": 297,
+            "tokens": 2328,
             "sources": 1,
             "clones": 0,
             "duplicatedLines": 0,
@@ -424,9 +568,33 @@
             "newDuplicatedLines": 0,
             "newClones": 0
           },
+          "src/controllers/gdprController.ts": {
+            "lines": 271,
+            "tokens": 2751,
+            "sources": 1,
+            "clones": 4,
+            "duplicatedLines": 48,
+            "duplicatedTokens": 470,
+            "percentage": 17.71,
+            "percentageTokens": 17.08,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
           "src/controllers/emergencyController.ts": {
-            "lines": 205,
-            "tokens": 1522,
+            "lines": 218,
+            "tokens": 1601,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/controllers/contentGeneratorController.ts": {
+            "lines": 196,
+            "tokens": 1699,
             "sources": 1,
             "clones": 0,
             "duplicatedLines": 0,
@@ -437,8 +605,8 @@
             "newClones": 0
           },
           "src/controllers/authController.ts": {
-            "lines": 280,
-            "tokens": 2126,
+            "lines": 447,
+            "tokens": 3408,
             "sources": 1,
             "clones": 0,
             "duplicatedLines": 0,
@@ -450,7 +618,7 @@
           },
           "src/controllers/apiConfigController.ts": {
             "lines": 195,
-            "tokens": 1721,
+            "tokens": 1723,
             "sources": 1,
             "clones": 0,
             "duplicatedLines": 0,
@@ -461,8 +629,8 @@
             "newClones": 0
           },
           "src/config/db.ts": {
-            "lines": 28,
-            "tokens": 251,
+            "lines": 57,
+            "tokens": 451,
             "sources": 1,
             "clones": 0,
             "duplicatedLines": 0,
@@ -473,8 +641,8 @@
             "newClones": 0
           },
           "src/config/config.ts": {
-            "lines": 66,
-            "tokens": 457,
+            "lines": 75,
+            "tokens": 558,
             "sources": 1,
             "clones": 0,
             "duplicatedLines": 0,
@@ -485,8 +653,20 @@
             "newClones": 0
           },
           "src/server.ts": {
-            "lines": 461,
-            "tokens": 3415,
+            "lines": 553,
+            "tokens": 4203,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "scripts/migrate-social-networks.ts": {
+            "lines": 241,
+            "tokens": 1701,
             "sources": 1,
             "clones": 0,
             "duplicatedLines": 0,
@@ -507,83 +687,23 @@
             "percentageTokens": 0,
             "newDuplicatedLines": 0,
             "newClones": 0
-          },
-          "direct-mongo-update.ts": {
-            "lines": 78,
-            "tokens": 701,
-            "sources": 1,
-            "clones": 1,
-            "duplicatedLines": 5,
-            "duplicatedTokens": 81,
-            "percentage": 6.41,
-            "percentageTokens": 11.55,
-            "newDuplicatedLines": 0,
-            "newClones": 0
-          },
-          "debug-db.ts": {
-            "lines": 52,
-            "tokens": 506,
-            "sources": 1,
-            "clones": 0,
-            "duplicatedLines": 0,
-            "duplicatedTokens": 0,
-            "percentage": 0,
-            "percentageTokens": 0,
-            "newDuplicatedLines": 0,
-            "newClones": 0
-          },
-          "db-check.ts": {
-            "lines": 96,
-            "tokens": 840,
-            "sources": 1,
-            "clones": 1,
-            "duplicatedLines": 5,
-            "duplicatedTokens": 81,
-            "percentage": 5.21,
-            "percentageTokens": 9.64,
-            "newDuplicatedLines": 0,
-            "newClones": 0
           }
         },
         "total": {
-          "lines": 9132,
-          "tokens": 70997,
-          "sources": 45,
-          "clones": 12,
-          "duplicatedLines": 172,
-          "duplicatedTokens": 1501,
-          "percentage": 1.88,
-          "percentageTokens": 2.11,
+          "lines": 12472,
+          "tokens": 96983,
+          "sources": 57,
+          "clones": 22,
+          "duplicatedLines": 341,
+          "duplicatedTokens": 2775,
+          "percentage": 2.73,
+          "percentageTokens": 2.86,
           "newDuplicatedLines": 0,
           "newClones": 0
         }
       },
       "javascript": {
         "sources": {
-          "src/public/js/website-test-utils.js": {
-            "lines": 127,
-            "tokens": 1038,
-            "sources": 1,
-            "clones": 0,
-            "duplicatedLines": 0,
-            "duplicatedTokens": 0,
-            "percentage": 0,
-            "percentageTokens": 0,
-            "newDuplicatedLines": 0,
-            "newClones": 0
-          },
-          "src/public/js/website-fix.js": {
-            "lines": 188,
-            "tokens": 1379,
-            "sources": 1,
-            "clones": 0,
-            "duplicatedLines": 0,
-            "duplicatedTokens": 0,
-            "percentage": 0,
-            "percentageTokens": 0,
-            "newDuplicatedLines": 0,
-            "newClones": 0
-          },
           "src/public/js/website-analysis.js": {
             "lines": 213,
             "tokens": 1209,
@@ -597,20 +717,8 @@
             "newClones": 0
           },
           "src/public/js/unified-website-manager.js": {
-            "lines": 631,
-            "tokens": 4629,
-            "sources": 1,
-            "clones": 0,
-            "duplicatedLines": 0,
-            "duplicatedTokens": 0,
-            "percentage": 0,
-            "percentageTokens": 0,
-            "newDuplicatedLines": 0,
-            "newClones": 0
-          },
-          "src/public/js/test-social-button.js": {
-            "lines": 44,
-            "tokens": 354,
+            "lines": 763,
+            "tokens": 5528,
             "sources": 1,
             "clones": 0,
             "duplicatedLines": 0,
@@ -633,8 +741,8 @@
             "newClones": 0
           },
           "src/public/js/main.js": {
-            "lines": 243,
-            "tokens": 1595,
+            "lines": 247,
+            "tokens": 1610,
             "sources": 1,
             "clones": 0,
             "duplicatedLines": 0,
@@ -644,9 +752,9 @@
             "newDuplicatedLines": 0,
             "newClones": 0
           },
-          "src/public/js/debug-social.js": {
-            "lines": 34,
-            "tokens": 279,
+          "src/public/js/gdpr.js": {
+            "lines": 168,
+            "tokens": 1355,
             "sources": 1,
             "clones": 0,
             "duplicatedLines": 0,
@@ -668,9 +776,21 @@
             "newDuplicatedLines": 0,
             "newClones": 0
           },
+          "src/public/js/cookie-consent.js": {
+            "lines": 319,
+            "tokens": 1505,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
           "src/public/js/content.js": {
             "lines": 32,
-            "tokens": 188,
+            "tokens": 187,
             "sources": 1,
             "clones": 0,
             "duplicatedLines": 0,
@@ -705,56 +825,8 @@
             "newClones": 0
           },
           "scripts/build-debug.js": {
-            "lines": 104,
-            "tokens": 822,
-            "sources": 1,
-            "clones": 0,
-            "duplicatedLines": 0,
-            "duplicatedTokens": 0,
-            "percentage": 0,
-            "percentageTokens": 0,
-            "newDuplicatedLines": 0,
-            "newClones": 0
-          },
-          "testmongodb.js": {
-            "lines": 34,
-            "tokens": 282,
-            "sources": 1,
-            "clones": 0,
-            "duplicatedLines": 0,
-            "duplicatedTokens": 0,
-            "percentage": 0,
-            "percentageTokens": 0,
-            "newDuplicatedLines": 0,
-            "newClones": 0
-          },
-          "test-add-website.js": {
-            "lines": 73,
-            "tokens": 658,
-            "sources": 1,
-            "clones": 0,
-            "duplicatedLines": 0,
-            "duplicatedTokens": 0,
-            "percentage": 0,
-            "percentageTokens": 0,
-            "newDuplicatedLines": 0,
-            "newClones": 0
-          },
-          "start-fixed.js": {
-            "lines": 17,
-            "tokens": 136,
-            "sources": 1,
-            "clones": 0,
-            "duplicatedLines": 0,
-            "duplicatedTokens": 0,
-            "percentage": 0,
-            "percentageTokens": 0,
-            "newDuplicatedLines": 0,
-            "newClones": 0
-          },
-          "start-direct.js": {
-            "lines": 34,
-            "tokens": 278,
+            "lines": 105,
+            "tokens": 824,
             "sources": 1,
             "clones": 0,
             "duplicatedLines": 0,
@@ -777,8 +849,8 @@
             "newClones": 0
           },
           "eslint.config.js": {
-            "lines": 64,
-            "tokens": 415,
+            "lines": 82,
+            "tokens": 541,
             "sources": 1,
             "clones": 0,
             "duplicatedLines": 0,
@@ -790,14 +862,14 @@
           }
         },
         "total": {
-          "lines": 2576,
-          "tokens": 18607,
-          "sources": 19,
+          "lines": 2667,
+          "tokens": 18104,
+          "sources": 13,
           "clones": 4,
           "duplicatedLines": 54,
           "duplicatedTokens": 412,
-          "percentage": 2.1,
-          "percentageTokens": 2.21,
+          "percentage": 2.02,
+          "percentageTokens": 2.28,
           "newDuplicatedLines": 0,
           "newClones": 0
         }
@@ -815,12 +887,24 @@
             "percentageTokens": 0,
             "newDuplicatedLines": 0,
             "newClones": 0
+          },
+          "src/public/css/cookie-consent.css": {
+            "lines": 258,
+            "tokens": 1400,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
           }
         },
         "total": {
-          "lines": 383,
-          "tokens": 1971,
-          "sources": 1,
+          "lines": 641,
+          "tokens": 3371,
+          "sources": 2,
           "clones": 0,
           "duplicatedLines": 0,
           "duplicatedTokens": 0,
@@ -832,14 +916,14 @@
       }
     },
     "total": {
-      "lines": 12091,
-      "tokens": 91575,
-      "sources": 65,
-      "clones": 16,
-      "duplicatedLines": 226,
-      "duplicatedTokens": 1913,
-      "percentage": 1.87,
-      "percentageTokens": 2.09,
+      "lines": 15780,
+      "tokens": 118458,
+      "sources": 72,
+      "clones": 26,
+      "duplicatedLines": 395,
+      "duplicatedTokens": 3187,
+      "percentage": 2.5,
+      "percentageTokens": 2.69,
       "newDuplicatedLines": 0,
       "newClones": 0
     }
@@ -991,6 +1075,186 @@
     },
     {
       "format": "typescript",
+      "lines": 15,
+      "fragment": "analysis.generatedContent = {\n            facebook: {\n              text: `Podívejte se na ${websiteUrl}!`,\n              image: scrapedContent.images && scrapedContent.images.length > 0 ? scrapedContent.images[0] : undefined\n            },\n            twitter: {\n              text: `Zajímavý obsah na ${websiteUrl}`,\n              image: scrapedContent.images && scrapedContent.images.length > 0 ? scrapedContent.images[0] : undefined\n            },\n            linkedin: {\n              text: `Doporučujeme obsah na ${websiteUrl}`,\n              image: scrapedContent.images && scrapedContent.images.length > 0 ? scrapedContent.images[0] : undefined\n            }\n          };\n          await",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src/services/webAnalysisService.ts",
+        "start": 173,
+        "end": 187,
+        "startLoc": {
+          "line": 173,
+          "column": 11,
+          "position": 1466
+        },
+        "endLoc": {
+          "line": 187,
+          "column": 6,
+          "position": 1640
+        }
+      },
+      "secondFile": {
+        "name": "src/services/webAnalysisService.ts",
+        "start": 101,
+        "end": 116,
+        "startLoc": {
+          "line": 101,
+          "column": 13,
+          "position": 824
+        },
+        "endLoc": {
+          "line": 116,
+          "column": 21,
+          "position": 1000
+        }
+      }
+    },
+    {
+      "format": "typescript",
+      "lines": 13,
+      "fragment": ".save();\n      \n      // Aktualizace uživatelského profilu\n      const user = await User.findById(userId);\n      \n      if (!user) {\n        webLog('Uživatel nenalezen', { userId });\n        return false;\n      }\n      \n      // Najdeme záznam sociální sítě nebo vytvoříme nový\n      const existingNetwork = user.socialNetworks.find(\n        (net: any) => net.platform === 'linkedin'",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src/services/tokenManagerService.ts",
+        "start": 479,
+        "end": 491,
+        "startLoc": {
+          "line": 479,
+          "column": 15,
+          "position": 3410
+        },
+        "endLoc": {
+          "line": 491,
+          "column": 11,
+          "position": 3508
+        }
+      },
+      "secondFile": {
+        "name": "src/services/tokenManagerService.ts",
+        "start": 288,
+        "end": 300,
+        "startLoc": {
+          "line": 288,
+          "column": 14,
+          "position": 2071
+        },
+        "endLoc": {
+          "line": 300,
+          "column": 10,
+          "position": 2169
+        }
+      }
+    },
+    {
+      "format": "typescript",
+      "lines": 16,
+      "fragment": "// Vytvoření OAuth instance pro Twitter API\n      const oauth = new OAuth({\n        consumer: {\n          key: tokens.apiKey,\n          secret: tokens.apiSecret\n        },\n        signature_method: 'HMAC-SHA1',\n        hash_function(baseString, key) {\n          return crypto\n            .createHmac('sha1', key)\n            .update(baseString)\n            .digest('base64');\n        }\n      });\n      \n      // Upload API endpoint",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src/services/socialApiService.ts",
+        "start": 337,
+        "end": 352,
+        "startLoc": {
+          "line": 337,
+          "column": 7,
+          "position": 2226
+        },
+        "endLoc": {
+          "line": 352,
+          "column": 23,
+          "position": 2327
+        }
+      },
+      "secondFile": {
+        "name": "src/services/socialApiService.ts",
+        "start": 260,
+        "end": 275,
+        "startLoc": {
+          "line": 260,
+          "column": 7,
+          "position": 1691
+        },
+        "endLoc": {
+          "line": 275,
+          "column": 26,
+          "position": 1791
+        }
+      }
+    },
+    {
+      "format": "typescript",
+      "lines": 15,
+      "fragment": "const oauth = new OAuth({\n                consumer: {\n                  key: tokens.apiKey,\n                  secret: tokens.apiSecret\n                },\n                signature_method: 'HMAC-SHA1',\n                hash_function(baseString, key) {\n                  return crypto\n                    .createHmac('sha1', key)\n                    .update(baseString)\n                    .digest('base64');\n                }\n              });\n              \n              const",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src/services/socialApiService.ts",
+        "start": 456,
+        "end": 470,
+        "startLoc": {
+          "line": 456,
+          "column": 15,
+          "position": 3148
+        },
+        "endLoc": {
+          "line": 470,
+          "column": 6,
+          "position": 3246
+        }
+      },
+      "secondFile": {
+        "name": "src/services/socialApiService.ts",
+        "start": 261,
+        "end": 275,
+        "startLoc": {
+          "line": 261,
+          "column": 7,
+          "position": 1694
+        },
+        "endLoc": {
+          "line": 275,
+          "column": 26,
+          "position": 1791
+        }
+      }
+    },
+    {
+      "format": "typescript",
+      "lines": 22,
+      "fragment": "const tokens = await TokenManagerService.getTwitterTokens(userId);\n      \n      if (!tokens) {\n        throw new Error('Nenalezeny platné tokeny pro Twitter');\n      }\n      \n      // Vytvoření OAuth instance pro Twitter API\n      const oauth = new OAuth({\n        consumer: {\n          key: tokens.apiKey,\n          secret: tokens.apiSecret\n        },\n        signature_method: 'HMAC-SHA1',\n        hash_function(baseString, key) {\n          return crypto\n            .createHmac('sha1', key)\n            .update(baseString)\n            .digest('base64');\n        }\n      });\n      \n      // Endpoint pro získání analytiky uživatele",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src/services/socialApiService.ts",
+        "start": 505,
+        "end": 526,
+        "startLoc": {
+          "line": 505,
+          "column": 7,
+          "position": 3456
+        },
+        "endLoc": {
+          "line": 526,
+          "column": 44,
+          "position": 3602
+        }
+      },
+      "secondFile": {
+        "name": "src/services/socialApiService.ts",
+        "start": 254,
+        "end": 275,
+        "startLoc": {
+          "line": 254,
+          "column": 7,
+          "position": 1647
+        },
+        "endLoc": {
+          "line": 275,
+          "column": 26,
+          "position": 1791
+        }
+      }
+    },
+    {
+      "format": "typescript",
       "lines": 10,
       "fragment": "[]> {\n    try {\n      const query: any = { userId: new mongoose.Types.ObjectId(userId) };\n\n      if (filters?.status) {\n        query.status = filters.status;\n      }\n\n      if (filters?.platform) {\n        query[",
       "tokens": 0,
@@ -1016,12 +1280,12 @@
         "startLoc": {
           "line": 129,
           "column": 15,
-          "position": 975
+          "position": 972
         },
         "endLoc": {
           "line": 138,
           "column": 2,
-          "position": 1058
+          "position": 1055
         }
       }
     },
@@ -1032,32 +1296,32 @@
       "tokens": 0,
       "firstFile": {
         "name": "src/services/contentGeneratorService.ts",
-        "start": 435,
-        "end": 449,
+        "start": 436,
+        "end": 450,
         "startLoc": {
-          "line": 435,
+          "line": 436,
           "column": 9,
-          "position": 3191
+          "position": 3196
         },
         "endLoc": {
-          "line": 449,
+          "line": 450,
           "column": 37,
-          "position": 3299
+          "position": 3304
         }
       },
       "secondFile": {
         "name": "src/services/contentGeneratorService.ts",
-        "start": 274,
-        "end": 288,
+        "start": 275,
+        "end": 289,
         "startLoc": {
-          "line": 274,
+          "line": 275,
           "column": 8,
-          "position": 1973
+          "position": 1978
         },
         "endLoc": {
-          "line": 288,
+          "line": 289,
           "column": 39,
-          "position": 2081
+          "position": 2086
         }
       }
     },
@@ -1068,32 +1332,32 @@
       "tokens": 0,
       "firstFile": {
         "name": "src/services/contentGeneratorService.ts",
-        "start": 460,
-        "end": 480,
+        "start": 461,
+        "end": 481,
         "startLoc": {
-          "line": 460,
+          "line": 461,
           "column": 9,
-          "position": 3399
+          "position": 3404
         },
         "endLoc": {
-          "line": 480,
+          "line": 481,
           "column": 40,
-          "position": 3575
+          "position": 3580
         }
       },
       "secondFile": {
         "name": "src/services/contentGeneratorService.ts",
-        "start": 300,
-        "end": 320,
+        "start": 301,
+        "end": 321,
         "startLoc": {
-          "line": 300,
+          "line": 301,
           "column": 8,
-          "position": 2175
+          "position": 2180
         },
         "endLoc": {
-          "line": 320,
+          "line": 321,
           "column": 42,
-          "position": 2351
+          "position": 2356
         }
       }
     },
@@ -1104,32 +1368,32 @@
       "tokens": 0,
       "firstFile": {
         "name": "src/services/contentGeneratorService.ts",
-        "start": 483,
-        "end": 497,
+        "start": 484,
+        "end": 498,
         "startLoc": {
-          "line": 483,
+          "line": 484,
           "column": 14,
-          "position": 3582
+          "position": 3587
         },
         "endLoc": {
-          "line": 497,
+          "line": 498,
           "column": 45,
-          "position": 3695
+          "position": 3700
         }
       },
       "secondFile": {
         "name": "src/services/contentGeneratorService.ts",
-        "start": 323,
-        "end": 337,
+        "start": 324,
+        "end": 338,
         "startLoc": {
-          "line": 323,
+          "line": 324,
           "column": 14,
-          "position": 2367
+          "position": 2372
         },
         "endLoc": {
-          "line": 337,
+          "line": 338,
           "column": 45,
-          "position": 2480
+          "position": 2485
         }
       }
     },
@@ -1140,32 +1404,32 @@
       "tokens": 0,
       "firstFile": {
         "name": "src/services/contentGeneratorService.ts",
-        "start": 599,
-        "end": 612,
+        "start": 600,
+        "end": 613,
         "startLoc": {
-          "line": 599,
+          "line": 600,
           "column": 11,
-          "position": 4345
+          "position": 4354
         },
         "endLoc": {
-          "line": 612,
+          "line": 613,
           "column": 36,
-          "position": 4449
+          "position": 4458
         }
       },
       "secondFile": {
         "name": "src/services/contentGeneratorService.ts",
-        "start": 275,
-        "end": 288,
+        "start": 276,
+        "end": 289,
         "startLoc": {
-          "line": 275,
+          "line": 276,
           "column": 12,
-          "position": 1977
+          "position": 1982
         },
         "endLoc": {
-          "line": 288,
+          "line": 289,
           "column": 39,
-          "position": 2081
+          "position": 2086
         }
       }
     },
@@ -1176,32 +1440,32 @@
       "tokens": 0,
       "firstFile": {
         "name": "src/services/contentGeneratorService.ts",
-        "start": 620,
-        "end": 640,
+        "start": 621,
+        "end": 641,
         "startLoc": {
-          "line": 620,
+          "line": 621,
           "column": 11,
-          "position": 4501
+          "position": 4510
         },
         "endLoc": {
-          "line": 640,
+          "line": 641,
           "column": 39,
-          "position": 4675
+          "position": 4684
         }
       },
       "secondFile": {
         "name": "src/services/contentGeneratorService.ts",
-        "start": 300,
-        "end": 320,
+        "start": 301,
+        "end": 321,
         "startLoc": {
-          "line": 300,
+          "line": 301,
           "column": 4,
-          "position": 2177
+          "position": 2182
         },
         "endLoc": {
-          "line": 320,
+          "line": 321,
           "column": 42,
-          "position": 2351
+          "position": 2356
         }
       }
     },
@@ -1212,32 +1476,32 @@
       "tokens": 0,
       "firstFile": {
         "name": "src/services/contentGeneratorService.ts",
-        "start": 643,
-        "end": 657,
+        "start": 644,
+        "end": 658,
         "startLoc": {
-          "line": 643,
+          "line": 644,
           "column": 14,
-          "position": 4686
+          "position": 4695
         },
         "endLoc": {
-          "line": 657,
+          "line": 658,
           "column": 44,
-          "position": 4799
+          "position": 4808
         }
       },
       "secondFile": {
         "name": "src/services/contentGeneratorService.ts",
-        "start": 323,
-        "end": 337,
+        "start": 324,
+        "end": 338,
         "startLoc": {
-          "line": 323,
+          "line": 324,
           "column": 14,
-          "position": 2367
+          "position": 2372
         },
         "endLoc": {
-          "line": 337,
+          "line": 338,
           "column": 45,
-          "position": 2480
+          "position": 2485
         }
       }
     },
@@ -1248,32 +1512,32 @@
       "tokens": 0,
       "firstFile": {
         "name": "src/services/contentGeneratorService.ts",
-        "start": 712,
-        "end": 728,
+        "start": 713,
+        "end": 729,
         "startLoc": {
-          "line": 712,
+          "line": 713,
           "column": 2,
-          "position": 5104
+          "position": 5113
         },
         "endLoc": {
-          "line": 728,
+          "line": 729,
           "column": 37,
-          "position": 5271
+          "position": 5280
         }
       },
       "secondFile": {
         "name": "src/services/contentGeneratorService.ts",
-        "start": 304,
-        "end": 320,
+        "start": 305,
+        "end": 321,
         "startLoc": {
-          "line": 304,
+          "line": 305,
           "column": 3,
-          "position": 2184
+          "position": 2189
         },
         "endLoc": {
-          "line": 320,
+          "line": 321,
           "column": 42,
-          "position": 2351
+          "position": 2356
         }
       }
     },
@@ -1284,32 +1548,104 @@
       "tokens": 0,
       "firstFile": {
         "name": "src/services/contentGeneratorService.ts",
-        "start": 731,
-        "end": 745,
+        "start": 732,
+        "end": 746,
         "startLoc": {
-          "line": 731,
+          "line": 732,
           "column": 2,
-          "position": 5287
+          "position": 5296
         },
         "endLoc": {
-          "line": 745,
+          "line": 746,
           "column": 42,
-          "position": 5399
+          "position": 5408
         }
       },
       "secondFile": {
         "name": "src/services/contentGeneratorService.ts",
-        "start": 323,
-        "end": 337,
+        "start": 324,
+        "end": 338,
         "startLoc": {
-          "line": 323,
+          "line": 324,
           "column": 3,
-          "position": 2368
+          "position": 2373
         },
         "endLoc": {
-          "line": 337,
+          "line": 338,
           "column": 45,
-          "position": 2480
+          "position": 2485
+        }
+      }
+    },
+    {
+      "format": "typescript",
+      "lines": 28,
+      "fragment": ";\n\nconst router = Router();\nconst contentGeneratorController = new ContentGeneratorController();\n\n/**\n * @route POST /api/content/generate\n * @desc Generate social media content for a website\n * @access Private\n */\nrouter.post(\n  '/generate',\n  requireAuth,\n  contentGeneratorController.generateSocialContent.bind(contentGeneratorController)\n);\n\n/**\n * @route POST /api/content/generate-variations\n * @desc Generate multiple content variations\n * @access Private\n */\nrouter.post(\n  '/generate-variations',\n  requireAuth,\n  contentGeneratorController.generateContentVariations.bind(contentGeneratorController)\n);\n\nexport",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src/routes/contentGeneratorRoutes.ts",
+        "start": 3,
+        "end": 30,
+        "startLoc": {
+          "line": 3,
+          "column": 31,
+          "position": 37
+        },
+        "endLoc": {
+          "line": 30,
+          "column": 7,
+          "position": 123
+        }
+      },
+      "secondFile": {
+        "name": "src/routes/contentRoutes.ts",
+        "start": 4,
+        "end": 35,
+        "startLoc": {
+          "line": 4,
+          "column": 20,
+          "position": 46
+        },
+        "endLoc": {
+          "line": 35,
+          "column": 4,
+          "position": 132
+        }
+      }
+    },
+    {
+      "format": "typescript",
+      "lines": 12,
+      "fragment": "= async (req: AuthRequest, res: Response, next: NextFunction) => {\n  try {\n    if (!req.userId) {\n      return res.status(401).json({ success: false, error: 'Neautorizovaný přístup' });\n    }\n\n    const user = await User.findById(req.userId);\n    if (!user) {\n      return res.status(404).json({ success: false, error: 'Uživatel nenalezen' });\n    }\n\n    // Kontrola souhlasu s konkrétním typem zpracování",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src/middleware/consentMiddleware.ts",
+        "start": 40,
+        "end": 51,
+        "startLoc": {
+          "line": 40,
+          "column": 2,
+          "position": 413
+        },
+        "endLoc": {
+          "line": 51,
+          "column": 51,
+          "position": 553
+        }
+      },
+      "secondFile": {
+        "name": "src/middleware/consentMiddleware.ts",
+        "start": 6,
+        "end": 17,
+        "startLoc": {
+          "line": 6,
+          "column": 2,
+          "position": 47
+        },
+        "endLoc": {
+          "line": 17,
+          "column": 41,
+          "position": 187
         }
       }
     },
@@ -1351,73 +1687,181 @@
     },
     {
       "format": "typescript",
-      "lines": 23,
-      "fragment": ";\n    const userId = req.user._id;\n    \n    const user = await User.findById(userId);\n    if (!user) {\n      return res.status(404).json({\n        success: false,\n        message: 'User not found'\n      });\n    }\n    \n    const network = user.socialNetworks.find(\n      (net: any) => net._id.toString() === networkId\n    );\n    \n    if (!network) {\n      return res.status(404).json({\n        success: false,\n        message: 'Social network not found'\n      });\n    }\n    \n    // Validace stavu sítě",
+      "lines": 13,
+      "fragment": "= async (req: Request, res: Response) => {\n  try {\n    const { networkId } = req.params;\n    const userId = req.user?._id;\n\n    if (!userId) {\n      return res.status(401).json({\n        success: false,\n        message: 'User not authenticated'\n      });\n    }\n\n    const",
       "tokens": 0,
       "firstFile": {
         "name": "src/controllers/socialNetworkController.ts",
-        "start": 433,
-        "end": 455,
+        "start": 153,
+        "end": 165,
         "startLoc": {
-          "line": 433,
-          "column": 5,
-          "position": 3598
+          "line": 153,
+          "column": 2,
+          "position": 1211
         },
         "endLoc": {
-          "line": 455,
-          "column": 23,
-          "position": 3770
+          "line": 165,
+          "column": 6,
+          "position": 1316
         }
       },
       "secondFile": {
         "name": "src/controllers/socialNetworkController.ts",
-        "start": 134,
-        "end": 156,
+        "start": 76,
+        "end": 88,
         "startLoc": {
-          "line": 134,
-          "column": 7,
-          "position": 1110
+          "line": 76,
+          "column": 2,
+          "position": 608
         },
         "endLoc": {
-          "line": 156,
-          "column": 32,
-          "position": 1278
+          "line": 88,
+          "column": 7,
+          "position": 713
         }
       }
     },
     {
       "format": "typescript",
-      "lines": 6,
-      "fragment": "users.forEach((user, index) => {\n      console.log(`\\nUživatel #${index + 1}:`);\n      console.log(`ID: ${user._id}`);\n      console.log(`Email: ${user.email}`);\n      console.log(`Plán: ${user.plan}`);\n      console.log(`Weby: ",
+      "lines": 18,
+      "fragment": "const userId = req.user?._id;\n\n    if (!userId) {\n      return res.status(401).json({\n        success: false,\n        message: 'User not authenticated'\n      });\n    }\n\n    const user = await User.findById(userId);\n    if (!user) {\n      return res.status(404).json({\n        success: false,\n        message: 'User not found'\n      });\n    }\n\n    const",
       "tokens": 0,
       "firstFile": {
-        "name": "db-check.ts",
-        "start": 26,
-        "end": 31,
+        "name": "src/controllers/socialNetworkController.ts",
+        "start": 156,
+        "end": 173,
         "startLoc": {
-          "line": 26,
+          "line": 156,
           "column": 5,
-          "position": 160
+          "position": 1254
         },
         "endLoc": {
-          "line": 31,
-          "column": 8,
-          "position": 241
+          "line": 173,
+          "column": 6,
+          "position": 1379
         }
       },
       "secondFile": {
-        "name": "direct-mongo-update.ts",
-        "start": 29,
-        "end": 34,
+        "name": "src/controllers/socialNetworkController.ts",
+        "start": 123,
+        "end": 140,
         "startLoc": {
-          "line": 29,
+          "line": 123,
           "column": 5,
-          "position": 209
+          "position": 991
         },
         "endLoc": {
-          "line": 34,
-          "column": 8,
-          "position": 290
+          "line": 140,
+          "column": 4,
+          "position": 1117
+        }
+      }
+    },
+    {
+      "format": "typescript",
+      "lines": 30,
+      "fragment": ";\n    const userId = req.user?._id;\n\n    if (!userId) {\n      return res.status(401).json({\n        success: false,\n        message: 'User not authenticated'\n      });\n    }\n    \n    const user = await User.findById(userId);\n    if (!user) {\n      return res.status(404).json({\n        success: false,\n        message: 'User not found'\n      });\n    }\n    \n    const network = user.socialNetworks.find(\n      (net: any) => net._id.toString() === networkId\n    );\n    \n    if (!network) {\n      return res.status(404).json({\n        success: false,\n        message: 'Social network not found'\n      });\n    }\n    \n    // Validace stavu sítě",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src/controllers/socialNetworkController.ts",
+        "start": 461,
+        "end": 490,
+        "startLoc": {
+          "line": 461,
+          "column": 5,
+          "position": 3786
+        },
+        "endLoc": {
+          "line": 490,
+          "column": 23,
+          "position": 4005
+        }
+      },
+      "secondFile": {
+        "name": "src/controllers/socialNetworkController.ts",
+        "start": 155,
+        "end": 184,
+        "startLoc": {
+          "line": 155,
+          "column": 7,
+          "position": 1251
+        },
+        "endLoc": {
+          "line": 184,
+          "column": 32,
+          "position": 1466
+        }
+      }
+    },
+    {
+      "format": "typescript",
+      "lines": 18,
+      "fragment": "});\n      return;\n    }\n\n    const user = await User.findById(req.userId);\n    if (!user) {\n      res.status(404).json({ success: false, error: 'Uživatel nenalezen' });\n      return;\n    }\n\n    // Ověření hesla\n    const isPasswordValid = await user.comparePassword(password);\n    if (!isPasswordValid) {\n      res.status(401).json({ success: false, error: 'Nesprávné heslo' });\n      return;\n    }\n\n    // Smazání všech souvisejících dat",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src/controllers/gdprController.ts",
+        "start": 197,
+        "end": 214,
+        "startLoc": {
+          "line": 197,
+          "column": 2,
+          "position": 2053
+        },
+        "endLoc": {
+          "line": 214,
+          "column": 35,
+          "position": 2195
+        }
+      },
+      "secondFile": {
+        "name": "src/controllers/gdprController.ts",
+        "start": 152,
+        "end": 169,
+        "startLoc": {
+          "line": 152,
+          "column": 2,
+          "position": 1603
+        },
+        "endLoc": {
+          "line": 169,
+          "column": 33,
+          "position": 1745
+        }
+      }
+    },
+    {
+      "format": "typescript",
+      "lines": 8,
+      "fragment": "= async (req: AuthRequest, res: Response) => {\n  try {\n    if (!req.userId) {\n      res.status(401).json({ success: false, error: 'Neautorizovaný přístup' });\n      return;\n    }\n\n    const user = await User.findById(req.userId).select('gdprConsent dataProcessingConsent consentGiven consentDate dataExportRequest dataDeletionRequest'",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src/controllers/gdprController.ts",
+        "start": 238,
+        "end": 245,
+        "startLoc": {
+          "line": 238,
+          "column": 2,
+          "position": 2404
+        },
+        "endLoc": {
+          "line": 245,
+          "column": 99,
+          "position": 2497
+        }
+      },
+      "secondFile": {
+        "name": "src/controllers/gdprController.ts",
+        "start": 50,
+        "end": 57,
+        "startLoc": {
+          "line": 50,
+          "column": 2,
+          "position": 446
+        },
+        "endLoc": {
+          "line": 57,
+          "column": 12,
+          "position": 539
         }
       }
     }

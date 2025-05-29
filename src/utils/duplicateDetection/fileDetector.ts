@@ -90,7 +90,7 @@ export async function detectDuplicateFiles(directory: string = process.cwd(), ig
     
     // Filtrování skupin s více než jedním souborem stejné velikosti
     const potentialDuplicates = Array.from(sizeGroups.entries())
-      .filter(([_, group]) => group.length > 1)
+      .filter(([, group]) => group.length > 1)
       .map(([size, group]) => ({ size, files: group }));
     
     // Výsledný seznam duplicitních souborů
@@ -150,7 +150,7 @@ export async function removeDuplicateFiles(directory: string = process.cwd()): P
   
   for (const duplicate of duplicates) {
     // Ponechání prvního souboru, odstranění zbytku
-    const [keep, ...remove] = duplicate.paths;
+    const [, ...remove] = duplicate.paths;
     
     for (const filePath of remove) {
       await util.promisify(fs.unlink)(filePath);

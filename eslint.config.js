@@ -26,7 +26,14 @@ module.exports = [
         __dirname: 'readonly',
         require: 'readonly',
         Buffer: 'readonly',
-        URL: 'readonly'
+        URL: 'readonly',
+        URLSearchParams: 'readonly',
+        setInterval: 'readonly',
+        clearInterval: 'readonly',
+        setTimeout: 'readonly',
+        clearTimeout: 'readonly',
+        FormData: 'readonly',
+        NodeJS: 'readonly'
       }
     },
     rules: {
@@ -57,8 +64,19 @@ module.exports = [
         Headers: 'readonly',
         fetch: 'readonly',
         setInterval: 'readonly',
+        clearInterval: 'readonly',
+        setTimeout: 'readonly',
+        clearTimeout: 'readonly',
         location: 'readonly',
-        HTMLElement: 'readonly'
+        HTMLElement: 'readonly',
+        console: 'readonly',
+        alert: 'readonly',
+        confirm: 'readonly',
+        FormData: 'readonly',
+        File: 'readonly',
+        Blob: 'readonly',
+        Event: 'readonly',
+        EventTarget: 'readonly'
       }
     }
   }

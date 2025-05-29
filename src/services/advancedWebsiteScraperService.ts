@@ -1,10 +1,9 @@
 import axios from 'axios';
 import * as cheerio from 'cheerio';
-import { logger, webLog } from '../utils/logger';
+import { webLog } from '../utils/logger';
 import { normalizeUrl } from '../utils/urlUtils';
 import { WebsiteScraperService, ScrapedContent } from './websiteScraperService';
 import { JSDOM } from 'jsdom';
-import * as path from 'path';
 import { URL } from 'url';
 import { Readability } from '@mozilla/readability';
 
@@ -112,7 +111,7 @@ export class AdvancedWebsiteScraperService {
       
       try {
         this.domainName = new URL(normalizedUrl).hostname;
-      } catch (e) {
+      } catch {
         this.domainName = '';
       }
       
@@ -305,7 +304,7 @@ export class AdvancedWebsiteScraperService {
         if (htmlLang.startsWith('cs') || htmlLang.startsWith('cz')) return 'cs';
         if (htmlLang.startsWith('en')) return 'en';
       }
-    } catch (e) {
+    } catch {
       // Ignorujeme chyby při získání HTML
     }
     
@@ -406,7 +405,7 @@ export class AdvancedWebsiteScraperService {
         if (!href.startsWith('http')) {
           try {
             fullUrl = new URL(href, this.baseUrl).href;
-          } catch (e) {
+          } catch {
             return;
           }
         }
@@ -419,7 +418,7 @@ export class AdvancedWebsiteScraperService {
           if (linkDomain === this.domainName) {
             type = 'internal';
           }
-        } catch (e) {
+        } catch {
           return;
         }
         
@@ -485,8 +484,8 @@ export class AdvancedWebsiteScraperService {
             result.products = result.products.slice(0, this.maxProductsToScrape);
             break;
           }
-        } catch (e) {
-          webLog('Chyba při scrapingu produktové stránky', { error: e, url: pageUrl });
+        } catch {
+          webLog('Chyba při scrapingu produktové stránky', { url: pageUrl });
           continue;
         }
       }
@@ -523,7 +522,7 @@ export class AdvancedWebsiteScraperService {
               }
             }
           }
-        } catch (e) {
+        } catch {
           // Ignorovat chyby parsování
         }
       });
@@ -715,8 +714,8 @@ export class AdvancedWebsiteScraperService {
               if (index !== -1) {
                 result.blogPosts[index] = { ...result.blogPosts[index], ...fullPost };
               }
-            } catch (e) {
-              webLog('Chyba při získávání plného obsahu článku', { error: e, url: postToFetch.url });
+            } catch {
+              webLog('Chyba při získávání plného obsahu článku', { url: postToFetch.url });
             }
           }
           
@@ -725,8 +724,8 @@ export class AdvancedWebsiteScraperService {
             result.blogPosts = result.blogPosts.slice(0, this.maxBlogPostsToScrape);
             break;
           }
-        } catch (e) {
-          webLog('Chyba při scrapingu blogové stránky', { error: e, url: pageUrl });
+        } catch {
+          webLog('Chyba při scrapingu blogové stránky', { url: pageUrl });
           continue;
         }
       }
@@ -767,7 +766,7 @@ export class AdvancedWebsiteScraperService {
               posts.push(post);
             }
           }
-        } catch (e) {
+        } catch {
           // Ignorovat chyby parsování
         }
       });
@@ -915,9 +914,9 @@ export class AdvancedWebsiteScraperService {
       }
       
       return {
-        content: article.content,
-        excerpt: article.excerpt || undefined,
-        title: article.title || undefined
+        content: article.content || undefined,
+        excerpt: article.excerpt || '',
+        title: article.title || ''
       };
     } catch (error) {
       webLog('Chyba při získávání plného obsahu blogového příspěvku', { error, url });
@@ -965,8 +964,8 @@ export class AdvancedWebsiteScraperService {
           // Extrahujeme sekce ze stránky
           const sections = await this.extractSections(pageUrl);
           result.sections = [...result.sections, ...sections];
-        } catch (e) {
-          webLog('Chyba při scrapingu stránky firemního webu', { error: e, url: pageUrl });
+        } catch {
+          webLog('Chyba při scrapingu stránky firemního webu', { url: pageUrl });
           continue;
         }
       }
@@ -1024,8 +1023,8 @@ export class AdvancedWebsiteScraperService {
           // Extrahujeme sekce ze stránky
           const sections = await this.extractSections(pageUrl);
           result.sections = [...result.sections, ...sections];
-        } catch (e) {
-          webLog('Chyba při scrapingu stránky generického webu', { error: e, url: pageUrl });
+        } catch {
+          webLog('Chyba při scrapingu stránky generického webu', { url: pageUrl });
           continue;
         }
       }
@@ -1070,7 +1069,7 @@ export class AdvancedWebsiteScraperService {
              (jsonLd['@type'] === 'ItemList' && jsonLd.itemListElement)) {
             count++;
           }
-        } catch (e) {
+        } catch {
           // Ignorovat chyby parsování
         }
       });
@@ -1113,7 +1112,7 @@ export class AdvancedWebsiteScraperService {
           if (jsonLd['@type'] === 'BlogPosting' || jsonLd['@type'] === 'Article') {
             count++;
           }
-        } catch (e) {
+        } catch {
           // Ignorovat chyby parsování
         }
       });
@@ -1292,7 +1291,7 @@ export class AdvancedWebsiteScraperService {
     try {
       const base = new URL(baseUrl);
       return new URL(url, base).href;
-    } catch (e) {
+    } catch {
       return url;
     }
   }

@@ -12,7 +12,6 @@ import socialNetworkRoutes from './routes/socialNetworkRoutes';
 import apiConfigRoutes from './routes/apiConfigRoutes';
 import webAnalysisRoutes from './routes/webAnalysisRoutes';
 import scheduledPostRoutes from './routes/scheduledPostRoutes';
-import contentGeneratorRoutes from './routes/contentGeneratorRoutes';
 import legalRoutes from './routes/legalRoutes';
 import gdprRoutes from './routes/gdprRoutes';
 import jwt from 'jsonwebtoken';

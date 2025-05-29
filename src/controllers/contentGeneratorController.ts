@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { SocialContentGeneratorService } from '../services/socialContentGeneratorService';
 import { logger } from '../utils/logger';
-import Content, { SocialContent } from '../models/Content';
+import Content from '../models/Content';
 
 export class ContentGeneratorController {
   private contentGenerator: SocialContentGeneratorService;
@@ -106,12 +106,14 @@ export class ContentGeneratorController {
         success: true,
         content: newContent
       });
+      return;
     } catch (error) {
       logger.error(`Error in content generation: ${error instanceof Error ? error.message : String(error)}`);
       res.status(500).json({
         success: false,
         error: 'Failed to generate content'
       });
+      return;
     }
   }
 
@@ -182,12 +184,14 @@ export class ContentGeneratorController {
         success: true,
         variations: savedVariations
       });
+      return;
     } catch (error) {
       logger.error(`Error generating content variations: ${error instanceof Error ? error.message : String(error)}`);
       res.status(500).json({
         success: false,
         error: 'Failed to generate content variations'
       });
+      return;
     }
   }
 }

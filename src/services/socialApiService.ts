@@ -3,6 +3,7 @@ import { webLog } from '../utils/logger';
 import { TokenManagerService } from './tokenManagerService';
 import crypto from 'crypto';
 import OAuth from 'oauth-1.0a';
+import FormData from 'form-data';
 
 /**
  * Služba pro volání API sociálních sítí s pokročilým error handlingem
@@ -367,18 +368,19 @@ export class SocialApiService {
                         mediaUrl.toLowerCase().endsWith('.gif') ? 'image/gif' : 
                         'image/jpeg';
       
-      // Vytvoření form data pro upload
+      // Vytvoření form data pro upload - použijeme multipart/form-data
       const formData = new FormData();
+      // V Node.js prostředí používáme buffer přímo
       formData.append('media', buffer, {
-        contentType: mediaType,
-        filename: 'media.jpg'
+        filename: 'media.jpg',
+        contentType: mediaType
       });
       
       // Upload média
       const uploadResponse = await axios.post(endpoint, formData, {
         headers: {
           ...headers,
-          ...formData.getHeaders()
+          'Content-Type': 'multipart/form-data'
         }
       });
       

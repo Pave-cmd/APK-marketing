@@ -485,7 +485,7 @@ export async function detectUnusedCode(
     // Kontrola, zda jsou nainstalované potřebné závislosti
     try {
       await execPromise('which eslint');
-    } catch (error) {
+    } catch {
       console.log('ESLint není nainstalován, instaluji...');
       await execPromise('npm install eslint @typescript-eslint/parser @typescript-eslint/eslint-plugin eslint-plugin-unused-imports @eslint/eslintrc @eslint/js --save-dev');
     }

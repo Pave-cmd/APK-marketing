@@ -42,10 +42,11 @@ router.get(
       console.log('[CONTENT-HISTORY] Getting history for user:', userId);
       
       if (!userId) {
-        return res.status(401).json({
+        res.status(401).json({
           success: false,
           error: 'User not authenticated'
         });
+        return;
       }
       
       // Use imported Content model

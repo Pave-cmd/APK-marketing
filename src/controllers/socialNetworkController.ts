@@ -9,7 +9,14 @@ import { SocialApiService } from '../services/socialApiService';
 export const addSocialNetwork = async (req: Request, res: Response) => {
   try {
     const { platform, accountId, profileUrl } = req.body;
-    const userId = req.user._id;
+    const userId = req.user?._id;
+
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        message: 'User not authenticated'
+      });
+    }
 
     if (!platform || !accountId || !profileUrl) {
       return res.status(400).json({
@@ -69,7 +76,14 @@ export const addSocialNetwork = async (req: Request, res: Response) => {
 export const removeSocialNetwork = async (req: Request, res: Response) => {
   try {
     const { networkId } = req.params;
-    const userId = req.user._id;
+    const userId = req.user?._id;
+
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        message: 'User not authenticated'
+      });
+    }
 
     webLog(`Removing social network ${networkId} for user ${userId}`);
 
@@ -106,7 +120,14 @@ export const removeSocialNetwork = async (req: Request, res: Response) => {
 
 export const getSocialNetworks = async (req: Request, res: Response) => {
   try {
-    const userId = req.user._id;
+    const userId = req.user?._id;
+
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        message: 'User not authenticated'
+      });
+    }
     
     const user = await User.findById(userId);
     if (!user) {
@@ -132,7 +153,14 @@ export const getSocialNetworks = async (req: Request, res: Response) => {
 export const authenticateSocialNetwork = async (req: Request, res: Response) => {
   try {
     const { networkId } = req.params;
-    const userId = req.user._id;
+    const userId = req.user?._id;
+
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        message: 'User not authenticated'
+      });
+    }
 
     const user = await User.findById(userId);
     if (!user) {
@@ -431,7 +459,14 @@ export const publishToSocialNetwork = async (req: Request, res: Response) => {
   try {
     const { networkId } = req.params;
     const { content, imageUrl, link } = req.body;
-    const userId = req.user._id;
+    const userId = req.user?._id;
+
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        message: 'User not authenticated'
+      });
+    }
     
     const user = await User.findById(userId);
     if (!user) {

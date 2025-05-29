@@ -101,7 +101,7 @@ function initWebsiteManager() {
         throw new Error('Nepodařilo se načíst seznam webů (HTTP ' + response.status + ')');
       }
       
-      return response.json().catch(err => {
+      return response.json().catch(() => {
         throw new Error('Server vrátil neplatná data. Zkuste to znovu později.');
       });
     })
@@ -209,7 +209,8 @@ function initWebsiteManager() {
           </td>
           <td>${currentDate}</td>
           <td><span class="badge bg-success">Aktivní</span></td>
-          <td id="analysis-status-${btoa(url)}" class="analysis-status">
+          <td id="analysis-status-${/* eslint-disable-next-line no-undef */
+            btoa(url)}" class="analysis-status">
             <span class="text-muted">Načítání...</span>
           </td>
           <td>
@@ -254,7 +255,8 @@ function initWebsiteManager() {
     console.log('[WEBSITES] Spouštím analýzu webu:', websiteUrl);
     
     // Aktualizace UI
-    const statusCellId = `analysis-status-${btoa(websiteUrl)}`;
+    const statusCellId = `analysis-status-${/* eslint-disable-next-line no-undef */
+      btoa(websiteUrl)}`;
     const statusCell = document.getElementById(statusCellId);
     
     if (statusCell) {
@@ -306,7 +308,8 @@ function initWebsiteManager() {
   
   // Funkce pro načtení stavu analýzy
   function loadAnalysisStatus(websiteUrl) {
-    const statusCellId = `analysis-status-${btoa(websiteUrl)}`;
+    const statusCellId = `analysis-status-${/* eslint-disable-next-line no-undef */
+      btoa(websiteUrl)}`;
     const statusCell = document.getElementById(statusCellId);
     
     if (!statusCell) return;
@@ -349,10 +352,11 @@ function initWebsiteManager() {
           case 'publishing':
             statusHtml = '<span class="badge bg-primary"><i class="fas fa-spinner fa-spin me-1"></i>Publikace</span>';
             break;
-          case 'completed':
+          case 'completed': {
             const lastScan = analysis.lastScan ? new Date(analysis.lastScan).toLocaleDateString('cs-CZ') : 'N/A';
             statusHtml = `<span class="text-success">Dokončeno ${lastScan}</span>`;
             break;
+          }
           case 'failed':
             statusHtml = '<span class="badge bg-danger">Selhalo</span>';
             break;
@@ -457,8 +461,9 @@ function initWebsiteManager() {
       }
       
       try {
+        /* eslint-disable-next-line no-undef */
         new URL(url); // Kontrola formátu URL
-      } catch (e) {
+      } catch {
         showModalAlert('Zadejte platnou URL webové stránky', 'danger');
         return;
       }
@@ -487,7 +492,7 @@ function initWebsiteManager() {
           console.log('[WEBSITES] Surová odpověď:', text);
           try {
             return JSON.parse(text);
-          } catch (e) {
+          } catch {
             throw new Error(`Neplatná odpověď ze serveru: ${text}`);
           }
         });
@@ -530,8 +535,8 @@ function initWebsiteManager() {
           try {
             const closeButton = document.querySelector('#addWebsiteModal .btn-close');
             if (closeButton) closeButton.click();
-          } catch (e) {
-            console.error('[WEBSITES] Chyba při zavírání modálu:', e);
+          } catch (_e) {
+            console.error('[WEBSITES] Chyba při zavírání modálu:', _e);
           }
         } else {
           // Chyba
@@ -623,8 +628,8 @@ function initWebsiteManager() {
         try {
           const closeButton = document.querySelector('#removeWebsiteModal .btn-close');
           if (closeButton) closeButton.click();
-        } catch (e) {
-          console.error('[WEBSITES] Chyba při zavírání modálu:', e);
+        } catch (_e) {
+          console.error('[WEBSITES] Chyba při zavírání modálu:', _e);
         }
         
         if (data.success) {
@@ -644,8 +649,8 @@ function initWebsiteManager() {
         try {
           const closeButton = document.querySelector('#removeWebsiteModal .btn-close');
           if (closeButton) closeButton.click();
-        } catch (e) {
-          console.error('[WEBSITES] Chyba při zavírání modálu:', e);
+        } catch (_e) {
+          console.error('[WEBSITES] Chyba při zavírání modálu:', _e);
         }
         
         displayAlert('Chyba při komunikaci se serverem', 'danger');
@@ -709,7 +714,7 @@ function initWebsiteManager() {
             if (data.success) {
                 setTimeout(loadWebsites, 1000);
             }
-        } catch (e) {
+        } catch {
             addTestMessage("Nelze parsovat odpověď jako JSON: " + text, true);
         }
     })
@@ -746,14 +751,8 @@ function initWebsiteManager() {
   console.log('[WEBSITES] Inicializace dokončena');
 }
 
-// Funkce pro spuštění analýzy webu (globální pro onclick)
-function startWebsiteAnalysis(websiteUrl) {
-  if (typeof startAnalysis === 'function') {
-    startAnalysis(websiteUrl);
-  } else {
-    console.error('[WEBSITES] Funkce startAnalysis není definována');
-  }
-}
+// Expose functions globally for HTML onclick handlers
+window.initWebsiteManager = initWebsiteManager;
 
 // Volání inicializace
 if (document.readyState === 'loading') {

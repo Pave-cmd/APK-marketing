@@ -282,7 +282,10 @@ class CookieConsent {
         document.head.appendChild(script);
 
         window.dataLayer = window.dataLayer || [];
-        function gtag() { dataLayer.push(arguments); }
+        function gtag() { 
+            /* eslint-disable-next-line no-undef */
+            dataLayer.push(arguments); 
+        }
         window.gtag = gtag;
         gtag('js', new Date());
         gtag('config', 'GA_MEASUREMENT_ID');
@@ -309,6 +312,8 @@ let cookieConsent;
 
 document.addEventListener('DOMContentLoaded', function() {
     cookieConsent = new CookieConsent();
+    // Expose globally for onclick handlers in HTML
+    window.cookieConsent = cookieConsent;
 });
 
 // Globální funkce pro přístup z jiných skriptů

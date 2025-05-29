@@ -1,4 +1,4 @@
-import { logger, webLog } from '../utils/logger';
+import { webLog } from '../utils/logger';
 import ScheduledPost, { IScheduledPost } from '../models/ScheduledPost';
 import User from '../models/User';
 import { SocialApiService } from './socialApiService';
@@ -530,7 +530,7 @@ export class ScheduledPostService {
       
       for (const post of posts) {
         try {
-          await this.publishScheduledPost(post._id.toString());
+          await this.publishScheduledPost(String(post._id));
         } catch (error) {
           webLog(`Chyba při publikaci naplánovaného příspěvku ${post._id}`, { error });
           // Chyby už jsou zaznamenány v publishScheduledPost
@@ -608,7 +608,8 @@ export class ScheduledPostService {
    */
   public calculateBestTimeToPost(
     platform: string,
-    timezone: string = 'Europe/Prague'
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    _timezone: string = 'Europe/Prague'
   ): Date {
     // Optimální časy publikace podle platformy
     const bestTimes: Record<string, { hour: number, minute: number }[]> = {

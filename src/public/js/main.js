@@ -159,7 +159,7 @@ function initializeScrollSpy() {
             return;
         }
 
-        const scrollSpy = new bootstrap.ScrollSpy(document.body, {
+        new bootstrap.ScrollSpy(document.body, {
             target: '#navbarMain'
         });
     } catch (error) {
@@ -242,3 +242,7 @@ function setActiveTab(element) {
     // Přidání aktivní třídy na vybraný prvek
     element.classList.add('active');
 }
+
+// Expose functions globally for HTML onclick handlers
+window.toggleMobileMenu = toggleMobileMenu;
+window.setActiveTab = setActiveTab;
